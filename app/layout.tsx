@@ -11,8 +11,16 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "React Next.js Boilerplate",
-  description: "A modern Next.js boilerplate with React 19, TypeScript, and Tailwind CSS",
+  title: "LearnReact - Learn React with interactive tutorials and quizzes",
+  description: "A comprehensive guide to React hooks and best practices with interactive tutorials and quizzes by Crestace. Learn React with interactive tutorials and quizzes",
+  keywords: ["React", "React hooks", "React tutorials", "React quizzes", "React best practices", "React examples", "React tutorials", "React quizzes", "React best practices", "React examples"],
+  authors: [{ name: "Crestace", url: "https://crestace.com" }],
+  creator: "Crestace",
+  publisher: "Crestace",
+  openGraph: {
+    title: "LearnReact - Learn React with interactive tutorials and quizzes",
+    description: "A comprehensive guide to React hooks and best practices with interactive tutorials and quizzes by Crestace. Learn React with interactive tutorials and quizzes",
+  },
 };
 
 export default function RootLayout({
