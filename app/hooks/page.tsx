@@ -15,9 +15,11 @@ import { UseIdExample } from "@/components/examples/UseIdExample";
 import { UseTransitionExample } from "@/components/examples/UseTransitionExample";
 import { UseFormStatusExample } from "@/components/examples/UseFormStatusExample";
 import { UseSyncExternalStoreExample } from "@/components/examples/UseSyncExternalStoreExample";
+import { UseDeferredValueExample } from "@/components/examples/UseDeferredValueExample";
+import { UseInsertionEffectExample } from "@/components/examples/UseInsertionEffectExample";
 import { Button } from "@/components/ui/Button";
 
-export default function HomePage() {
+export default function Hooks() {
   return (
     <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-4xl">
@@ -73,6 +75,7 @@ export default function HomePage() {
             <div className="space-y-8">
               <UseCallbackExample />
               <UseMemoExample />
+              <UseDeferredValueExample />
               <UseLayoutEffectExample />
             </div>
           </section>
@@ -91,6 +94,7 @@ export default function HomePage() {
             <h2 className="mb-4 text-2xl font-semibold">Advanced Hooks</h2>
             <div className="space-y-8">
               <UseSyncExternalStoreExample />
+              <UseInsertionEffectExample />
             </div>
           </section>
         </div>

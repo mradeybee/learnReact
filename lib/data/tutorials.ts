@@ -10857,18 +10857,1995 @@ new PerformanceChecklist().runChecks();`,
     title: "Design Systems and Component Libraries",
     description: "Build comprehensive design systems, component libraries, and documentation systems used by large engineering organizations.",
     level: "staff",
-    estimatedTime: "160 min",
-    topics: ["Design Systems", "Component APIs", "Documentation", "Accessibility"],
+    estimatedTime: "240 min",
+    topics: ["Design Systems", "Component APIs", "Documentation", "Accessibility", "Design Tokens", "Component Architecture", "Storybook", "Testing"],
     prerequisites: ["Performance Optimization at Enterprise Scale"],
     content: {
-      overview: "Design systems ensure consistency across products. Staff engineers lead the creation of design systems that serve entire organizations.",
+      overview: "Design systems are the foundation of consistent, scalable product experiences across large organizations. As a Staff Engineer, you'll lead the creation of design systems that serve multiple teams, products, and platforms. This tutorial covers the complete lifecycle of building a design system: from foundational design tokens and component architecture to documentation, testing strategies, accessibility compliance, and organizational adoption. You'll learn how to make architectural decisions that balance flexibility with consistency, create developer-friendly APIs, establish governance models, and ensure long-term maintainability. This knowledge is essential for leading design system initiatives that scale across hundreds of developers and multiple product lines.",
       sections: [
         {
-          title: "Design System Architecture",
-          content: "A design system includes components, tokens, patterns, and documentation. It serves both designers and developers."
+          title: "Lesson 1: Understanding Design System Fundamentals",
+          content: "Design systems are comprehensive collections of reusable components, design patterns, style guidelines, and tools that ensure consistency across products. At a Staff Engineer level, you need to understand the full scope and strategic importance of design systems.\n\nWhat is a Design System?\n• Collection of reusable components and patterns\n• Design tokens (colors, spacing, typography, etc.)\n• Style guides and documentation\n• Tools and workflows for designers and developers\n• Governance and contribution models\n\nComponents of a Design System:\n• Design Tokens: Atomic design values (colors, spacing, typography)\n• Components: Reusable UI building blocks\n• Patterns: Combinations of components for common use cases\n• Documentation: Guidelines, examples, and API references\n• Tools: Design tools, code generators, testing frameworks\n\nStrategic Benefits:\n• Consistency across products and teams\n• Faster development velocity\n• Improved accessibility by default\n• Easier maintenance and updates\n• Brand consistency at scale\n\nCommon Design System Examples:\n• Material Design (Google)\n• Carbon Design System (IBM)\n• Ant Design (Ant Financial)\n• Chakra UI\n• MUI (Material-UI)\n• Polaris (Shopify)",
+          codeExample: {
+            code: `// Design System Structure Example
+// A well-architected design system has clear layers:
+
+// Layer 1: Design Tokens (Foundation)
+// tokens/colors.ts
+export const colors = {
+  primary: {
+    50: '#f0f9ff',
+    100: '#e0f2fe',
+    // ... more shades
+    900: '#0c4a6e',
+  },
+  semantic: {
+    success: '#10b981',
+    error: '#ef4444',
+    warning: '#f59e0b',
+    info: '#3b82f6',
+  },
+};
+
+// tokens/spacing.ts
+export const spacing = {
+  xs: '0.25rem',  // 4px
+  sm: '0.5rem',   // 8px
+  md: '1rem',     // 16px
+  lg: '1.5rem',   // 24px
+  xl: '2rem',     // 32px
+};
+
+// Layer 2: Primitive Components
+// components/Button/Button.tsx
+import { ButtonHTMLAttributes } from 'react';
+import { colors, spacing } from '../../tokens';
+
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
+  isLoading?: boolean;
+}
+
+export function Button({
+  variant = 'primary',
+  size = 'md',
+  isLoading,
+  children,
+  ...props
+}: ButtonProps) {
+  return (
+    <button
+      className={getButtonClasses(variant, size)}
+      disabled={isLoading || props.disabled}
+      {...props}
+    >
+      {isLoading ? <Spinner /> : children}
+    </button>
+  );
+}
+
+// Layer 3: Composite Components
+// components/Form/FormField.tsx
+import { Button } from '../Button';
+import { Input } from '../Input';
+import { Label } from '../Label';
+
+export function FormField({ label, error, ...inputProps }) {
+  return (
+    <div className="form-field">
+      <Label htmlFor={inputProps.id}>{label}</Label>
+      <Input {...inputProps} aria-invalid={!!error} />
+      {error && <ErrorMessage>{error}</ErrorMessage>}
+    </div>
+  );
+}`,
+            explanation: "Design systems are built in layers: tokens (foundation), primitives (basic components), composites (combined components), and patterns (page-level compositions). Each layer builds upon the previous one, ensuring consistency and reusability."
+          }
+        },
+        {
+          title: "Lesson 2: Design Tokens Architecture",
+          content: "Design tokens are the atomic design values that define your design language. They're the foundation upon which all components are built. A well-structured token system enables theming, maintains consistency, and allows for easy design updates.\n\nTypes of Design Tokens:\n• Color tokens (palette, semantic colors)\n• Spacing tokens (consistent spacing scale)\n• Typography tokens (font families, sizes, weights)\n• Shadow tokens (elevation system)\n• Border radius tokens\n• Animation/transition tokens\n• Breakpoint tokens (responsive design)\n\nToken Categories:\n• Base tokens: Raw values (colors, numbers)\n• Semantic tokens: Named by purpose (primary, danger, success)\n• Component tokens: Specific to components\n\nToken Formats:\n• CSS custom properties (CSS variables)\n• JSON/YAML files\n• TypeScript/JavaScript objects\n• Style dictionary format\n\nToken Distribution:\n• Design tools (Figma, Sketch)\n• Code (CSS, JavaScript, TypeScript)\n• Documentation\n• Style guides",
+          codeExample: {
+            code: `// tokens/index.ts - Complete token system
+export const tokens = {
+  // Color System
+  color: {
+    semantic: {
+      primary: {
+        base: 'var(--color-blue-600)',
+        hover: 'var(--color-blue-700)',
+        active: 'var(--color-blue-800)',
+        disabled: 'var(--color-gray-300)',
+      },
+      success: {
+        base: 'var(--color-green-600)',
+        light: 'var(--color-green-100)',
+        dark: 'var(--color-green-800)',
+      },
+    },
+    background: {
+      primary: 'var(--color-white)',
+      secondary: 'var(--color-gray-50)',
+      tertiary: 'var(--color-gray-100)',
+    },
+  },
+  
+  // Spacing System
+  spacing: {
+    scale: {
+      0: '0',
+      1: '0.25rem',  // 4px
+      2: '0.5rem',   // 8px
+      4: '1rem',     // 16px
+      6: '1.5rem',   // 24px
+      8: '2rem',     // 32px
+    },
+  },
+  
+  // Typography System
+  typography: {
+    fontFamily: {
+      sans: ['Inter', 'system-ui', 'sans-serif'].join(', '),
+      mono: ['Fira Code', 'Monaco', 'monospace'].join(', '),
+    },
+    fontSize: {
+      xs: { value: '0.75rem', lineHeight: '1rem' },
+      sm: { value: '0.875rem', lineHeight: '1.25rem' },
+      base: { value: '1rem', lineHeight: '1.5rem' },
+    },
+  },
+};`,
+            explanation: "Design tokens provide a single source of truth for design values. They're organized by category (color, spacing, typography, etc.) and can be semantic (purpose-based) or base (raw values). CSS variables enable runtime theming while TypeScript provides type safety."
+          }
+        },
+        {
+          title: "Lesson 3: Component Architecture and API Design",
+          content: "Component architecture is the backbone of your design system. Well-designed components are composable, flexible, accessible, and maintainable. Staff engineers make critical architectural decisions about component APIs, composition patterns, and extensibility.\n\nComponent Design Principles:\n• Single Responsibility: Each component has one clear purpose\n• Composition over Configuration: Prefer composition for flexibility\n• Accessibility First: Built-in a11y support\n• Progressive Enhancement: Works without JavaScript\n• Polymorphic Components: Same component, different HTML elements\n• Controlled vs Uncontrolled: Support both patterns\n\nComponent API Patterns:\n• Compound Components: Related components work together\n• Render Props: Flexible rendering control\n• Slots/Children: Flexible content placement\n• Variant System: Consistent styling options\n• Size System: Consistent sizing scale",
+          codeExample: {
+            code: `// Well-architected component example
+import { forwardRef } from 'react';
+import { cn } from '../../utils';
+
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
+  isLoading?: boolean;
+}
+
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ variant = 'primary', size = 'md', isLoading, children, ...props }, ref) => {
+    return (
+      <button
+        ref={ref}
+        disabled={isLoading || props.disabled}
+        className={cn(/* styles */)}
+        {...props}
+      >
+        {isLoading ? <Spinner /> : children}
+      </button>
+    );
+  }
+);`,
+            explanation: "Well-architected components use forwardRef for ref forwarding, TypeScript for type safety, variant systems for styling, and composition patterns for flexibility. Compound components allow related components to share context while maintaining a clean API."
+          }
+        },
+        {
+          title: "Lesson 4: Accessibility (a11y) in Design Systems",
+          content: "Accessibility is not optional - it's a requirement. A design system must ensure all components are accessible by default. Staff engineers establish accessibility standards and ensure they're enforced throughout the system.\n\nWCAG Guidelines:\n• Perceivable: Information must be presentable to users\n• Operable: Interface components must be operable\n• Understandable: Information must be understandable\n• Robust: Content must be robust enough for assistive technologies\n\nAccessibility Requirements:\n• Keyboard navigation support\n• Screen reader support (ARIA labels, roles)\n• Focus management\n• Color contrast (WCAG AA minimum)\n• Touch target sizes (minimum 44x44px)\n• Form label associations\n• Error messaging",
+          codeExample: {
+            code: `// Accessible Modal Component
+export function Modal({ isOpen, onClose, title, children }: ModalProps) {
+  const modalRef = useRef<HTMLDivElement>(null);
+  
+  // Trap focus within modal
+  useEffect(() => {
+    if (isOpen) {
+      const firstFocusable = modalRef.current?.querySelector(
+        'button, [href], input, select, textarea'
+      ) as HTMLElement;
+      firstFocusable?.focus();
+      
+      const handleEscape = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') onClose();
+      };
+      document.addEventListener('keydown', handleEscape);
+      
+      return () => document.removeEventListener('keydown', handleEscape);
+    }
+  }, [isOpen, onClose]);
+  
+  if (!isOpen) return null;
+  
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+      ref={modalRef}
+    >
+      <h2 id="modal-title">{title}</h2>
+      {children}
+    </div>
+  );
+}`,
+            explanation: "Accessibility must be built into every component. Use proper ARIA attributes, manage focus, trap focus in modals, support keyboard navigation, provide screen reader announcements, and test with automated and manual methods."
+          }
+        },
+        {
+          title: "Lesson 5: Component Documentation and Storybook",
+          content: "Documentation is crucial for design system adoption. Well-documented components reduce onboarding time, improve consistency, and increase developer productivity. Storybook has become the standard tool for component documentation.\n\nDocumentation Requirements:\n• Component API documentation (props, types)\n• Usage examples (basic, advanced)\n• Design guidelines (when to use, when not to use)\n• Accessibility information\n• Design specs (from design tools)\n• Code examples (copy-paste ready)\n\nStorybook Setup:\n• Installation and configuration\n• Addons (controls, actions, accessibility, viewport)\n• Story organization\n• Documentation pages\n• Design tokens integration\n• Automated visual regression testing",
+          codeExample: {
+            code: `// Button.stories.tsx
+import type { Meta, StoryObj } from '@storybook/react';
+import { Button } from './Button';
+
+const meta: Meta<typeof Button> = {
+  title: 'Components/Button',
+  component: Button,
+  tags: ['autodocs'],
+};
+
+export default meta;
+type Story = StoryObj<typeof Button>;
+
+export const Default: Story = {
+  args: {
+    children: 'Button',
+    variant: 'primary',
+    size: 'md',
+  },
+};
+
+export const Variants: Story = {
+  render: () => (
+    <div className="flex gap-4">
+      <Button variant="primary">Primary</Button>
+      <Button variant="secondary">Secondary</Button>
+      <Button variant="outline">Outline</Button>
+    </div>
+  ),
+};`,
+            explanation: "Storybook provides interactive documentation for components. Stories showcase different variants, states, and use cases. Well-documented components with comprehensive stories reduce onboarding time and improve consistency."
+          }
+        },
+        {
+          title: "Lesson 6: Testing Strategies for Design Systems",
+          content: "Design systems require comprehensive testing to ensure quality, consistency, and prevent regressions. Multiple testing strategies work together to catch issues at different levels.\n\nTesting Layers:\n• Unit Tests: Component logic and behavior\n• Integration Tests: Component interactions\n• Visual Regression Tests: Screenshot comparisons\n• Accessibility Tests: A11y compliance\n• E2E Tests: User workflows\n• Performance Tests: Bundle size, render performance\n\nTesting Tools:\n• Jest + React Testing Library: Unit/integration tests\n• Chromatic/Percy: Visual regression testing\n• axe-core: Accessibility testing\n• Lighthouse CI: Performance testing\n• Playwright/Cypress: E2E testing",
+          codeExample: {
+            code: `// Button.test.tsx
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { Button } from './Button';
+
+describe('Button', () => {
+  it('renders children correctly', () => {
+    render(<Button>Click me</Button>);
+    expect(screen.getByRole('button', { name: /click me/i })).toBeInTheDocument();
+  });
+  
+  it('calls onClick when clicked', async () => {
+    const handleClick = jest.fn();
+    render(<Button onClick={handleClick}>Click me</Button>);
+    
+    await userEvent.click(screen.getByRole('button'));
+    expect(handleClick).toHaveBeenCalledTimes(1);
+  });
+  
+  it('has no accessibility violations', async () => {
+    const { container } = render(<Button>Click me</Button>);
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+});`,
+            explanation: "Comprehensive testing ensures design system quality. Unit tests verify behavior, integration tests check interactions, visual regression tests catch styling bugs, accessibility tests ensure a11y compliance, and performance tests maintain speed."
+          }
+        },
+        {
+          title: "Lesson 7: Versioning, Distribution, and Package Management",
+          content: "Design systems need proper versioning and distribution strategies. Staff engineers establish processes for versioning, publishing, and managing breaking changes across multiple consuming applications.\n\nSemantic Versioning:\n• MAJOR: Breaking changes\n• MINOR: New features (backward compatible)\n• PATCH: Bug fixes (backward compatible)\n\nDistribution Methods:\n• npm package: Most common\n• Monorepo packages: Internal distribution\n• CDN: For non-bundled scenarios\n• Private registries: Enterprise packages\n\nBreaking Change Strategy:\n• Deprecation warnings before removal\n• Migration guides\n• Codemods for automated migration\n• Support multiple versions during transition",
+          codeExample: {
+            code: `// package.json - Design System Package Configuration
+{
+  "name": "@company/design-system",
+  "version": "2.0.0",
+  "main": "./dist/index.js",
+  "module": "./dist/index.esm.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./styles": "./dist/styles.css"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  }
+}`,
+            explanation: "Proper versioning and distribution are crucial for design systems. Use semantic versioning, provide clear migration guides, include deprecation warnings before breaking changes, offer codemods for automated migration, and structure packages for optimal tree-shaking."
+          }
+        },
+        {
+          title: "Lesson 8: Governance, Contribution, and Adoption",
+          content: "Design systems succeed or fail based on organizational adoption. Staff engineers establish governance models, contribution processes, and adoption strategies that ensure the system serves the entire organization.\n\nGovernance Model:\n• Design System Team: Core maintainers\n• Design System Council: Cross-functional leadership\n• Working Groups: Domain experts\n• Contributors: Community contributors\n\nContribution Process:\n• RFC (Request for Comments) process\n• Design review workflow\n• Code review standards\n• Testing requirements\n• Documentation requirements\n\nAdoption Strategy:\n• Pilot programs with early adopters\n• Training and onboarding\n• Migration support\n• Success metrics\n• Feedback loops\n\nSuccess Metrics:\n• Adoption rate across teams\n• Component usage statistics\n• Time to implement features\n• Design consistency scores\n• Developer satisfaction\n• Bug reports and support tickets",
+          codeExample: {
+            code: `// Contribution workflow example
+
+// 1. RFC Process
+// RFCs document proposed changes for review
+
+// 2. Component Contribution Template
+// CONTRIBUTING.md provides checklist:
+// - Design review completed
+// - TypeScript types defined
+// - Unit tests written (80%+ coverage)
+// - Accessibility tests pass
+// - Storybook stories created
+// - Documentation complete
+
+// 3. Adoption tracking
+export function trackComponentUsage(componentName: string) {
+  window.analytics?.track('Design System: Component Used', {
+    component: componentName,
+    version: getDesignSystemVersion(),
+  });
+}`,
+            explanation: "Governance, contribution processes, and adoption strategies are critical for design system success. Establish clear contribution workflows, track adoption metrics, provide feedback mechanisms, support migrations, and maintain transparent communication."
+          }
         }
       ],
-      conclusion: "Design systems are long-term investments. Plan for extensibility and maintainability from the start."
+      conclusion: "Building a design system is a long-term investment that requires careful architecture, comprehensive documentation, rigorous testing, and organizational commitment. As a Staff Engineer, you balance technical excellence with practical adoption, ensuring the system scales across teams while maintaining quality and consistency. Focus on developer experience, accessibility by default, clear documentation, and robust governance. Remember: a design system is only as successful as its adoption and the value it provides to teams building products. Plan for extensibility, maintainability, and evolution from the start, and you'll create a foundation that serves your organization for years to come."
+    }
+  },
+  
+  // TYPESCRIPT TUTORIALS
+  {
+    id: "beginner-5",
+    title: "TypeScript Basics for React Developers",
+    description: "Learn TypeScript fundamentals specifically for React development. Understand type annotations, interfaces, and how to add type safety to your React components.",
+    level: "beginner",
+    estimatedTime: "60 min",
+    topics: ["TypeScript Basics", "Type Annotations", "Interfaces", "React with TypeScript", "Props Typing"],
+    prerequisites: ["Introduction to React: Your First Component", "Basic JavaScript knowledge"],
+    content: {
+      overview: "TypeScript is JavaScript with type safety. It adds static typing to help catch errors during development, provides better IDE support, and makes your code more maintainable. This tutorial covers TypeScript fundamentals specifically for React developers. You'll learn how to type React components, props, state, and events. TypeScript helps prevent bugs, improves developer experience with autocomplete, and makes refactoring safer and easier.",
+      sections: [
+        {
+          title: "Lesson 1: What is TypeScript and Why Use It?",
+          content: "TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. It adds static type checking to catch errors before runtime.\n\nBenefits of TypeScript:\n• Catch errors during development, not in production\n• Better IDE support (autocomplete, refactoring)\n• Self-documenting code (types serve as documentation)\n• Easier refactoring (confidence when changing code)\n• Better collaboration (clear contracts between components)\n\nTypeScript vs JavaScript:\n• JavaScript: Dynamic typing (types checked at runtime)\n• TypeScript: Static typing (types checked at compile time)\n• All valid JavaScript is valid TypeScript\n• TypeScript compiles to JavaScript\n\nGetting Started:\n• Install TypeScript: `npm install -D typescript @types/react @types/react-dom`\n• Create tsconfig.json\n• Rename .js files to .tsx for React components\n• Start adding types gradually",
+          codeExample: {
+            code: `// JavaScript (no types)
+function greet(name) {
+  return "Hello, " + name;
+}
+
+greet(42); // Works but wrong! Should be string
+
+// TypeScript (with types)
+function greet(name: string): string {
+  return "Hello, " + name;
+}
+
+greet(42); // Error: Argument of type 'number' is not assignable to parameter of type 'string'
+
+// React Component with TypeScript
+interface ButtonProps {
+  label: string;
+  onClick: () => void;
+  disabled?: boolean; // Optional prop
+}
+
+function Button({ label, onClick, disabled = false }: ButtonProps) {
+  return (
+    <button onClick={onClick} disabled={disabled}>
+      {label}
+    </button>
+  );
+}
+
+// TypeScript catches errors
+<Button label="Click me" onClick={() => {}} /> // ✅ Correct
+<Button label={123} onClick={() => {}} /> // ❌ Error: label must be string
+<Button /> // ❌ Error: label and onClick are required`,
+            explanation: "TypeScript adds type annotations to catch errors before runtime. In React, you type props using interfaces. Optional props use '?' and can have default values."
+          }
+        },
+        {
+          title: "Lesson 2: Basic TypeScript Types",
+          content: "TypeScript provides several built-in types. Understanding these is fundamental to using TypeScript effectively.\n\nPrimitive Types:\n• string: Text data\n• number: Numbers (both integers and floats)\n• boolean: true or false\n• null: Explicitly null\n• undefined: Not defined\n• symbol: Unique identifier\n\nType Annotations:\n• Explicit typing: `let name: string = 'John'`\n• Type inference: `let name = 'John'` (TypeScript infers string)\n• Union types: `string | number` (can be either)\n• Arrays: `string[]` or `Array<string>`\n• Objects: Define structure with interfaces\n\nAny and Unknown:\n• any: Disables type checking (use sparingly)\n• unknown: Type-safe version of any\n\nVoid and Never:\n• void: No return value (functions that don't return)\n• never: Function that never returns (throws error or infinite loop)",
+          codeExample: {
+            code: `// Primitive types
+let name: string = "Alice";
+let age: number = 30;
+let isActive: boolean = true;
+let data: null = null;
+let value: undefined = undefined;
+
+// Type inference (TypeScript guesses the type)
+let city = "New York"; // TypeScript knows this is string
+// city = 123; // Error: can't assign number to string
+
+// Union types (can be multiple types)
+let id: string | number = "abc123";
+id = 12345; // Also valid
+
+// Arrays
+let fruits: string[] = ["apple", "banana", "orange"];
+let numbers: Array<number> = [1, 2, 3, 4, 5];
+
+// Objects with interface
+interface User {
+  name: string;
+  age: number;
+  email?: string; // Optional property
+}
+
+let user: User = {
+  name: "John",
+  age: 25,
+  // email is optional, so we can omit it
+};
+
+// Functions
+function add(a: number, b: number): number {
+  return a + b;
+}
+
+function logMessage(message: string): void {
+  console.log(message);
+  // No return value
+}
+
+function throwError(message: string): never {
+  throw new Error(message);
+  // Never returns (always throws)`,
+            explanation: "TypeScript has many built-in types. Use type annotations explicitly or let TypeScript infer types. Union types allow multiple types. Interfaces define object shapes."
+          }
+        },
+        {
+          title: "Lesson 3: Typing React Components",
+          content: "React components in TypeScript need proper typing for props, state, and events. This is where TypeScript shines in React development.\n\nComponent Types:\n• Function components: Most common\n• Props interfaces: Define component props\n• Event handlers: Type React events\n• State: Use useState with types\n\nCommon Patterns:\n• Interface for props\n• Generic types for flexible components\n• Event handler types\n• Children prop typing\n• Ref typing",
+          codeExample: {
+            code: `// Typing Function Components
+
+// Props interface
+interface CardProps {
+  title: string;
+  description?: string;
+  children?: React.ReactNode;
+  onClick?: () => void;
+}
+
+function Card({ title, description, children, onClick }: CardProps) {
+  return (
+    <div onClick={onClick}>
+      <h2>{title}</h2>
+      {description && <p>{description}</p>}
+      {children}
+    </div>
+  );
+}
+
+// Typing state
+function Counter() {
+  const [count, setCount] = useState<number>(0);
+  //                  ^^^^^ Explicit type (optional but good practice)
+  
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={() => setCount(count + 1)}>+</button>
+    </div>
+  );
+}
+
+// Typing event handlers
+function Form() {
+  const [email, setEmail] = useState<string>("");
+  
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+  };
+  
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log(email);
+  };
+  
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="email"
+        value={email}
+        onChange={handleChange}
+      />
+      <button type="submit">Submit</button>
+    </form>
+  );
+}
+
+// Typing children
+interface LayoutProps {
+  children: React.ReactNode; // Can be any valid React child
+}
+
+function Layout({ children }: LayoutProps) {
+  return <div className="layout">{children}</div>;
+}
+
+// Typing refs
+function InputWithRef() {
+  const inputRef = useRef<HTMLInputElement>(null);
+  
+  const focusInput = () => {
+    inputRef.current?.focus(); // Optional chaining for safety
+  };
+  
+  return (
+    <div>
+      <input ref={inputRef} type="text" />
+      <button onClick={focusInput}>Focus Input</button>
+    </div>
+  );
+}`,
+            explanation: "Type React components with interfaces for props. Type state with useState generics. Type events with React event types. Use React.ReactNode for children. Type refs with the HTML element type."
+          }
+        },
+        {
+          title: "Lesson 4: Common React TypeScript Patterns",
+          content: "Learn common patterns for typing React features in TypeScript.\n\nPatterns Covered:\n• Optional props\n• Default props\n• Event handlers\n• Conditional rendering types\n• Form handling\n• List rendering\n• Custom hooks typing\n\nBest Practices:\n• Use interfaces for props\n• Leverage type inference when possible\n• Use React.ReactNode for children\n• Type event handlers explicitly\n• Use union types for variants",
+          codeExample: {
+            code: `// Optional and default props
+interface ButtonProps {
+  label: string;
+  variant?: "primary" | "secondary" | "outline";
+  size?: "sm" | "md" | "lg";
+  disabled?: boolean;
+}
+
+function Button({
+  label,
+  variant = "primary", // Default value
+  size = "md",
+  disabled = false,
+}: ButtonProps) {
+  return (
+    <button
+      className={\`btn btn-\${variant} btn-\${size}\`}
+      disabled={disabled}
+    >
+      {label}
+    </button>
+  );
+}
+
+// Union types for variants
+type Status = "loading" | "success" | "error";
+
+interface StatusBadgeProps {
+  status: Status;
+}
+
+function StatusBadge({ status }: StatusBadgeProps) {
+  const colors = {
+    loading: "gray",
+    success: "green",
+    error: "red",
+  };
+  
+  return (
+    <span className={\`badge badge-\${colors[status]}\`}>
+      {status}
+    </span>
+  );
+}
+
+// Typing custom hooks
+function useCounter(initialValue: number = 0) {
+  const [count, setCount] = useState<number>(initialValue);
+  
+  const increment = () => setCount(count + 1);
+  const decrement = () => setCount(count - 1);
+  const reset = () => setCount(initialValue);
+  
+  return { count, increment, decrement, reset };
+}
+
+// Using the hook
+function App() {
+  const { count, increment, decrement } = useCounter(0);
+  
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={increment}>+</button>
+      <button onClick={decrement}>-</button>
+    </div>
+  );
+}
+
+// Typing API responses
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
+function UserProfile({ userId }: { userId: number }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  
+  useEffect(() => {
+    fetch(\`/api/users/\${userId}\`)
+      .then((res) => res.json())
+      .then((data: User) => {
+        setUser(data);
+        setLoading(false);
+      });
+  }, [userId]);
+  
+  if (loading) return <div>Loading...</div>;
+  if (!user) return <div>User not found</div>;
+  
+  return (
+    <div>
+      <h1>{user.name}</h1>
+      <p>{user.email}</p>
+    </div>
+  );
+}`,
+            explanation: "Common patterns include optional props with defaults, union types for variants, typing custom hooks, and handling async data with proper types. TypeScript makes these patterns safer and more maintainable."
+          }
+        }
+      ],
+      conclusion: "TypeScript brings type safety to React development, catching errors early and improving developer experience. Start by typing your props with interfaces, then gradually add types to state, events, and functions. Remember: TypeScript is there to help, not to slow you down. Use type inference when types are obvious, and be explicit when it adds clarity. The investment in typing pays off with fewer bugs and easier refactoring."
+    }
+  },
+  {
+    id: "intermediate-5",
+    title: "Advanced TypeScript Patterns in React",
+    description: "Learn advanced TypeScript patterns for React: generics, utility types, type guards, and complex component typing.",
+    level: "intermediate",
+    estimatedTime: "90 min",
+    topics: ["Generics", "Utility Types", "Type Guards", "Advanced Patterns", "Type Narrowing"],
+    prerequisites: ["TypeScript Basics for React Developers", "Component Composition and Context"],
+    content: {
+      overview: "As you build more complex React applications, you'll encounter situations that require advanced TypeScript patterns. This tutorial covers generics for reusable components, utility types for transforming types, type guards for runtime type checking, and advanced patterns for complex scenarios. You'll learn how to create flexible, type-safe components that work with different data types while maintaining full type safety.",
+      sections: [
+        {
+          title: "Lesson 1: Generics in React Components",
+          content: "Generics allow you to create reusable components that work with different types while maintaining type safety.\n\nWhat are Generics?\n• Type parameters that make components flexible\n• Maintain type safety while working with different types\n• Written with angle brackets: <T>\n\nUse Cases:\n• Lists with different item types\n• Data fetchers for different API responses\n• Form components with different value types\n• Utility hooks that work with any type\n\nBenefits:\n• Type safety preserved\n• Code reuse\n• Better autocomplete\n• Catch errors at compile time",
+          codeExample: {
+            code: `// Generic List Component
+interface ListProps<T> {
+  items: T[];
+  renderItem: (item: T) => React.ReactNode;
+  keyExtractor: (item: T) => string | number;
+}
+
+function List<T>({ items, renderItem, keyExtractor }: ListProps<T>) {
+  return (
+    <ul>
+      {items.map((item) => (
+        <li key={keyExtractor(item)}>{renderItem(item)}</li>
+      ))}
+    </ul>
+  );
+}
+
+// Usage with different types
+interface User {
+  id: number;
+  name: string;
+}
+
+interface Product {
+  sku: string;
+  title: string;
+  price: number;
+}
+
+function App() {
+  const users: User[] = [
+    { id: 1, name: "Alice" },
+    { id: 2, name: "Bob" },
+  ];
+  
+  const products: Product[] = [
+    { sku: "PROD-1", title: "Widget", price: 29.99 },
+    { sku: "PROD-2", title: "Gadget", price: 49.99 },
+  ];
+  
+  return (
+    <div>
+      <List
+        items={users}
+        renderItem={(user) => <span>{user.name}</span>}
+        keyExtractor={(user) => user.id}
+      />
+      
+      <List
+        items={products}
+        renderItem={(product) => (
+          <span>
+            {product.title} - {'$'}{product.price}
+          </span>
+        )}
+        keyExtractor={(product) => product.sku}
+      />
+    </div>
+  );
+}
+
+// Generic Hook
+function useFetch<T>(url: string) {
+  const [data, setData] = useState<T | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  
+  useEffect(() => {
+    fetch(url)
+      .then((res) => res.json())
+      .then((data: T) => {
+        setData(data);
+        setLoading(false);
+      })
+      .catch((err: Error) => {
+        setError(err);
+        setLoading(false);
+      });
+  }, [url]);
+  
+  return { data, loading, error };
+}
+
+// Usage
+function UserProfile({ userId }: { userId: number }) {
+  const { data: user, loading, error } = useFetch<User>(
+    \`/api/users/\${userId}\`
+  );
+  
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+  if (!user) return <div>Not found</div>;
+  
+  return <div>{user.name}</div>; // TypeScript knows user is User type
+}`,
+            explanation: "Generics make components flexible and reusable while maintaining type safety. Use angle brackets <T> to define type parameters. TypeScript infers the generic type from usage, preserving full type safety."
+          }
+        },
+        {
+          title: "Lesson 2: Utility Types",
+          content: "TypeScript provides utility types that transform existing types. These are incredibly useful for React development.\n\nCommon Utility Types:\n• Partial<T>: Makes all properties optional\n• Required<T>: Makes all properties required\n• Pick<T, K>: Select specific properties\n• Omit<T, K>: Remove specific properties\n• Readonly<T>: Make all properties readonly\n• Record<K, V>: Create object type with specific keys\n\nUse Cases:\n• Form state (Partial of main type)\n• Update functions (Partial of entity)\n• Component variants (Pick specific props)\n• Configuration objects (Record types)\n• Immutable data (Readonly)",
+          codeExample: {
+            code: `// Base interface
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  age: number;
+  role: "admin" | "user";
+}
+
+// Partial: All properties optional (useful for forms)
+type PartialUser = Partial<User>;
+// Equivalent to:
+// {
+//   id?: number;
+//   name?: string;
+//   email?: string;
+//   age?: number;
+//   role?: "admin" | "user";
+// }
+
+function EditUserForm({ user }: { user: User }) {
+  const [formData, setFormData] = useState<Partial<User>>({
+    name: user.name,
+    email: user.email,
+    // Other fields optional
+  });
+  
+  return (
+    <form>
+      <input
+        value={formData.name || ""}
+        onChange={(e) =>
+          setFormData({ ...formData, name: e.target.value })
+        }
+      />
+    </form>
+  );
+}
+
+// Pick: Select specific properties
+type UserPreview = Pick<User, "id" | "name" | "email">;
+// Only has: id, name, email
+
+function UserCard({ user }: { user: UserPreview }) {
+  return (
+    <div>
+      <h3>{user.name}</h3>
+      <p>{user.email}</p>
+    </div>
+  );
+}
+
+// Omit: Remove specific properties
+type UserWithoutId = Omit<User, "id">;
+// Has everything except id
+
+function CreateUserForm() {
+  const [formData, setFormData] = useState<UserWithoutId>({
+    name: "",
+    email: "",
+    age: 0,
+    role: "user",
+  });
+  
+  // id will be generated on server
+}
+
+// Required: Make all properties required
+interface Config {
+  apiUrl?: string;
+  timeout?: number;
+}
+
+type RequiredConfig = Required<Config>;
+// apiUrl and timeout are now required
+
+// Record: Create object type with specific keys
+type StatusColors = Record<"success" | "error" | "warning", string>;
+// Equivalent to:
+// {
+//   success: string;
+//   error: string;
+//   warning: string;
+// }
+
+const colors: StatusColors = {
+  success: "green",
+  error: "red",
+  warning: "yellow",
+};
+
+// Readonly: Make all properties readonly
+type ImmutableUser = Readonly<User>;
+// Cannot modify properties after creation`,
+            explanation: "Utility types transform existing types. Partial is great for forms, Pick/Omit for selective properties, Record for key-value objects, and Readonly for immutable data. These utilities help create precise types without duplication."
+          }
+        },
+        {
+          title: "Lesson 3: Type Guards and Type Narrowing",
+          content: "Type guards are functions that check types at runtime and narrow TypeScript's type checking accordingly.\n\nWhat are Type Guards?\n• Functions that return type predicates\n• Narrow types based on runtime checks\n• Make code type-safe with runtime validation\n\nCommon Patterns:\n• typeof checks\n• instanceof checks\n• Property checks\n• Custom type predicates\n• Discriminated unions\n\nUse Cases:\n• API response validation\n• Form validation\n• Error handling\n• Conditional rendering",
+          codeExample: {
+            code: `// Type guards
+function isString(value: unknown): value is string {
+  return typeof value === "string";
+}
+
+function isUser(value: unknown): value is User {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "id" in value &&
+    "name" in value &&
+    "email" in value
+  );
+}
+
+// Using type guards
+function processData(data: unknown) {
+  if (isString(data)) {
+    // TypeScript knows data is string here
+    console.log(data.toUpperCase());
+  }
+  
+  if (isUser(data)) {
+    // TypeScript knows data is User here
+    console.log(data.name, data.email);
+  }
+}
+
+// Discriminated unions
+type ApiResponse<T> =
+  | { status: "success"; data: T }
+  | { status: "error"; error: string }
+  | { status: "loading" };
+
+function handleResponse<T>(response: ApiResponse<T>) {
+  if (response.status === "success") {
+    // TypeScript knows data exists
+    return response.data;
+  } else if (response.status === "error") {
+    // TypeScript knows error exists
+    throw new Error(response.error);
+  } else {
+    // TypeScript knows this is loading state
+    return null;
+  }
+}
+
+// React component with type guards
+function DataDisplay({ data }: { data: unknown }) {
+  if (isUser(data)) {
+    return (
+      <div>
+        <h2>{data.name}</h2>
+        <p>{data.email}</p>
+      </div>
+    );
+  }
+  
+  if (isString(data)) {
+    return <p>{data}</p>;
+  }
+  
+  return <div>Unknown data type</div>;
+}
+
+// Form validation with type guards
+function validateEmail(email: unknown): email is string {
+  return (
+    isString(email) &&
+    email.includes("@") &&
+    email.length > 5
+  );
+}
+
+function EmailInput() {
+  const [email, setEmail] = useState<string>("");
+  const [isValid, setIsValid] = useState(false);
+  
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setEmail(value);
+    setIsValid(validateEmail(value));
+  };
+  
+  return (
+    <div>
+      <input
+        type="email"
+        value={email}
+        onChange={handleChange}
+        aria-invalid={!isValid}
+      />
+      {isValid && <span>✓ Valid email</span>}
+    </div>
+  );
+}`,
+            explanation: "Type guards narrow types based on runtime checks. Use type predicates (value is Type) to tell TypeScript what type something is after checking. Discriminated unions work great with type narrowing for handling different states or response types."
+          }
+        },
+        {
+          title: "Lesson 4: Advanced Component Patterns",
+          content: "Advanced TypeScript patterns for complex React components.\n\nPatterns Covered:\n• Polymorphic components\n• Higher-order components with types\n• Render props pattern\n• Compound components\n• Forward refs with generics\n\nBest Practices:\n• Use generics for flexibility\n• Maintain type safety\n• Leverage utility types\n• Type event handlers precisely",
+          codeExample: {
+            code: `// Polymorphic component
+type PolymorphicProps<T extends React.ElementType> = {
+  as?: T;
+  children: React.ReactNode;
+} & React.ComponentPropsWithoutRef<T>;
+
+function Polymorphic<T extends React.ElementType = "div">({
+  as,
+  children,
+  ...props
+}: PolymorphicProps<T>) {
+  const Component = as || "div";
+  return <Component {...props}>{children}</Component>;
+}
+
+// Usage
+<Polymorphic as="button" onClick={() => {}}>Click</Polymorphic>
+<Polymorphic as="a" href="/link">Link</Polymorphic>
+<Polymorphic>Default div</Polymorphic>
+
+// Higher-order component with types
+function withLoading<P extends object>(
+  Component: React.ComponentType<P>
+) {
+  return function WithLoadingComponent(
+    props: P & { loading?: boolean }
+  ) {
+    if (props.loading) {
+      return <div>Loading...</div>;
+    }
+    
+    const { loading, ...componentProps } = props;
+    return <Component {...(componentProps as P)} />;
+  };
+}
+
+// Render props pattern
+interface DataProps<T> {
+  url: string;
+  children: (data: T | null, loading: boolean, error: Error | null) => React.ReactNode;
+}
+
+function DataFetcher<T>({ url, children }: DataProps<T>) {
+  const [data, setData] = useState<T | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  
+  useEffect(() => {
+    fetch(url)
+      .then((res) => res.json())
+      .then((data: T) => setData(data))
+      .catch((err) => setError(err))
+      .finally(() => setLoading(false));
+  }, [url]);
+  
+  return <>{children(data, loading, error)}</>;
+}
+
+// Usage
+<DataFetcher<User> url="/api/user/1">
+  {(user, loading, error) => {
+    if (loading) return <div>Loading...</div>;
+    if (error) return <div>Error: {error.message}</div>;
+    if (!user) return <div>Not found</div>;
+    return <div>{user.name}</div>;
+  }}
+</DataFetcher>`,
+            explanation: "Advanced patterns like polymorphic components, HOCs, and render props can be fully type-safe with TypeScript. Use generics to maintain flexibility while preserving type safety. These patterns enable powerful, reusable components."
+          }
+        }
+      ],
+      conclusion: "Advanced TypeScript patterns make your React code more flexible and type-safe. Generics enable reusable components, utility types transform types efficiently, type guards provide runtime safety, and advanced patterns unlock powerful component architectures. Remember: TypeScript's type system is powerful - leverage it to create robust, maintainable code. Start simple and add complexity only when needed."
+    }
+  },
+  {
+    id: "advanced-5",
+    title: "TypeScript Generics and Utility Types Deep Dive",
+    description: "Master TypeScript generics, conditional types, mapped types, and advanced utility type patterns for complex React applications.",
+    level: "advanced",
+    estimatedTime: "120 min",
+    topics: ["Generics", "Conditional Types", "Mapped Types", "Template Literal Types", "Type Utilities"],
+    prerequisites: ["Advanced TypeScript Patterns in React", "Performance Optimization Techniques"],
+    content: {
+      overview: "This tutorial dives deep into TypeScript's advanced type system features. You'll learn how to create sophisticated generic types, use conditional types for type-level logic, leverage mapped types for transformations, and build reusable type utilities. These advanced features enable you to create type-safe abstractions, build better APIs, and catch errors at compile time that would otherwise only appear at runtime.",
+      sections: [
+        {
+          title: "Lesson 1: Advanced Generics",
+          content: "Go beyond basic generics to create sophisticated type-safe abstractions.\n\nAdvanced Generic Concepts:\n• Generic constraints (extends keyword)\n• Multiple type parameters\n• Default type parameters\n• Generic utility functions\n• Generic type inference\n\nUse Cases:\n• Type-safe API clients\n• Generic data structures\n• Flexible component APIs\n• Utility functions that work with any type",
+          codeExample: {
+            code: `// Generic constraints
+interface HasId {
+  id: string | number;
+}
+
+function getById<T extends HasId>(items: T[], id: T["id"]): T | undefined {
+  return items.find((item) => item.id === id);
+}
+
+// Multiple type parameters
+function mapArray<T, U>(
+  array: T[],
+  mapper: (item: T) => U
+): U[] {
+  return array.map(mapper);
+}
+
+// Default type parameters
+interface CacheOptions<T = string> {
+  key: string;
+  value: T;
+  ttl?: number;
+}
+
+// Generic utility functions
+function createApiClient<T extends Record<string, any>>(
+  endpoints: T
+) {
+  return {
+    async get<K extends keyof T>(
+      endpoint: K,
+      params?: Parameters<T[K]>[0]
+    ): Promise<ReturnType<T[K]>> {
+      // Implementation
+      return {} as ReturnType<T[K]>;
+    },
+  };
+}
+
+// Usage
+const api = createApiClient({
+  users: () => ({ id: 1, name: "Alice" }),
+  products: (id: number) => ({ id, title: "Widget" }),
+});
+
+const user = await api.get("users"); // Type-safe!
+const product = await api.get("products", 123); // Type-safe!`,
+            explanation: "Advanced generics use constraints to limit type parameters, multiple parameters for complex relationships, and default types for convenience. Generic utilities create powerful, type-safe abstractions."
+          }
+        },
+        {
+          title: "Lesson 2: Conditional Types",
+          content: "Conditional types enable type-level logic - types that depend on other types.\n\nConditional Type Syntax:\n• `T extends U ? X : Y`\n• Checks if T extends U\n• Returns X if true, Y if false\n\nCommon Patterns:\n• Type extraction\n• Type filtering\n• Type transformation based on conditions\n• Utility type building\n\nUse Cases:\n• Extract return types\n• Filter union types\n• Create type-safe utilities\n• Build complex type systems",
+          codeExample: {
+            code: `// Basic conditional type
+type IsString<T> = T extends string ? true : false;
+
+type A = IsString<string>; // true
+type B = IsString<number>; // false
+
+// Extract return type
+type ReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
+
+// Extract function parameters
+type Parameters<T> = T extends (...args: infer P) => any ? P : never;
+
+// Non-nullable type
+type NonNullable<T> = T extends null | undefined ? never : T;
+
+// Extract array element type
+type ArrayElement<T> = T extends (infer U)[] ? U : never;
+
+type Numbers = ArrayElement<number[]>; // number
+
+// Extract promise type
+type Awaited<T> = T extends Promise<infer U> ? U : T;
+
+type Result = Awaited<Promise<string>>; // string
+
+// Filter types
+type StringKeys<T> = {
+  [K in keyof T]: T[K] extends string ? K : never;
+}[keyof T];
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  age: number;
+}
+
+type UserStringKeys = StringKeys<User>; // "name" | "email"
+
+// Exclude/Extract helpers
+type Exclude<T, U> = T extends U ? never : T;
+type Extract<T, U> = T extends U ? T : never;
+
+type T1 = Exclude<"a" | "b" | "c", "a">; // "b" | "c"
+type T2 = Extract<"a" | "b" | "c", "a" | "b">; // "a" | "b"`,
+            explanation: "Conditional types perform type-level logic using the ternary operator. Use 'infer' to extract types from other types. Conditional types are powerful for building utility types and complex type transformations."
+          }
+        },
+        {
+          title: "Lesson 3: Mapped Types",
+          content: "Mapped types create new types by transforming properties of existing types.\n\nMapped Type Syntax:\n• `{ [K in keyof T]: ... }`\n• Iterates over keys of T\n• Transforms each property\n\nCommon Patterns:\n• Make all properties optional/required\n• Make all properties readonly\n• Transform property types\n• Add/remove modifiers\n\nBuilt-in Mapped Types:\n• Partial<T>\n• Required<T>\n• Readonly<T>\n• Record<K, V>\n• Pick<T, K>\n• Omit<T, K>",
+          codeExample: {
+            code: `// How built-in mapped types work
+
+// Partial implementation
+type MyPartial<T> = {
+  [P in keyof T]?: T[P];
+};
+
+// Required implementation
+type MyRequired<T> = {
+  [P in keyof T]-?: T[P];
+};
+
+// Readonly implementation
+type MyReadonly<T> = {
+  readonly [P in keyof T]: T[P];
+};
+
+// Record implementation
+type MyRecord<K extends keyof any, T> = {
+  [P in K]: T;
+};
+
+// Custom mapped types
+// Make all properties nullable
+type Nullable<T> = {
+  [P in keyof T]: T[P] | null;
+};
+
+// Transform to getters
+type Getters<T> = {
+  [P in keyof T as \`get\${Capitalize<string & P>}\`]: () => T[P];
+};
+
+interface User {
+  name: string;
+  age: number;
+}
+
+type UserGetters = Getters<User>;
+// {
+//   getName: () => string;
+//   getAge: () => number;
+// }
+
+// Filter properties by type
+type StringProperties<T> = {
+  [P in keyof T as T[P] extends string ? P : never]: T[P];
+};
+
+interface Person {
+  id: number;
+  name: string;
+  email: string;
+  age: number;
+}
+
+type PersonStrings = StringProperties<Person>;
+// { name: string; email: string; }
+
+// Add prefix to keys
+type Prefixed<T, Prefix extends string> = {
+  [P in keyof T as \`\${Prefix}\${string & P}\`]: T[P];
+};
+
+type PrefixedUser = Prefixed<User, "user_">;
+// { user_name: string; user_age: number; }`,
+            explanation: "Mapped types transform existing types by iterating over their properties. Use 'as' clauses to filter or rename keys. Mapped types enable powerful type transformations while maintaining type safety."
+          }
+        },
+        {
+          title: "Lesson 4: Template Literal Types",
+          content: "Template literal types combine string literal types to create new string types.\n\nFeatures:\n• String concatenation at type level\n• Pattern matching\n• Type-safe string manipulation\n• Union type combinations\n\nUse Cases:\n• Type-safe CSS class names\n• API endpoint types\n• Event name types\n• Route types\n• ID generation",
+          codeExample: {
+            code: `// Basic template literal types
+type Greeting = \`Hello, \${string}\`;
+type Email = \`\${string}@\${string}.\${string}\`;
+
+// With unions
+type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
+type Endpoint = "/users" | "/posts" | "/comments";
+
+type ApiRoute = \`\${HttpMethod} \${Endpoint}\`;
+// "GET /users" | "POST /users" | "GET /posts" | ...
+
+// Pattern matching
+type ExtractMethod<T> = T extends \`\${infer M} \${string}\` ? M : never;
+type ExtractPath<T> = T extends \`\${string} \${infer P}\` ? P : never;
+
+type Method = ExtractMethod<"GET /users">; // "GET"
+type Path = ExtractPath<"GET /users">; // "/users"
+
+// CSS class utilities
+type Spacing = "sm" | "md" | "lg";
+type Direction = "top" | "bottom" | "left" | "right";
+
+type MarginClass = \`m\${Capitalize<Direction>}-\${Spacing}\`;
+// "mTop-sm" | "mTop-md" | "mBottom-sm" | ...
+
+// Event types
+type EventType = "click" | "change" | "submit";
+type ElementType = "button" | "input" | "form";
+
+type EventName = \`\${ElementType}\${Capitalize<EventType>}\`;
+// "buttonClick" | "inputChange" | "formSubmit" | ...
+
+// Utility type for event handlers
+type EventHandlers<T extends EventName> = {
+  [K in T]: (event: Event) => void;
+};
+
+const handlers: EventHandlers<EventName> = {
+  buttonClick: (e) => {},
+  inputChange: (e) => {},
+  formSubmit: (e) => {},
+};`,
+            explanation: "Template literal types create new string types by combining literal types. Use 'infer' to extract parts of template literals. They're powerful for type-safe strings, CSS classes, API routes, and event names."
+          }
+        },
+        {
+          title: "Lesson 5: Building Type Utilities",
+          content: "Combine all advanced TypeScript features to build reusable type utilities.\n\nUtility Building Principles:\n• Start with clear purpose\n• Use composition\n• Document with comments\n• Test with examples\n• Make it reusable\n\nCommon Utilities:\n• Deep readonly\n• Deep partial\n• Optional by key\n• Required by key\n• Function parameter extraction",
+          codeExample: {
+            code: `// Deep readonly
+type DeepReadonly<T> = {
+  readonly [P in keyof T]: T[P] extends object
+    ? DeepReadonly<T[P]>
+    : T[P];
+};
+
+// Deep partial
+type DeepPartial<T> = {
+  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
+};
+
+// Make specific keys optional
+type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+}
+
+type UserWithoutRole = Optional<User, "role">;
+// { id: number; name: string; email: string; role?: string; }
+
+// Make specific keys required
+type Required<T, K extends keyof T> = T & { [P in K]-?: T[P] };
+
+// Extract function overloads
+type Overloads<T> = T extends {
+  (...args: infer A1): infer R1;
+  (...args: infer A2): infer R2;
+  (...args: infer A3): infer R3;
+  (...args: infer A4): infer R4;
+}
+  ? [
+      (...args: A1) => R1,
+      (...args: A2) => R2,
+      (...args: A3) => R3,
+      (...args: A4) => R4
+    ]
+  : T extends {
+      (...args: infer A1): infer R1;
+      (...args: infer A2): infer R2;
+      (...args: infer A3): infer R3;
+    }
+  ? [(...args: A1) => R1, (...args: A2) => R2, (...args: A3) => R3]
+  : T extends {
+      (...args: infer A1): infer R1;
+      (...args: infer A2): infer R2;
+    }
+  ? [(...args: A1) => R1, (...args: A2) => R2]
+  : T extends (...args: infer A) => infer R
+  ? [(...args: A) => R]
+  : never;
+
+// React component prop utilities
+type ComponentProps<T> = T extends React.ComponentType<infer P>
+  ? P
+  : never;
+
+type ComponentPropsWithoutRef<T> = T extends React.ForwardRefExoticComponent<
+  infer P
+>
+  ? P
+  : React.ComponentProps<T>;`,
+            explanation: "Build reusable type utilities by combining advanced TypeScript features. Start simple, compose utilities, and create powerful type transformations. These utilities can be shared across projects and improve type safety throughout your codebase."
+          }
+        }
+      ],
+      conclusion: "Advanced TypeScript features enable sophisticated type-safe code. Generics provide flexibility, conditional types add type-level logic, mapped types transform types, and template literal types create precise string types. Combine these features to build powerful type utilities that catch errors at compile time. Remember: these advanced features are tools - use them when they add value, not just because they're possible. Start with simpler solutions and add complexity only when needed."
+    }
+  },
+  {
+    id: "expert-9",
+    title: "Advanced TypeScript: Conditional Types and Type Manipulation",
+    description: "Master TypeScript's most advanced features: recursive conditional types, type-level programming, and building complex type systems for React applications.",
+    level: "expert",
+    estimatedTime: "150 min",
+    topics: ["Recursive Types", "Type-Level Programming", "Type Inference", "Complex Type Systems", "Type Safety Patterns"],
+    prerequisites: ["TypeScript Generics and Utility Types Deep Dive", "Creating Your Own React Library"],
+    content: {
+      overview: "This expert-level tutorial explores TypeScript's most advanced type system features. You'll learn recursive conditional types, type-level programming techniques, advanced type inference patterns, and how to build complex type systems that provide incredible type safety for React applications. These techniques enable you to create type-safe abstractions that would be impossible in other languages, catching entire classes of errors at compile time.",
+      sections: [
+        {
+          title: "Lesson 1: Recursive Conditional Types",
+          content: "Recursive conditional types enable type-level computation and complex type transformations.\n\nRecursive Patterns:\n• Types that reference themselves\n• Conditional recursion\n• Type-level loops\n• Deep type transformations\n\nUse Cases:\n• Deep type utilities\n• Complex type extraction\n• Type-level algorithms\n• Schema validation types",
+          codeExample: {
+            code: `// Deep type operations with recursion
+
+// Deep readonly (recursive)
+type DeepReadonly<T> = {
+  readonly [P in keyof T]: T[P] extends object
+    ? T[P] extends any[]
+      ? ReadonlyArray<DeepReadonly<T[P][number]>>
+      : DeepReadonly<T[P]>
+    : T[P];
+};
+
+// Deep required
+type DeepRequired<T> = {
+  [P in keyof T]-?: T[P] extends object
+    ? DeepRequired<T[P]>
+    : T[P];
+};
+
+// Extract all string paths from object
+type Paths<T> = T extends object
+  ? {
+      [K in keyof T]: K extends string
+        ? T[K] extends object
+          ? K | \`\${K}.\${Paths<T[K]>}\`
+          : K
+        : never;
+    }[keyof T]
+  : never;
+
+interface User {
+  profile: {
+    name: string;
+    address: {
+      street: string;
+      city: string;
+    };
+  };
+  settings: {
+    theme: string;
+  };
+}
+
+type UserPaths = Paths<User>;
+// "profile" | "profile.name" | "profile.address" | "profile.address.street" | ...
+
+// Get value type at path
+type PathValue<T, P extends Paths<T>> = P extends \`\${infer K}.\${infer Rest}\`
+  ? K extends keyof T
+    ? PathValue<T[K], Rest>
+    : never
+  : P extends keyof T
+  ? T[P]
+  : never;
+
+type StreetType = PathValue<User, "profile.address.street">; // string`,
+            explanation: "Recursive conditional types enable deep type transformations and type-level computation. Use conditional types with recursion to traverse nested structures and build powerful type utilities."
+          }
+        },
+        {
+          title: "Lesson 2: Type-Level Programming",
+          content: "Type-level programming performs computations at the type level, catching logic errors at compile time.\n\nConcepts:\n• Type-level functions\n• Type-level conditionals\n• Type-level loops\n• Type-level arithmetic\n• Type-level data structures\n\nApplications:\n• Schema validation\n• API type generation\n• Type-safe routing\n• Complex business logic validation",
+          codeExample: {
+            code: `// Type-level arithmetic (simplified)
+type Length<T extends readonly any[]> = T["length"];
+
+type A = Length<[1, 2, 3]>; // 3
+
+// Type-level array operations
+type Head<T extends readonly any[]> = T extends readonly [infer H, ...any[]]
+  ? H
+  : never;
+
+type Tail<T extends readonly any[]> = T extends readonly [any, ...infer Rest]
+  ? Rest
+  : never;
+
+type Last<T extends readonly any[]> = T extends readonly [...any[], infer L]
+  ? L
+  : never;
+
+// Type-level string manipulation
+type Split<
+  S extends string,
+  D extends string
+> = S extends \`\${infer First}\${D}\${infer Rest}\`
+  ? [First, ...Split<Rest, D>]
+  : [S];
+
+type Parts = Split<"a.b.c", ".">; // ["a", "b", "c"]
+
+// Type-safe state machine
+type State = "idle" | "loading" | "success" | "error";
+
+type ValidTransition<S extends State> = S extends "idle"
+  ? "loading"
+  : S extends "loading"
+  ? "success" | "error"
+  : never;
+
+function transition<S extends State>(
+  current: S,
+  next: ValidTransition<S>
+): ValidTransition<S> {
+  return next;
+}
+
+// Type-safe, compile-time validated state transitions
+transition("idle", "loading"); // ✅
+transition("loading", "success"); // ✅
+transition("idle", "success"); // ❌ Error`,
+            explanation: "Type-level programming performs computations in the type system. Build type-level functions, conditionals, and data structures to validate logic at compile time. This catches entire classes of errors before runtime."
+          }
+        },
+        {
+          title: "Lesson 3: Advanced Type Inference",
+          content: "Master TypeScript's type inference system to create APIs that infer types automatically.\n\nInference Techniques:\n• Inference from function parameters\n• Inference from return types\n• Conditional inference\n• Variadic tuple types\n• Const assertions\n\nBenefits:\n• Better developer experience\n• Automatic type detection\n• Less manual typing\n• More flexible APIs",
+          codeExample: {
+            code: `// Inference from usage
+function createStore<T>(initialValue: T) {
+  let value = initialValue;
+  
+  return {
+    get: () => value,
+    set: (newValue: T) => {
+      value = newValue;
+    },
+  };
+}
+
+const store = createStore(0); // T inferred as number
+const count = store.get(); // number
+
+// Variadic tuple types
+function zip<A extends readonly any[], B extends readonly any[]>(
+  a: A,
+  b: B
+): {
+  [K in keyof A]: [A[K], B[K extends keyof B ? K : never]];
+} {
+  return a.map((item, i) => [item, b[i]]) as any;
+}
+
+const zipped = zip([1, 2, 3] as const, ["a", "b", "c"] as const);
+// [[1, "a"], [2, "b"], [3, "c"]]
+
+// Const assertions
+const config = {
+  apiUrl: "https://api.example.com",
+  timeout: 5000,
+  retries: 3,
+} as const;
+
+// All properties are readonly literals
+
+// Function overloads with inference
+function createElement<T extends keyof HTMLElementTagNameMap>(
+  tag: T
+): HTMLElementTagNameMap[T];
+function createElement<T extends React.ComponentType<any>>(
+  component: T
+): React.ComponentProps<T>;
+function createElement(tag: any): any {
+  // Implementation
+}
+
+const div = createElement("div"); // HTMLDivElement
+const button = createElement("button"); // HTMLButtonElement
+
+// Infer component props
+type InferProps<T> = T extends React.ComponentType<infer P> ? P : never;
+
+// Type-safe event emitter
+type EventMap = {
+  click: { x: number; y: number };
+  change: { value: string };
+  submit: { data: FormData };
+};
+
+class TypedEventEmitter<T extends Record<string, any>> {
+  private listeners: {
+    [K in keyof T]?: Array<(event: T[K]) => void>;
+  } = {};
+  
+  on<K extends keyof T>(event: K, handler: (data: T[K]) => void) {
+    if (!this.listeners[event]) {
+      this.listeners[event] = [];
+    }
+    this.listeners[event]!.push(handler);
+  }
+  
+  emit<K extends keyof T>(event: K, data: T[K]) {
+    this.listeners[event]?.forEach((handler) => handler(data));
+  }
+}
+
+const emitter = new TypedEventEmitter<EventMap>();
+emitter.on("click", (data) => {
+  // data is { x: number; y: number }
+});
+emitter.emit("click", { x: 10, y: 20 }); // Type-safe!`,
+            explanation: "Advanced type inference creates APIs that automatically detect and enforce types. Use variadic tuple types, const assertions, and conditional inference to build flexible, type-safe APIs that require minimal manual typing."
+          }
+        },
+        {
+          title: "Lesson 4: Building Complex Type Systems",
+          content: "Combine all advanced TypeScript features to build complex, type-safe systems.\n\nSystem Building:\n• Type-safe API clients\n• Schema validation types\n• Form state types\n• Routing types\n• State management types\n\nPrinciples:\n• Start with simple types\n• Compose complex types\n• Leverage inference\n• Document complex types\n• Test with examples",
+          codeExample: {
+            code: `// Type-safe API client builder
+type EndpointDefinition = {
+  [K: string]: (params?: any) => Promise<any>;
+};
+
+type ApiClient<T extends EndpointDefinition> = {
+  [K in keyof T]: T[K] extends (params: infer P) => Promise<infer R>
+    ? P extends undefined
+      ? () => Promise<R>
+      : (params: P) => Promise<R>
+    : never;
+};
+
+function createApiClient<T extends EndpointDefinition>(
+  config: T
+): ApiClient<T> {
+  // Implementation
+  return {} as ApiClient<T>;
+}
+
+const api = createApiClient({
+  getUser: (id: number) => Promise.resolve({ id, name: "Alice" }),
+  createPost: (data: { title: string; content: string }) =>
+    Promise.resolve({ id: 1, ...data }),
+});
+
+// Fully type-safe!
+const user = await api.getUser(123);
+const post = await api.createPost({ title: "Hello", content: "World" });
+
+// Type-safe form state
+type FormField<T> = {
+  value: T;
+  error?: string;
+  touched: boolean;
+};
+
+type FormState<T extends Record<string, any>> = {
+  [K in keyof T]: FormField<T[K]>;
+} & {
+  isValid: boolean;
+  isSubmitting: boolean;
+};
+
+function createFormState<T extends Record<string, any>>(
+  initialValues: T
+): FormState<T> {
+  // Implementation
+  return {} as FormState<T>;
+}
+
+const form = createFormState({
+  email: "",
+  password: "",
+  age: 0,
+});
+
+// form.email.value is string
+// form.age.value is number
+// form.isValid is boolean`,
+            explanation: "Complex type systems combine all advanced TypeScript features. Build type-safe APIs, form systems, routing, and state management with full compile-time validation. These systems catch errors before runtime and provide excellent developer experience."
+          }
+        }
+      ],
+      conclusion: "Advanced TypeScript features enable incredible type safety. Recursive conditional types perform type-level computation, type-level programming validates logic at compile time, and advanced inference creates flexible APIs. Build complex type systems that catch entire classes of errors before runtime. Remember: these are powerful tools that require careful design. Start simple, add complexity gradually, and always prioritize readability and maintainability over cleverness."
+    }
+  },
+  {
+    id: "staff-6",
+    title: "TypeScript at Scale: Type-Safe Architecture",
+    description: "Design type-safe architectures for large-scale React applications. Learn monorepo type strategies, shared type libraries, API contract types, and enterprise patterns.",
+    level: "staff",
+    estimatedTime: "180 min",
+    topics: ["Type Architecture", "Monorepo Types", "API Contracts", "Shared Types", "Enterprise Patterns"],
+    prerequisites: ["Advanced TypeScript: Conditional Types and Type Manipulation", "Design Systems and Component Libraries"],
+    content: {
+      overview: "At the Staff Engineer level, you design type-safe architectures that scale across teams, products, and organizations. This tutorial covers monorepo type strategies, shared type libraries, API contract management, cross-service type sharing, and enterprise patterns for maintaining type safety at scale. You'll learn how to establish type governance, create shared type systems, manage API contracts with types, and ensure type safety across large codebases with multiple teams.",
+      sections: [
+        {
+          title: "Lesson 1: Type Architecture for Large Applications",
+          content: "Design type architectures that scale across teams and products.\n\nArchitectural Principles:\n• Shared type libraries\n• Type boundaries between modules\n• Type versioning strategies\n• Type governance\n• Documentation standards\n\nStructure Patterns:\n• Monorepo type organization\n• Shared types package\n• Domain-specific types\n• API contract types\n• Cross-cutting types\n\nBest Practices:\n• Define clear type boundaries\n• Version types independently\n• Document type decisions\n• Establish type review process\n• Monitor type usage",
+          codeExample: {
+            code: `// Monorepo type structure
+// packages/
+//   types/
+//     shared/          # Cross-cutting types
+//     api/            # API contract types
+//     domain/         # Domain-specific types
+//   apps/
+//     web/           # Web app (uses types package)
+//     mobile/        # Mobile app (uses types package)
+
+// packages/types/shared/index.ts
+export interface BaseEntity {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export type ID<T extends BaseEntity> = T["id"];
+
+// packages/types/api/contracts.ts
+export interface ApiResponse<T> {
+  data: T;
+  meta?: {
+    pagination?: {
+      page: number;
+      limit: number;
+      total: number;
+    };
+  };
+  errors?: ApiError[];
+}
+
+export interface ApiError {
+  code: string;
+  message: string;
+  field?: string;
+}
+
+// packages/types/domain/user.ts
+import { BaseEntity } from "../shared";
+
+export interface User extends BaseEntity {
+  email: string;
+  name: string;
+  role: "admin" | "user" | "guest";
+  preferences: UserPreferences;
+}
+
+export interface UserPreferences {
+  theme: "light" | "dark";
+  notifications: boolean;
+}
+
+// Type boundaries
+// Each domain owns its types
+// Cross-domain types go in shared
+// API types are separate from domain types`,
+            explanation: "Organize types in a monorepo with clear boundaries. Separate shared types, domain types, and API contract types. Establish ownership and versioning strategies for types at scale."
+          }
+        },
+        {
+          title: "Lesson 2: API Contract Management with Types",
+          content: "Use TypeScript types to define and enforce API contracts across services.\n\nContract Strategies:\n• OpenAPI/Swagger type generation\n• GraphQL type generation\n• Shared contract types\n• Version management\n• Breaking change detection\n\nBenefits:\n• Type safety across services\n• Automatic validation\n• Documentation generation\n• Breaking change detection\n• Client/server type sync",
+          codeExample: {
+            code: `// API contract types
+// contracts/api/users.ts
+export interface GetUserRequest {
+  userId: string;
+}
+
+export interface GetUserResponse {
+  user: User;
+}
+
+export interface CreateUserRequest {
+  email: string;
+  name: string;
+  role?: UserRole;
+}
+
+export interface CreateUserResponse {
+  user: User;
+  token: string;
+}
+
+// Contract validation
+type RequiredFields<T, K extends keyof T> = T & Required<Pick<T, K>>;
+
+function validateRequest<T>(
+  request: unknown,
+  schema: ZodSchema<T>
+): T {
+  return schema.parse(request);
+}
+
+// Type-safe API client
+type ApiEndpoints = {
+  "GET /users/:id": {
+    params: { id: string };
+    response: GetUserResponse;
+  };
+  "POST /users": {
+    body: CreateUserRequest;
+    response: CreateUserResponse;
+  };
+};
+
+class TypeSafeApiClient {
+  async request<
+    E extends keyof ApiEndpoints,
+    R = ApiEndpoints[E]["response"]
+  >(
+    endpoint: E,
+    options: E extends keyof ApiEndpoints
+      ? ApiEndpoints[E] extends { params: infer P }
+        ? { params: P }
+        : ApiEndpoints[E] extends { body: infer B }
+        ? { body: B }
+        : {}
+      : never
+  ): Promise<R> {
+    // Implementation
+    return {} as R;
+  }
+}
+
+// Usage - fully type-safe
+const client = new TypeSafeApiClient();
+const user = await client.request("GET /users/:id", {
+  params: { id: "123" },
+});
+// user is GetUserResponse
+
+// GraphQL type generation
+// schema.graphql -> generated/types.ts (via codegen)
+// Automatic type generation from GraphQL schema
+// Ensures types stay in sync with schema`,
+            explanation: "API contract types ensure type safety across services. Define contracts explicitly, generate types from schemas (OpenAPI, GraphQL), and use type-safe clients. This catches breaking changes at compile time and keeps services in sync."
+          }
+        },
+        {
+          title: "Lesson 3: Shared Type Libraries",
+          content: "Create and maintain shared type libraries for organization-wide type safety.\n\nLibrary Design:\n• Clear public API\n• Semantic versioning\n• Breaking change policy\n• Migration guides\n• Documentation\n\nDistribution:\n• npm packages\n• Monorepo packages\n• Type-only packages\n• Version management\n\nConsumption:\n• Import strategies\n• Type re-exports\n• Module augmentation\n• Declaration merging",
+          codeExample: {
+            code: `// packages/@company/types/package.json
+{
+  "name": "@company/types",
+  "version": "2.0.0",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./api": "./dist/api/index.d.ts",
+    "./domain": "./dist/domain/index.d.ts"
+  },
+  "dependencies": {},
+  "peerDependencies": {}
+}
+
+// packages/@company/types/index.ts
+// Public API - carefully curated exports
+export * from "./shared";
+export * from "./api";
+export * from "./domain";
+
+// Versioned API types
+export * as v1 from "./api/v1";
+export * as v2 from "./api/v2";
+
+// Usage in apps
+import { User, ApiResponse } from "@company/types";
+import { GetUserResponse } from "@company/types/api/v2";
+
+// Type-only imports (tree-shakeable)
+import type { User } from "@company/types";
+
+// Module augmentation for extending types
+declare module "@company/types" {
+  interface User {
+    customField?: string;
+  }
+}
+
+// Type guards in shared library
+export function isUser(value: unknown): value is User {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "id" in value &&
+    "email" in value
+  );
+}`,
+            explanation: "Shared type libraries provide organization-wide type safety. Design clear public APIs, version types carefully, support multiple versions during migrations, and enable module augmentation for extensibility. Type-only packages have no runtime cost."
+          }
+        },
+        {
+          title: "Lesson 4: Type Governance and Best Practices",
+          content: "Establish type governance processes for large teams and organizations.\n\nGovernance Areas:\n• Type review process\n• Breaking change policy\n• Documentation standards\n• Naming conventions\n• Type complexity guidelines\n\nProcess:\n• Type RFCs for major changes\n• Automated type checking\n• Type coverage metrics\n• Breaking change detection\n• Migration automation\n\nTools:\n• TypeScript compiler checks\n• ESLint type rules\n• Custom type validators\n• Breaking change detectors",
+          codeExample: {
+            code: `// Type governance checklist
+
+// 1. Type Review Process
+// - All exported types reviewed
+// - Breaking changes documented
+// - Migration paths provided
+
+// 2. Naming Conventions
+// - Interfaces: PascalCase (User, ApiResponse)
+// - Types: PascalCase (UserRole, ApiEndpoint)
+// - Type parameters: Single uppercase letter (T, K, V)
+
+// 3. Documentation Standards
+/**
+ * Represents a user in the system.
+ * 
+ * @example
+ * const user: User = {
+ *   id: "123",
+ *   email: "user@example.com",
+ *   name: "John Doe"
+ * };
+ */
+export interface User {
+  /** Unique identifier */
+  id: string;
+  /** User's email address */
+  email: string;
+  /** User's full name */
+  name: string;
+}
+
+// 4. Complexity Guidelines
+// - Prefer composition over complex types
+// - Limit conditional type nesting
+// - Use utility types instead of inline complex types
+// - Extract complex types to named types
+
+// 5. Breaking Change Detection
+// tools/check-breaking-changes.ts
+import { compareTypes } from "./type-comparator";
+
+const oldTypes = loadTypes("v1.0.0");
+const newTypes = loadTypes("v2.0.0");
+
+const breakingChanges = compareTypes(oldTypes, newTypes);
+
+if (breakingChanges.length > 0) {
+  console.error("Breaking changes detected:", breakingChanges);
+  process.exit(1);
+}
+
+// 6. Type Coverage
+// Track type coverage across codebase
+// Enforce "no any" policy
+// Monitor type errors in CI`,
+            explanation: "Type governance ensures quality and consistency at scale. Establish review processes, naming conventions, documentation standards, complexity guidelines, and automated checking. Monitor breaking changes and type coverage across the organization."
+          }
+        },
+        {
+          title: "Lesson 5: Enterprise Type Patterns",
+          content: "Advanced patterns for maintaining type safety in enterprise applications.\n\nPatterns:\n• Multi-version type support\n• Backward compatibility\n• Type migrations\n• Cross-service type sharing\n• Distributed type systems\n\nChallenges:\n• Multiple service versions\n• Gradual migrations\n• Team coordination\n• Performance at scale\n• Tooling complexity",
+          codeExample: {
+            code: `// Multi-version support
+// Support multiple API versions simultaneously
+type ApiVersion = "v1" | "v2" | "v3";
+
+type VersionedApi<T extends ApiVersion> = {
+  v1: V1ApiTypes;
+  v2: V2ApiTypes;
+  v3: V3ApiTypes;
+}[T];
+
+function createApiClient<T extends ApiVersion>(version: T): ApiClient<VersionedApi<T>> {
+  // Implementation
+}
+
+const v2Client = createApiClient("v2"); // Type-safe v2 client
+
+// Backward compatibility types
+type BackwardCompatible<T, U> = T & Partial<U>;
+
+// Migration utilities
+type Migrate<T, U> = {
+  from: T;
+  to: U;
+  migrate: (value: T) => U;
+};
+
+// Cross-service type sharing
+// services/
+//   user-service/types.ts
+//   order-service/types.ts
+//   shared-types/        # Shared across services
+
+// Type registry for discovery
+export const TypeRegistry = {
+  User: import("@company/types/domain/user"),
+  Order: import("@company/types/domain/order"),
+  // ... more types
+} as const;
+
+// Type-safe service communication
+type ServiceContract = {
+  "user-service": {
+    "getUser": (id: string) => Promise<User>;
+    "createUser": (data: CreateUserRequest) => Promise<User>;
+  };
+  "order-service": {
+    "createOrder": (data: CreateOrderRequest) => Promise<Order>;
+  };
+};
+
+function callService<
+  S extends keyof ServiceContract,
+  M extends keyof ServiceContract[S]
+>(
+  service: S,
+  method: M,
+  ...args: Parameters<ServiceContract[S][M]>
+): ReturnType<ServiceContract[S][M]> {
+  // Implementation
+}`,
+            explanation: "Enterprise patterns handle complex scenarios: multi-version support, backward compatibility, gradual migrations, and cross-service type sharing. Design type systems that evolve safely while maintaining compatibility and type safety."
+          }
+        }
+      ],
+      conclusion: "TypeScript at scale requires careful architecture, governance, and patterns. Design type systems with clear boundaries, establish shared type libraries, manage API contracts with types, and create processes for type governance. Build type-safe architectures that scale across teams, services, and time. Remember: types are infrastructure - invest in them wisely, maintain them carefully, and they'll pay dividends in reduced bugs and improved developer experience."
     }
   }
 ];

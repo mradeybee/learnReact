@@ -15,6 +15,8 @@ import { UseIdExample } from "@/components/examples/UseIdExample";
 import { UseTransitionExample } from "@/components/examples/UseTransitionExample";
 import { UseFormStatusExample } from "@/components/examples/UseFormStatusExample";
 import { UseSyncExternalStoreExample } from "@/components/examples/UseSyncExternalStoreExample";
+import { UseDeferredValueExample } from "@/components/examples/UseDeferredValueExample";
+import { UseInsertionEffectExample } from "@/components/examples/UseInsertionEffectExample";
 import { Button } from "@/components/ui/Button";
 
 export default function HomePage() {
@@ -73,6 +75,7 @@ export default function HomePage() {
             <div className="space-y-8">
               <UseCallbackExample />
               <UseMemoExample />
+              <UseDeferredValueExample />
               <UseLayoutEffectExample />
             </div>
           </section>
@@ -91,6 +94,7 @@ export default function HomePage() {
             <h2 className="mb-4 text-2xl font-semibold">Advanced Hooks</h2>
             <div className="space-y-8">
               <UseSyncExternalStoreExample />
+              <UseInsertionEffectExample />
             </div>
           </section>
         </div>
