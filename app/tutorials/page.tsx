@@ -5,7 +5,6 @@ import { TutorialCard } from "@/components/tutorials/TutorialCard";
 import { tutorials } from "@/lib/data/tutorials";
 import { TutorialLevel } from "@/lib/types/tutorial";
 import { Button } from "@/components/ui/Button";
-import { cn } from "@/lib/utils";
 
 const levelFilters: { value: TutorialLevel | "all"; label: string }[] = [
   { value: "all", label: "All Levels" },

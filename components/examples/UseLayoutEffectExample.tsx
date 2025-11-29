@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect, useLayoutEffect, useRef } from "react";
+import { useState, useLayoutEffect, useRef } from "react";
 import { Button } from "@/components/ui/Button";
-import { cn } from "@/lib/utils";
 
 // Demo Components for each use case
 function TooltipDemo() {
@@ -31,6 +30,9 @@ function TooltipDemo() {
         top = buttonRect.top - tooltipRect.height - 8;
       }
       
+      // useLayoutEffect is designed for synchronous DOM updates before paint
+      // This is a valid use case for synchronous state updates
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTooltipStyle({ 
         top: `${top}px`, 
         left: `${left}px`
@@ -118,23 +120,23 @@ function AccordionDemo() {
 
 function ScrollRestorationDemo() {
   const [items, setItems] = useState<string[]>([]);
-  const [restorePosition, setRestorePosition] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollPositionRef = useRef(0);
+  const shouldRestoreRef = useRef(false);
 
   useLayoutEffect(() => {
-    if (restorePosition && containerRef.current) {
+    if (shouldRestoreRef.current && containerRef.current) {
       containerRef.current.scrollTop = scrollPositionRef.current;
-      setRestorePosition(false);
+      shouldRestoreRef.current = false;
     }
-  }, [items, restorePosition]);
+  }, [items]);
 
   const addItems = () => {
     if (containerRef.current) {
       scrollPositionRef.current = containerRef.current.scrollTop;
+      shouldRestoreRef.current = true;
     }
     setItems([...items, `New Item ${items.length + 1}`]);
-    setRestorePosition(true);
   };
 
   const resetItems = () => {
@@ -162,7 +164,7 @@ function ScrollRestorationDemo() {
         >
           {items.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-8">
-              Click "Add Item" to see scroll restoration
+              Click &quot;Add Item&quot; to see scroll restoration
             </p>
           ) : (
             items.map((item, idx) => (

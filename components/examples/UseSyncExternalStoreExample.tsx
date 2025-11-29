@@ -60,6 +60,11 @@ function createLocalStorageStore(key: string, initialValue: string) {
   };
 
   const subscribe = (listener: Listener) => {
+    // SSR-safe: return no-op if window is not available
+    if (typeof window === "undefined") {
+      return () => {}; // No-op unsubscribe for SSR
+    }
+    
     // Subscribe to storage events to sync across tabs
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === key) {
@@ -82,6 +87,7 @@ function createLocalStorageStore(key: string, initialValue: string) {
   };
 
   const setValue = (value: string) => {
+    if (typeof window === "undefined") return; // SSR-safe
     try {
       localStorage.setItem(key, value);
       // Dispatch custom event for same-tab updates
@@ -96,6 +102,10 @@ function createLocalStorageStore(key: string, initialValue: string) {
 
 const localStorageStore = createLocalStorageStore("useSyncExternalStore-demo", "React Hooks");
 
+// Server snapshot functions for SSR
+const getCounterServerSnapshot = () => 0;
+const getLocalStorageServerSnapshot = () => "React Hooks";
+
 /**
  * React useSyncExternalStore hook example
  * Subscribe to external data sources that work with concurrent rendering
@@ -106,13 +116,15 @@ export function UseSyncExternalStoreExample() {
   // Subscribe to external store
   const storeValue = useSyncExternalStore(
     counterStore.subscribe,
-    counterStore.getSnapshot
+    counterStore.getSnapshot,
+    getCounterServerSnapshot // getServerSnapshot - required for SSR
   );
 
   // Subscribe to localStorage
   const storedText = useSyncExternalStore(
     localStorageStore.subscribe,
-    localStorageStore.getSnapshot
+    localStorageStore.getSnapshot,
+    getLocalStorageServerSnapshot // getServerSnapshot - required for SSR
   );
 
   const handleIncrement = useCallback(() => {
