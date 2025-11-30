@@ -12847,6 +12847,5858 @@ function callService<
       ],
       conclusion: "TypeScript at scale requires careful architecture, governance, and patterns. Design type systems with clear boundaries, establish shared type libraries, manage API contracts with types, and create processes for type governance. Build type-safe architectures that scale across teams, services, and time. Remember: types are infrastructure - invest in them wisely, maintain them carefully, and they'll pay dividends in reduced bugs and improved developer experience."
     }
+  },
+  {
+    id: "intermediate-6",
+    title: "Throttling and Debouncing in React",
+    description: "Learn how to optimize event handlers and API calls using throttling and debouncing techniques to improve performance and user experience.",
+    level: "intermediate",
+    estimatedTime: "60 min",
+    topics: ["Throttling", "Debouncing", "Performance Optimization", "Event Handlers", "Custom Hooks", "API Optimization"],
+    prerequisites: ["Managing State with useState", "Understanding useEffect", "Event Handling in React"],
+    content: {
+      overview: "Throttling and debouncing are essential techniques for optimizing performance in React applications. They help control how often functions execute, which is crucial for handling frequent events like scrolling, resizing, typing, or API calls. This tutorial covers the differences between throttling and debouncing, when to use each, and how to implement them effectively in React components using custom hooks.",
+      sections: [
+        {
+          title: "Understanding Throttling vs Debouncing",
+          content: "Throttling and debouncing are often confused, but they serve different purposes.\n\nThrottling:\n• Limits function execution to at most once per time period\n• Executes the function at regular intervals\n• Useful for events that fire continuously (scroll, resize, mousemove)\n• Example: Update scroll position indicator every 100ms\n\nDebouncing:\n• Delays function execution until after a period of inactivity\n• Executes only after user stops the action\n• Useful for events that should trigger after completion (search input, form validation)\n• Example: Search API call only after user stops typing for 300ms\n\nKey Difference:\n• Throttling: \"Execute at most once per X milliseconds\"\n• Debouncing: \"Execute only if X milliseconds have passed since last call\"\n\nVisual Analogy:\n• Throttling: Like a metronome - regular beats\n• Debouncing: Like an elevator - waits for everyone to get on before moving",
+          codeExample: {
+            code: `// Throttling: Execute at most once per 100ms
+// If called 10 times in 50ms, executes 2 times (at 0ms and 100ms)
+
+// Debouncing: Execute only after 300ms of inactivity
+// If called 10 times in 500ms, executes once (300ms after last call)
+
+// Example scenario: User typing "hello"
+// Throttling (100ms): Executes at h, l, o (3 times)
+// Debouncing (300ms): Executes once after "o" + 300ms (1 time)`,
+            explanation: "Throttling ensures regular execution, while debouncing waits for a pause in activity. Choose throttling for continuous events and debouncing for events that should trigger after completion."
+          }
+        },
+        {
+          title: "Implementing Debouncing",
+          content: "Debouncing is perfect for search inputs, form validation, and API calls triggered by user input.\n\nWhen to Use Debouncing:\n• Search input fields\n• Form validation on typing\n• API calls triggered by input\n• Window resize handlers (sometimes)\n• Auto-save functionality\n\nBenefits:\n• Reduces unnecessary API calls\n• Improves performance\n• Better user experience (less flickering)\n• Saves server resources\n\nImplementation Steps:\n1. Create a debounce function\n2. Use useMemo or useCallback to create debounced version\n3. Clean up on unmount\n4. Handle edge cases (immediate execution, cancellation)",
+          codeExample: {
+            code: `// Basic debounce implementation
+function debounce<T extends (...args: unknown[]) => unknown>(
+  func: T,
+  wait: number
+): (...args: Parameters<T>) => void {
+  let timeoutId: NodeJS.Timeout | null = null;
+  
+  return function executedFunction(...args: Parameters<T>) {
+    // Clear previous timeout
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+    
+    // Set new timeout
+    timeoutId = setTimeout(() => {
+      func(...args);
+    }, wait);
+  };
+}
+
+// Using debounce in React component
+function SearchInput() {
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<string[]>([]);
+  
+  // Debounced search function
+  const debouncedSearch = useMemo(
+    () => debounce(async (searchQuery: string) => {
+      if (!searchQuery.trim()) {
+        setResults([]);
+        return;
+      }
+      
+      // Simulate API call
+      const response = await fetch(\`/api/search?q=\${searchQuery}\`);
+      const data = await response.json();
+      setResults(data.results);
+    }, 300),
+    [] // Only create once
+  );
+  
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      // Cancel pending debounced calls
+      debouncedSearch.cancel?.();
+    };
+  }, [debouncedSearch]);
+  
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setQuery(value);
+    debouncedSearch(value);
+  };
+  
+  return (
+    <div>
+      <input
+        type="text"
+        value={query}
+        onChange={handleChange}
+        placeholder="Search..."
+      />
+      <ul>
+        {results.map((result, idx) => (
+          <li key={idx}>{result}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+// Enhanced debounce with immediate execution option
+function debounceImmediate<T extends (...args: unknown[]) => unknown>(
+  func: T,
+  wait: number,
+  immediate = false
+): (...args: Parameters<T>) => void {
+  let timeoutId: NodeJS.Timeout | null = null;
+  
+  return function executedFunction(...args: Parameters<T>) {
+    const callNow = immediate && !timeoutId;
+    
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+    
+    timeoutId = setTimeout(() => {
+      timeoutId = null;
+      if (!immediate) {
+        func(...args);
+      }
+    }, wait);
+    
+    if (callNow) {
+      func(...args);
+    }
+  };
+}`,
+            explanation: "Debouncing delays execution until after a period of inactivity. Use it for search inputs and API calls to reduce unnecessary requests and improve performance."
+          }
+        },
+        {
+          title: "Implementing Throttling",
+          content: "Throttling ensures functions execute at most once per time period, perfect for continuous events.\n\nWhen to Use Throttling:\n• Scroll event handlers\n• Window resize handlers\n• Mouse move tracking\n• Touch move events\n• Infinite scroll loading\n• Analytics tracking\n\nBenefits:\n• Prevents excessive function calls\n• Maintains responsiveness\n• Reduces performance impact\n• Smooth user experience\n\nImplementation Approaches:\n1. Leading edge: Execute immediately, then throttle\n2. Trailing edge: Execute at end of time period\n3. Both: Execute immediately and at end",
+          codeExample: {
+            code: `// Basic throttle implementation (leading edge)
+function throttle<T extends (...args: unknown[]) => unknown>(
+  func: T,
+  limit: number
+): (...args: Parameters<T>) => void {
+  let inThrottle: boolean;
+  
+  return function executedFunction(...args: Parameters<T>) {
+    if (!inThrottle) {
+      func(...args);
+      inThrottle = true;
+      setTimeout(() => {
+        inThrottle = false;
+      }, limit);
+    }
+  };
+}
+
+// Throttle with trailing edge option
+function throttleTrailing<T extends (...args: unknown[]) => unknown>(
+  func: T,
+  limit: number
+): (...args: Parameters<T>) => void {
+  let lastFunc: NodeJS.Timeout | null = null;
+  let lastRan: number = 0;
+  
+  return function executedFunction(...args: Parameters<T>) {
+    if (!lastRan) {
+      func(...args);
+      lastRan = Date.now();
+    } else {
+      if (lastFunc) {
+        clearTimeout(lastFunc);
+      }
+      lastFunc = setTimeout(() => {
+        if (Date.now() - lastRan >= limit) {
+          func(...args);
+          lastRan = Date.now();
+        }
+      }, limit - (Date.now() - lastRan));
+    }
+  };
+}
+
+// Using throttle in React component
+function ScrollTracker() {
+  const [scrollY, setScrollY] = useState(0);
+  const [scrollCount, setScrollCount] = useState(0);
+  
+  useEffect(() => {
+    const handleScroll = throttle(() => {
+      setScrollY(window.scrollY);
+      setScrollCount(prev => prev + 1);
+    }, 100); // Execute at most once per 100ms
+    
+    window.addEventListener('scroll', handleScroll);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+  
+  return (
+    <div>
+      <p>Scroll Position: {scrollY}px</p>
+      <p>Scroll Events Processed: {scrollCount}</p>
+      <p className="text-sm text-muted-foreground">
+        (Throttled to max 10 times per second)
+      </p>
+    </div>
+  );
+}
+
+// Throttled resize handler
+function ResponsiveComponent() {
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  
+  useEffect(() => {
+    const handleResize = throttle(() => {
+      setWindowWidth(window.innerWidth);
+    }, 250);
+    
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+  
+  return (
+    <div>
+      <p>Window Width: {windowWidth}px</p>
+      {windowWidth < 768 && <p>Mobile View</p>}
+      {windowWidth >= 768 && <p>Desktop View</p>}
+    </div>
+  );
+}`,
+            explanation: "Throttling limits function execution frequency. Use it for continuous events like scrolling and resizing to maintain performance while still responding to user actions."
+          }
+        },
+        {
+          title: "Custom React Hooks for Throttling and Debouncing",
+          content: "Creating custom hooks makes throttling and debouncing reusable across components.\n\nBenefits of Custom Hooks:\n• Reusable logic\n• Clean component code\n• Proper cleanup handling\n• Type safety\n• Easy testing\n\nHook Design Considerations:\n• Handle cleanup on unmount\n• Support dependency arrays\n• Allow configuration (delay, immediate)\n• Return cancel function\n• TypeScript support",
+          codeExample: {
+            code: `// Custom useDebounce hook
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+  
+  useEffect(() => {
+    // Set timeout to update debounced value
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+    
+    // Cleanup timeout on value change or unmount
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+  
+  return debouncedValue;
+}
+
+// Usage: Debounce search query
+function SearchComponent() {
+  const [query, setQuery] = useState('');
+  const debouncedQuery = useDebounce(query, 300);
+  const [results, setResults] = useState<string[]>([]);
+  
+  useEffect(() => {
+    if (debouncedQuery) {
+      // API call only happens after user stops typing
+      fetch(\`/api/search?q=\${debouncedQuery}\`)
+        .then(res => res.json())
+        .then(data => setResults(data.results));
+    }
+  }, [debouncedQuery]);
+  
+  return (
+    <div>
+      <input
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Search..."
+      />
+      <ul>
+        {results.map((result, idx) => (
+          <li key={idx}>{result}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+// Custom useDebounceCallback hook
+function useDebounceCallback<T extends (...args: unknown[]) => unknown>(
+  callback: T,
+  delay: number
+): T {
+  const timeoutRef = useRef<NodeJS.Timeout>();
+  const callbackRef = useRef(callback);
+  
+  // Update callback ref when callback changes
+  useEffect(() => {
+    callbackRef.current = callback;
+  }, [callback]);
+  
+  const debouncedCallback = useCallback(
+    ((...args: Parameters<T>) => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      
+      timeoutRef.current = setTimeout(() => {
+        callbackRef.current(...args);
+      }, delay);
+    }) as T,
+    [delay]
+  );
+  
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+  
+  return debouncedCallback;
+}
+
+// Custom useThrottle hook
+function useThrottle<T>(value: T, limit: number): T {
+  const [throttledValue, setThrottledValue] = useState<T>(value);
+  const lastRan = useRef<number>(Date.now());
+  
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      if (Date.now() - lastRan.current >= limit) {
+        setThrottledValue(value);
+        lastRan.current = Date.now();
+      }
+    }, limit - (Date.now() - lastRan.current));
+    
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, limit]);
+  
+  return throttledValue;
+}
+
+// Custom useThrottleCallback hook
+function useThrottleCallback<T extends (...args: unknown[]) => unknown>(
+  callback: T,
+  limit: number
+): T {
+  const lastRan = useRef<number>(0);
+  const callbackRef = useRef(callback);
+  
+  useEffect(() => {
+    callbackRef.current = callback;
+  }, [callback]);
+  
+  const throttledCallback = useCallback(
+    ((...args: Parameters<T>) => {
+      const now = Date.now();
+      if (now - lastRan.current >= limit) {
+        callbackRef.current(...args);
+        lastRan.current = now;
+      }
+    }) as T,
+    [limit]
+  );
+  
+  return throttledCallback;
+}
+
+// Usage: Throttled scroll handler
+function ScrollComponent() {
+  const [scrollY, setScrollY] = useState(0);
+  
+  const handleScroll = useThrottleCallback(() => {
+    setScrollY(window.scrollY);
+  }, 100);
+  
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
+  
+  return <div>Scroll Position: {scrollY}px</div>;
+}`,
+            explanation: "Custom hooks encapsulate throttling and debouncing logic, making it reusable and easier to use in components. They handle cleanup automatically and provide a clean API."
+          }
+        },
+        {
+          title: "Real-World Use Cases",
+          content: "Understanding when and how to apply throttling and debouncing in real applications.\n\nCommon Scenarios:\n\n1. Search Input (Debounce):\n• User types search query\n• Wait 300ms after typing stops\n• Then make API call\n• Reduces API calls from 10+ to 1\n\n2. Infinite Scroll (Throttle):\n• User scrolls down page\n• Check scroll position every 200ms\n• Load more content when near bottom\n• Prevents excessive checks\n\n3. Form Validation (Debounce):\n• User types in email field\n• Wait 500ms after typing stops\n• Then validate email format\n• Better UX than validating on every keystroke\n\n4. Window Resize (Throttle):\n• User resizes browser window\n• Update layout calculations every 250ms\n• Prevents layout thrashing\n\n5. Button Click (Debounce):\n• Prevent double-clicks\n• Disable button for 1000ms after click\n• Prevents duplicate submissions\n\n6. Analytics Tracking (Throttle):\n• Track scroll depth\n• Send analytics every 2 seconds\n• Reduces network requests\n\nBest Practices:\n• Use debounce for user input (search, validation)\n• Use throttle for continuous events (scroll, resize)\n• Choose appropriate delays (100-500ms common)\n• Always cleanup in useEffect\n• Test with fast user interactions",
+          codeExample: {
+            code: `// 1. Search with debounce
+function SearchPage() {
+  const [query, setQuery] = useState('');
+  const debouncedQuery = useDebounce(query, 300);
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  
+  useEffect(() => {
+    if (!debouncedQuery) {
+      setResults([]);
+      return;
+    }
+    
+    setLoading(true);
+    searchAPI(debouncedQuery)
+      .then(data => {
+        setResults(data);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [debouncedQuery]);
+  
+  return (
+    <div>
+      <input
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Search products..."
+      />
+      {loading && <p>Searching...</p>}
+      <ResultsList results={results} />
+    </div>
+  );
+}
+
+// 2. Infinite scroll with throttle
+function InfiniteScrollList() {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  
+  const checkScroll = useThrottleCallback(() => {
+    const scrollTop = window.scrollY;
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
+    
+    // Load more when 200px from bottom
+    if (documentHeight - (scrollTop + windowHeight) < 200 && hasMore && !loading) {
+      loadMore();
+    }
+  }, 200);
+  
+  const loadMore = async () => {
+    setLoading(true);
+    const newItems = await fetchMoreItems();
+    setItems(prev => [...prev, ...newItems]);
+    setHasMore(newItems.length > 0);
+    setLoading(false);
+  };
+  
+  useEffect(() => {
+    window.addEventListener('scroll', checkScroll);
+    return () => window.removeEventListener('scroll', checkScroll);
+  }, [checkScroll, hasMore, loading]);
+  
+  return <ItemList items={items} />;
+}
+
+// 3. Form validation with debounce
+function EmailInput() {
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState('');
+  const debouncedEmail = useDebounce(email, 500);
+  
+  useEffect(() => {
+    if (!debouncedEmail) {
+      setError('');
+      return;
+    }
+    
+    const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+    if (!emailRegex.test(debouncedEmail)) {
+      setError('Please enter a valid email address');
+    } else {
+      setError('');
+    }
+  }, [debouncedEmail]);
+  
+  return (
+    <div>
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="Email"
+      />
+      {error && <p className="text-red-500">{error}</p>}
+    </div>
+  );
+}
+
+// 4. Button click debounce (prevent double-click)
+function SubmitButton() {
+  const [disabled, setDisabled] = useState(false);
+  
+  const handleSubmit = useDebounceCallback(async () => {
+    setDisabled(true);
+    await submitForm();
+    setDisabled(false);
+  }, 1000);
+  
+  return (
+    <button onClick={handleSubmit} disabled={disabled}>
+      {disabled ? 'Submitting...' : 'Submit'}
+    </button>
+  );
+}
+
+// 5. Analytics tracking with throttle
+function ScrollAnalytics() {
+  const trackScroll = useThrottleCallback(() => {
+    const scrollPercent = 
+      (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+    
+    // Send to analytics (throttled to every 2 seconds)
+    analytics.track('scroll_depth', { percent: Math.round(scrollPercent) });
+  }, 2000);
+  
+  useEffect(() => {
+    window.addEventListener('scroll', trackScroll);
+    return () => window.removeEventListener('scroll', trackScroll);
+  }, [trackScroll]);
+  
+  return null; // This is just for tracking
+}`,
+            explanation: "Real-world applications use throttling and debouncing for search, infinite scroll, form validation, button clicks, and analytics. Choose the right technique based on the use case."
+          }
+        },
+        {
+          title: "Performance Considerations and Best Practices",
+          content: "Understanding performance implications and following best practices ensures optimal results.\n\nPerformance Tips:\n• Choose appropriate delays (100-500ms common)\n• Use debounce for expensive operations (API calls)\n• Use throttle for frequent events (scroll, resize)\n• Always cleanup timeouts/intervals\n• Consider using requestAnimationFrame for animations\n• Test with fast user interactions\n\nCommon Pitfalls:\n• Forgetting to cleanup (memory leaks)\n• Creating new debounced/throttled functions on every render\n• Using wrong technique for the use case\n• Too short delays (poor UX)\n• Too long delays (feels unresponsive)\n\nBest Practices:\n• Use useMemo/useCallback for stable references\n• Cleanup in useEffect return\n• Test edge cases (rapid clicking, fast typing)\n• Consider user experience\n• Monitor performance impact\n• Use TypeScript for type safety",
+          codeExample: {
+            code: `// ❌ BAD: Creating new debounced function on every render
+function BadSearch() {
+  const [query, setQuery] = useState('');
+  
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setQuery(value);
+    
+    // ❌ New debounced function created every render!
+    const debounced = debounce(() => {
+      searchAPI(value);
+    }, 300);
+    debounced();
+  };
+  
+  return <input value={query} onChange={handleChange} />;
+}
+
+// ✅ GOOD: Stable debounced function reference
+function GoodSearch() {
+  const [query, setQuery] = useState('');
+  
+  const debouncedSearch = useMemo(
+    () => debounce((searchQuery: string) => {
+      searchAPI(searchQuery);
+    }, 300),
+    [] // Only create once
+  );
+  
+  // Cleanup
+  useEffect(() => {
+    return () => {
+      debouncedSearch.cancel?.();
+    };
+  }, [debouncedSearch]);
+  
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setQuery(value);
+    debouncedSearch(value);
+  };
+  
+  return <input value={query} onChange={handleChange} />;
+}
+
+// ❌ BAD: No cleanup (memory leak)
+function BadThrottle() {
+  useEffect(() => {
+    const handler = throttle(() => {
+      console.log('scroll');
+    }, 100);
+    
+    window.addEventListener('scroll', handler);
+    // ❌ Missing cleanup!
+  }, []);
+  
+  return <div>Content</div>;
+}
+
+// ✅ GOOD: Proper cleanup
+function GoodThrottle() {
+  useEffect(() => {
+    const handler = throttle(() => {
+      console.log('scroll');
+    }, 100);
+    
+    window.addEventListener('scroll', handler);
+    
+    // ✅ Cleanup on unmount
+    return () => {
+      window.removeEventListener('scroll', handler);
+    };
+  }, []);
+  
+  return <div>Content</div>;
+}
+
+// Performance comparison
+function PerformanceDemo() {
+  const [count, setCount] = useState(0);
+  const [throttledCount, setThrottledCount] = useState(0);
+  
+  // Without throttle: fires on every scroll
+  useEffect(() => {
+    const handler = () => setCount(prev => prev + 1);
+    window.addEventListener('scroll', handler);
+    return () => window.removeEventListener('scroll', handler);
+  }, []);
+  
+  // With throttle: fires max once per 100ms
+  useEffect(() => {
+    const handler = throttle(() => {
+      setThrottledCount(prev => prev + 1);
+    }, 100);
+    window.addEventListener('scroll', handler);
+    return () => window.removeEventListener('scroll', handler);
+  }, []);
+  
+  return (
+    <div>
+      <p>Scroll Events (no throttle): {count}</p>
+      <p>Scroll Events (throttled): {throttledCount}</p>
+      <p className="text-sm text-muted-foreground">
+        Scroll quickly to see the difference!
+      </p>
+    </div>
+  );
+}
+
+// Choosing the right delay
+const DELAY_GUIDE = {
+  // Debounce delays
+  search: 300,        // Search input: 300ms
+  validation: 500,    // Form validation: 500ms
+  autosave: 1000,    // Auto-save: 1000ms
+  
+  // Throttle delays
+  scroll: 100,       // Scroll tracking: 100ms
+  resize: 250,       // Window resize: 250ms
+  mousemove: 16,     // Mouse move (60fps): 16ms
+  analytics: 2000,   // Analytics: 2000ms
+};`,
+            explanation: "Follow best practices: use stable function references, always cleanup, choose appropriate delays, and test performance. Avoid common pitfalls like memory leaks and recreating functions on every render."
+          }
+        }
+      ],
+      conclusion: "Throttling and debouncing are essential techniques for optimizing React applications. Use debouncing for user input and API calls that should wait for completion. Use throttling for continuous events like scrolling and resizing. Create custom hooks for reusability, always handle cleanup properly, and choose appropriate delays based on your use case. These techniques significantly improve performance and user experience by reducing unnecessary function executions and API calls. Remember: debounce waits for a pause, throttle limits frequency - choose the right tool for the job."
+    }
+  },
+  {
+    id: "beginner-6",
+    title: "Conditional Rendering and Lists in React",
+    description: "Learn how to conditionally render components and display lists of data efficiently in React applications.",
+    level: "beginner",
+    estimatedTime: "50 min",
+    topics: ["Conditional Rendering", "Lists", "Keys", "Array Methods", "Filtering", "Mapping"],
+    prerequisites: ["Understanding Props", "Managing State with useState"],
+    content: {
+      overview: "Conditional rendering and lists are fundamental patterns in React. You'll frequently need to show or hide components based on conditions, and display collections of data. This tutorial covers all the ways to conditionally render content and how to properly render lists with keys for optimal performance.",
+      sections: [
+        {
+          title: "Understanding Conditional Rendering",
+          content: "Conditional rendering allows you to show or hide components based on conditions. React supports several patterns for conditional rendering.\n\nCommon Use Cases:\n• Show/hide components based on state\n• Display different content for logged in/out users\n• Show loading states\n• Display error messages conditionally\n• Render different components based on props\n\nWhy It's Important:\n• Creates dynamic, interactive UIs\n• Improves user experience\n• Reduces unnecessary DOM elements\n• Makes components more flexible",
+          codeExample: {
+            code: `// Basic conditional rendering with if/else
+function Greeting({ isLoggedIn }) {
+  if (isLoggedIn) {
+    return <h1>Welcome back!</h1>;
+  } else {
+    return <h1>Please sign in.</h1>;
+  }
+}
+
+// Conditional rendering with ternary operator
+function UserStatus({ isOnline }) {
+  return (
+    <div>
+      <p>Status: {isOnline ? 'Online' : 'Offline'}</p>
+      {isOnline ? (
+        <span className="text-green-500">●</span>
+      ) : (
+        <span className="text-gray-500">○</span>
+      )}
+    </div>
+  );
+}
+
+// Conditional rendering with && operator
+function Notification({ count }) {
+  return (
+    <div>
+      <h2>Notifications</h2>
+      {count > 0 && (
+        <p>You have {count} new notifications</p>
+      )}
+      {count === 0 && (
+        <p>No new notifications</p>
+      )}
+    </div>
+  );
+}
+
+// Preventing component from rendering
+function Warning({ show }) {
+  if (!show) {
+    return null; // Don't render anything
+  }
+  
+  return <div className="warning">Warning message</div>;
+}`,
+            explanation: "Use if/else for simple conditions, ternary for inline conditions, && for conditional rendering, and return null to prevent rendering. Choose the pattern that makes your code most readable."
+          }
+        },
+        {
+          title: "Rendering Lists of Data",
+          content: "React makes it easy to render lists of items. You use JavaScript's array methods, especially map(), to transform arrays of data into arrays of React elements.\n\nKey Concepts:\n• Use map() to transform arrays to JSX\n• Each list item needs a unique key\n• Keys help React identify which items changed\n• Keys should be stable, predictable, and unique\n\nCommon Patterns:\n• Rendering arrays of objects\n• Filtering before rendering\n• Sorting lists\n• Nested lists",
+          codeExample: {
+            code: `// Basic list rendering
+function NumberList({ numbers }) {
+  return (
+    <ul>
+      {numbers.map((number) => (
+        <li key={number}>{number}</li>
+      ))}
+    </ul>
+  );
+}
+
+// Rendering list of objects
+const users = [
+  { id: 1, name: 'Alice', age: 25 },
+  { id: 2, name: 'Bob', age: 30 },
+  { id: 3, name: 'Charlie', age: 35 }
+];
+
+function UserList() {
+  return (
+    <ul>
+      {users.map((user) => (
+        <li key={user.id}>
+          {user.name} - {user.age} years old
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+// List with component
+function TodoList({ todos }) {
+  return (
+    <div>
+      {todos.map((todo) => (
+        <TodoItem key={todo.id} todo={todo} />
+      ))}
+    </div>
+  );
+}
+
+function TodoItem({ todo }) {
+  return (
+    <div>
+      <h3>{todo.title}</h3>
+      <p>{todo.description}</p>
+    </div>
+  );
+}`,
+            explanation: "Use map() to transform arrays into JSX elements. Always provide a key prop for list items. Use unique IDs when available, or index as last resort."
+          }
+        },
+        {
+          title: "Understanding Keys in Lists",
+          content: "Keys are special string attributes you need to include when creating lists of elements. They help React identify which items have changed, been added, or removed.\n\nWhy Keys Matter:\n• Help React efficiently update the DOM\n• Preserve component state across re-renders\n• Prevent bugs when list order changes\n• Improve performance\n\nKey Rules:\n• Keys must be unique among siblings\n• Keys should be stable (don't use index if items can reorder)\n• Keys should be predictable (not random)\n• Keys only need to be unique within the same list\n\nWhat NOT to Use:\n• Don't use array index if items can be reordered\n• Don't use random values\n• Don't use keys that change on every render",
+          codeExample: {
+            code: `// ✅ GOOD: Using unique IDs
+function UserList({ users }) {
+  return (
+    <ul>
+      {users.map((user) => (
+        <li key={user.id}>{user.name}</li>
+      ))}
+    </ul>
+  );
+}
+
+// ✅ OK: Using index when list is static
+function StaticList({ items }) {
+  return (
+    <ul>
+      {items.map((item, index) => (
+        <li key={index}>{item}</li>
+      ))}
+    </ul>
+  );
+}
+
+// ❌ BAD: Using index when items can be reordered
+function TodoList({ todos }) {
+  const [sortedTodos, setSortedTodos] = useState(todos);
+  
+  return (
+    <ul>
+      {sortedTodos.map((todo, index) => (
+        <li key={index}>{todo.text}</li>
+        // ❌ If todos are reordered, React will get confused
+      ))}
+    </ul>
+  );
+}
+
+// ✅ GOOD: Using stable unique IDs
+function TodoList({ todos }) {
+  const [sortedTodos, setSortedTodos] = useState(todos);
+  
+  return (
+    <ul>
+      {sortedTodos.map((todo) => (
+        <li key={todo.id}>{todo.text}</li>
+        // ✅ React can track items even when reordered
+      ))}
+    </ul>
+  );
+}
+
+// Creating keys from multiple properties
+function ProductList({ products }) {
+  return (
+    <div>
+      {products.map((product) => (
+        <Product
+          key={\`\${product.category}-\${product.id}\`}
+          product={product}
+        />
+      ))}
+    </div>
+  );
+}`,
+            explanation: "Keys help React efficiently update lists. Use unique, stable IDs when possible. Only use index for static lists that never reorder. Never use random values or values that change on every render."
+          }
+        },
+        {
+          title: "Filtering and Transforming Lists",
+          content: "Often you need to filter, sort, or transform data before rendering it. JavaScript array methods work perfectly with React.\n\nCommon Operations:\n• filter() - Show only items matching criteria\n• sort() - Order items\n• slice() - Show limited items\n• find() - Find specific item\n• reduce() - Aggregate data\n\nBest Practices:\n• Filter before mapping when possible\n• Use useMemo for expensive operations\n• Keep transformations readable\n• Consider extracting complex logic",
+          codeExample: {
+            code: `// Filtering before rendering
+function ActiveUsers({ users }) {
+  const activeUsers = users.filter(user => user.isActive);
+  
+  return (
+    <ul>
+      {activeUsers.map(user => (
+        <li key={user.id}>{user.name}</li>
+      ))}
+    </ul>
+  );
+}
+
+// Filtering and mapping together
+function TodoList({ todos, filter }) {
+  const filteredTodos = todos.filter(todo => {
+    if (filter === 'active') return !todo.completed;
+    if (filter === 'completed') return todo.completed;
+    return true; // 'all'
+  });
+  
+  return (
+    <ul>
+      {filteredTodos.map(todo => (
+        <TodoItem key={todo.id} todo={todo} />
+      ))}
+    </ul>
+  );
+}
+
+// Sorting before rendering
+function SortedProductList({ products }) {
+  const sortedProducts = [...products].sort((a, b) => 
+    a.price - b.price
+  );
+  
+  return (
+    <div>
+      {sortedProducts.map(product => (
+        <Product key={product.id} product={product} />
+      ))}
+    </div>
+  );
+}
+
+// Complex filtering and transformation
+function UserDashboard({ users }) {
+  const stats = useMemo(() => {
+    const active = users.filter(u => u.isActive).length;
+    const admins = users.filter(u => u.role === 'admin').length;
+    const total = users.length;
+    
+    return { active, admins, total };
+  }, [users]);
+  
+  return (
+    <div>
+      <p>Total: {stats.total}</p>
+      <p>Active: {stats.active}</p>
+      <p>Admins: {stats.admins}</p>
+    </div>
+  );
+}
+
+// Conditional list rendering
+function SearchResults({ query, items }) {
+  const filtered = items.filter(item =>
+    item.name.toLowerCase().includes(query.toLowerCase())
+  );
+  
+  if (filtered.length === 0) {
+    return <p>No results found</p>;
+  }
+  
+  return (
+    <ul>
+      {filtered.map(item => (
+        <li key={item.id}>{item.name}</li>
+      ))}
+    </ul>
+  );
+}`,
+            explanation: "Use JavaScript array methods to filter, sort, and transform data before rendering. Use useMemo for expensive operations. Always filter before mapping when possible for better performance."
+          }
+        },
+        {
+          title: "Nested Lists and Complex Structures",
+          content: "Sometimes you need to render nested lists or complex data structures. The same principles apply, but you need to handle keys carefully.\n\nNested List Patterns:\n• Lists within lists\n• Tables with rows and cells\n• Nested components with lists\n• Hierarchical data structures\n\nKey Considerations:\n• Each level needs its own keys\n• Keys must be unique at their level\n• Consider component structure\n• Keep nesting shallow when possible",
+          codeExample: {
+            code: `// Nested lists
+function CategoryList({ categories }) {
+  return (
+    <ul>
+      {categories.map(category => (
+        <li key={category.id}>
+          <h3>{category.name}</h3>
+          <ul>
+            {category.items.map(item => (
+              <li key={item.id}>{item.name}</li>
+            ))}
+          </ul>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+// Table with rows
+function DataTable({ data }) {
+  return (
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+        </tr>
+      </thead>
+      <tbody>
+        {data.map(row => (
+          <tr key={row.id}>
+            <td>{row.name}</td>
+            <td>{row.email}</td>
+            <td>{row.role}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
+// Complex nested structure
+function CommentThread({ comments }) {
+  return (
+    <div>
+      {comments.map(comment => (
+        <div key={comment.id}>
+          <Comment comment={comment} />
+          {comment.replies && comment.replies.length > 0 && (
+            <div className="ml-8">
+              {comment.replies.map(reply => (
+                <Comment key={reply.id} comment={reply} />
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Grid layout
+function ProductGrid({ products }) {
+  return (
+    <div className="grid grid-cols-3 gap-4">
+      {products.map(product => (
+        <ProductCard key={product.id} product={product} />
+      ))}
+    </div>
+  );
+}`,
+            explanation: "Nested lists work the same way - each level needs keys. Keep structure clear and consider extracting complex nested components for better readability."
+          }
+        },
+        {
+          title: "Common Patterns and Best Practices",
+          content: "Following best practices makes your list rendering code more maintainable and performant.\n\nBest Practices:\n• Always use keys for list items\n• Use unique, stable IDs when possible\n• Filter before mapping\n• Extract list items into components\n• Use useMemo for expensive transformations\n• Handle empty states\n• Consider pagination for large lists\n• Use virtual scrolling for very long lists\n\nCommon Patterns:\n• Empty state handling\n• Loading states\n• Error states\n• Pagination\n• Infinite scroll\n• Search/filter UI",
+          codeExample: {
+            code: `// ✅ GOOD: Complete list component with all states
+function UserList({ users, loading, error }) {
+  if (loading) {
+    return <div>Loading users...</div>;
+  }
+  
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
+  
+  if (users.length === 0) {
+    return <div>No users found</div>;
+  }
+  
+  return (
+    <ul>
+      {users.map(user => (
+        <UserItem key={user.id} user={user} />
+      ))}
+    </ul>
+  );
+}
+
+// ✅ GOOD: Extracted list item component
+function TodoList({ todos }) {
+  return (
+    <ul>
+      {todos.map(todo => (
+        <TodoItem key={todo.id} todo={todo} />
+      ))}
+    </ul>
+  );
+}
+
+function TodoItem({ todo }) {
+  return (
+    <li className={todo.completed ? 'completed' : ''}>
+      <input type="checkbox" checked={todo.completed} />
+      <span>{todo.text}</span>
+    </li>
+  );
+}
+
+// ✅ GOOD: Using useMemo for expensive operations
+function ExpensiveList({ items, filter }) {
+  const filteredItems = useMemo(() => {
+    return items
+      .filter(item => item.category === filter)
+      .sort((a, b) => a.price - b.price);
+  }, [items, filter]);
+  
+  return (
+    <div>
+      {filteredItems.map(item => (
+        <ItemCard key={item.id} item={item} />
+      ))}
+    </div>
+  );
+}
+
+// ✅ GOOD: Pagination
+function PaginatedList({ items, pageSize = 10 }) {
+  const [page, setPage] = useState(1);
+  const startIndex = (page - 1) * pageSize;
+  const paginatedItems = items.slice(startIndex, startIndex + pageSize);
+  
+  return (
+    <div>
+      <ul>
+        {paginatedItems.map(item => (
+          <li key={item.id}>{item.name}</li>
+        ))}
+      </ul>
+      <div>
+        <button onClick={() => setPage(p => p - 1)} disabled={page === 1}>
+          Previous
+        </button>
+        <span>Page {page}</span>
+        <button 
+          onClick={() => setPage(p => p + 1)} 
+          disabled={startIndex + pageSize >= items.length}
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  );
+}`,
+            explanation: "Follow best practices: handle all states (loading, error, empty), extract list items into components, use useMemo for expensive operations, and consider pagination for large lists."
+          }
+        }
+      ],
+      conclusion: "Conditional rendering and lists are fundamental to React development. Use conditional rendering to create dynamic UIs, and always provide keys when rendering lists. Filter and transform data before rendering, handle empty states, and extract list items into components for better maintainability. Remember: keys help React efficiently update lists, so use unique, stable IDs whenever possible."
+    }
+  },
+  {
+    id: "beginner-7",
+    title: "Event Handling in React",
+    description: "Learn how to handle user interactions like clicks, form submissions, and keyboard events in React components.",
+    level: "beginner",
+    estimatedTime: "45 min",
+    topics: ["Event Handlers", "Synthetic Events", "Form Events", "Keyboard Events", "Event Binding", "Preventing Default"],
+    prerequisites: ["Understanding Props", "Managing State with useState"],
+    content: {
+      overview: "Event handling is how you make React components interactive. React uses SyntheticEvents - a wrapper around native browser events that provides consistent behavior across browsers. This tutorial covers all aspects of handling events in React, from simple clicks to complex form interactions.",
+      sections: [
+        {
+          title: "Understanding React Events",
+          content: "React events are similar to native DOM events, but with some important differences.\n\nKey Concepts:\n• React uses SyntheticEvents (cross-browser compatible)\n• Event handlers are passed as props (onClick, onChange, etc.)\n• Events are camelCase (onClick, not onclick)\n• Event handlers receive a SyntheticEvent object\n• React pools events for performance\n\nDifferences from Native Events:\n• Consistent across browsers\n• Events are pooled (for performance)\n• Can't access event asynchronously without special handling\n• Some events work differently (e.g., onChange fires on every keystroke)",
+          codeExample: {
+            code: `// Basic event handler
+function Button() {
+  const handleClick = () => {
+    console.log('Button clicked!');
+  };
+  
+  return <button onClick={handleClick}>Click me</button>;
+}
+
+// Inline event handler
+function Button() {
+  return (
+    <button onClick={() => console.log('Clicked!')}>
+      Click me
+    </button>
+  );
+}
+
+// Event handler with parameters
+function ButtonList() {
+  const handleClick = (id) => {
+    console.log('Button', id, 'clicked');
+  };
+  
+  return (
+    <div>
+      <button onClick={() => handleClick(1)}>Button 1</button>
+      <button onClick={() => handleClick(2)}>Button 2</button>
+    </div>
+  );
+}
+
+// Accessing event object
+function Input() {
+  const handleChange = (event) => {
+    console.log('Input value:', event.target.value);
+  };
+  
+  return <input onChange={handleChange} />;
+}`,
+            explanation: "React events work similarly to native events but use camelCase props. Event handlers receive a SyntheticEvent object with the same interface as native events."
+          }
+        },
+        {
+          title: "Common Event Types",
+          content: "React supports all standard DOM events. Here are the most commonly used ones.\n\nMouse Events:\n• onClick - Click\n• onDoubleClick - Double click\n• onMouseEnter - Mouse enters element\n• onMouseLeave - Mouse leaves element\n• onMouseOver - Mouse over element\n• onMouseDown - Mouse button pressed\n• onMouseUp - Mouse button released\n\nForm Events:\n• onChange - Value changed (fires on every keystroke for inputs)\n• onSubmit - Form submitted\n• onFocus - Element receives focus\n• onBlur - Element loses focus\n• onInput - Input value changed\n\nKeyboard Events:\n• onKeyDown - Key pressed down\n• onKeyUp - Key released\n• onKeyPress - Key pressed (deprecated)\n\nOther Events:\n• onScroll - Element scrolled\n• onLoad - Resource loaded\n• onError - Error occurred",
+          codeExample: {
+            code: `// Click events
+function ClickExample() {
+  const handleClick = (e) => {
+    console.log('Clicked!', e);
+  };
+  
+  return <button onClick={handleClick}>Click me</button>;
+}
+
+// Form events
+function FormExample() {
+  const [value, setValue] = useState('');
+  
+  const handleChange = (e) => {
+    setValue(e.target.value);
+  };
+  
+  const handleSubmit = (e) => {
+    e.preventDefault(); // Prevent page reload
+    console.log('Form submitted:', value);
+  };
+  
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        value={value}
+        onChange={handleChange}
+        onFocus={() => console.log('Focused')}
+        onBlur={() => console.log('Blurred')}
+      />
+      <button type="submit">Submit</button>
+    </form>
+  );
+}
+
+// Keyboard events
+function KeyboardExample() {
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      console.log('Enter pressed');
+    }
+    if (e.key === 'Escape') {
+      console.log('Escape pressed');
+    }
+  };
+  
+  return (
+    <input
+      onKeyDown={handleKeyDown}
+      placeholder="Press Enter or Escape"
+    />
+  );
+}
+
+// Mouse events
+function MouseExample() {
+  const [hovered, setHovered] = useState(false);
+  
+  return (
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{ backgroundColor: hovered ? 'yellow' : 'white' }}
+    >
+      Hover over me
+    </div>
+  );
+}`,
+            explanation: "React supports all standard DOM events. Use camelCase props (onClick, not onclick). onChange fires on every keystroke for inputs, which is different from native HTML."
+          }
+        },
+        {
+          title: "Preventing Default Behavior",
+          content: "Sometimes you need to prevent the default browser behavior for events. This is especially common with form submissions and link clicks.\n\nCommon Use Cases:\n• Prevent form submission from reloading page\n• Prevent link navigation\n• Prevent context menu\n• Prevent text selection\n\nHow to Prevent Default:\n• Call event.preventDefault()\n• Must be called synchronously\n• Works with SyntheticEvents\n• Can be combined with stopPropagation()",
+          codeExample: {
+            code: `// Prevent form submission
+function LoginForm() {
+  const handleSubmit = (e) => {
+    e.preventDefault(); // Prevent page reload
+    // Handle form submission
+    console.log('Form submitted');
+  };
+  
+  return (
+    <form onSubmit={handleSubmit}>
+      <input type="text" name="username" />
+      <input type="password" name="password" />
+      <button type="submit">Login</button>
+    </form>
+  );
+}
+
+// Prevent link navigation
+function CustomLink({ href, children }) {
+  const handleClick = (e) => {
+    e.preventDefault();
+    // Custom navigation logic
+    console.log('Navigating to:', href);
+  };
+  
+  return (
+    <a href={href} onClick={handleClick}>
+      {children}
+    </a>
+  );
+}
+
+// Prevent default and stop propagation
+function NestedButtons() {
+  const handleOuterClick = (e) => {
+    console.log('Outer clicked');
+  };
+  
+  const handleInnerClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation(); // Prevent event bubbling
+    console.log('Inner clicked');
+  };
+  
+  return (
+    <div onClick={handleOuterClick}>
+      <button onClick={handleInnerClick}>
+        Inner Button
+      </button>
+    </div>
+  );
+}`,
+            explanation: "Use preventDefault() to stop default browser behavior. Use stopPropagation() to prevent event bubbling. Both must be called synchronously in the event handler."
+          }
+        },
+        {
+          title: "Passing Arguments to Event Handlers",
+          content: "Often you need to pass additional arguments to event handlers beyond just the event object.\n\nCommon Patterns:\n• Pass item ID when clicking list item\n• Pass index when iterating\n• Pass custom data\n• Pass both event and custom data\n\nMethods:\n• Arrow functions in JSX\n• bind() method\n• Higher-order functions\n• Data attributes (less common)",
+          codeExample: {
+            code: `// Passing arguments with arrow functions
+function TodoList({ todos }) {
+  const handleDelete = (id) => {
+    console.log('Delete todo:', id);
+  };
+  
+  return (
+    <ul>
+      {todos.map(todo => (
+        <li key={todo.id}>
+          {todo.text}
+          <button onClick={() => handleDelete(todo.id)}>
+            Delete
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+// Passing event and custom data
+function ProductList({ products }) {
+  const handleAddToCart = (productId, event) => {
+    event.preventDefault();
+    console.log('Add product', productId, 'to cart');
+  };
+  
+  return (
+    <div>
+      {products.map(product => (
+        <button
+          key={product.id}
+          onClick={(e) => handleAddToCart(product.id, e)}
+        >
+          Add {product.name} to Cart
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// Using bind (less common)
+function ButtonList() {
+  const handleClick = (id, event) => {
+    console.log('Button', id, 'clicked');
+  };
+  
+  return (
+    <div>
+      <button onClick={handleClick.bind(null, 1)}>Button 1</button>
+      <button onClick={handleClick.bind(null, 2)}>Button 2</button>
+    </div>
+  );
+}
+
+// Higher-order function pattern
+function createHandler(id) {
+  return (event) => {
+    console.log('Item', id, 'clicked', event);
+  };
+}
+
+function ItemList({ items }) {
+  return (
+    <ul>
+      {items.map(item => (
+        <li key={item.id}>
+          <button onClick={createHandler(item.id)}>
+            {item.name}
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+}`,
+            explanation: "Use arrow functions to pass arguments to event handlers. You can pass both the event and custom data. Arrow functions are the most common and readable approach."
+          }
+        },
+        {
+          title: "Controlled vs Uncontrolled Components",
+          content: "React offers two approaches for handling form inputs: controlled and uncontrolled components.\n\nControlled Components:\n• Input value controlled by React state\n• onChange handler updates state\n• State is single source of truth\n• More React-like, recommended\n• Easier to validate and transform\n\nUncontrolled Components:\n• Input value stored in DOM\n• Use refs to access values\n• Less code, simpler for simple forms\n• Good for one-time reads\n• Less React-like\n\nWhen to Use Each:\n• Controlled: Most cases, especially with validation\n• Uncontrolled: Simple forms, file inputs, third-party libraries",
+          codeExample: {
+            code: `// Controlled component
+function ControlledInput() {
+  const [value, setValue] = useState('');
+  
+  const handleChange = (e) => {
+    setValue(e.target.value);
+  };
+  
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log('Submitted:', value);
+  };
+  
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="text"
+        value={value}
+        onChange={handleChange}
+      />
+      <button type="submit">Submit</button>
+    </form>
+  );
+}
+
+// Uncontrolled component
+function UncontrolledInput() {
+  const inputRef = useRef(null);
+  
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log('Submitted:', inputRef.current?.value);
+  };
+  
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="text"
+        ref={inputRef}
+        defaultValue="initial"
+      />
+      <button type="submit">Submit</button>
+    </form>
+  );
+}
+
+// Controlled with validation
+function ValidatedInput() {
+  const [value, setValue] = useState('');
+  const [error, setError] = useState('');
+  
+  const handleChange = (e) => {
+    const newValue = e.target.value;
+    setValue(newValue);
+    
+    if (newValue.length < 3) {
+      setError('Must be at least 3 characters');
+    } else {
+      setError('');
+    }
+  };
+  
+  return (
+    <div>
+      <input
+        type="text"
+        value={value}
+        onChange={handleChange}
+      />
+      {error && <p className="error">{error}</p>}
+    </div>
+  );
+}`,
+            explanation: "Use controlled components for most cases - they're more React-like and easier to work with. Use uncontrolled components for simple cases or when integrating with third-party libraries."
+          }
+        },
+        {
+          title: "Best Practices and Common Patterns",
+          content: "Following best practices makes your event handling code more maintainable and performant.\n\nBest Practices:\n• Name handlers with 'handle' prefix (handleClick, handleSubmit)\n• Extract complex handlers into separate functions\n• Use controlled components for forms\n• Prevent default behavior when needed\n• Don't create new functions in render (use useCallback if needed)\n• Handle async operations properly\n• Clean up event listeners in useEffect\n\nCommon Patterns:\n• Form submission\n• Search input with debounce\n• Keyboard shortcuts\n• Click outside to close\n• Drag and drop\n• File upload",
+          codeExample: {
+            code: `// ✅ GOOD: Named handler function
+function Button() {
+  const handleClick = () => {
+    console.log('Clicked');
+  };
+  
+  return <button onClick={handleClick}>Click</button>;
+}
+
+// ✅ GOOD: Using useCallback for stable reference
+function ExpensiveList({ items }) {
+  const handleItemClick = useCallback((id) => {
+    console.log('Item clicked:', id);
+  }, []);
+  
+  return (
+    <ul>
+      {items.map(item => (
+        <ListItem
+          key={item.id}
+          item={item}
+          onClick={handleItemClick}
+        />
+      ))}
+    </ul>
+  );
+}
+
+// ✅ GOOD: Async event handler
+function AsyncButton() {
+  const [loading, setLoading] = useState(false);
+  
+  const handleClick = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await fetchData();
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  return (
+    <button onClick={handleClick} disabled={loading}>
+      {loading ? 'Loading...' : 'Submit'}
+    </button>
+  );
+}
+
+// ✅ GOOD: Keyboard shortcuts
+function KeyboardShortcuts() {
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (e.ctrlKey && e.key === 's') {
+        e.preventDefault();
+        console.log('Save shortcut');
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, []);
+  
+  return <div>Press Ctrl+S to save</div>;
+}
+
+// ✅ GOOD: Click outside handler
+function Dropdown({ isOpen, onClose, children }) {
+  const ref = useRef(null);
+  
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (ref.current && !ref.current.contains(event.target)) {
+        onClose();
+      }
+    };
+    
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [isOpen, onClose]);
+  
+  return isOpen ? <div ref={ref}>{children}</div> : null;
+}`,
+            explanation: "Follow best practices: name handlers clearly, use useCallback when needed, handle async operations properly, and clean up event listeners. Extract complex logic into separate functions."
+          }
+        }
+      ],
+      conclusion: "Event handling is essential for interactive React applications. Use SyntheticEvents for cross-browser compatibility, prevent default behavior when needed, and prefer controlled components for forms. Name handlers clearly, extract complex logic, and always clean up event listeners. Remember: React events are camelCase, onChange fires on every keystroke, and you can pass arguments using arrow functions."
+    }
+  },
+  {
+    id: "intermediate-7",
+    title: "Component Composition and Patterns",
+    description: "Learn advanced component composition techniques, children props, render props, and compound components to build flexible, reusable React components.",
+    level: "intermediate",
+    estimatedTime: "75 min",
+    topics: ["Component Composition", "Children Prop", "Render Props", "Compound Components", "Higher-Order Components", "Composition Patterns"],
+    prerequisites: ["Understanding Props", "Managing State with useState", "Conditional Rendering and Lists"],
+    content: {
+      overview: "Component composition is one of React's most powerful features. Instead of building monolithic components, you compose smaller, focused components together. This tutorial covers various composition patterns including children, render props, compound components, and higher-order components to create flexible, reusable component APIs.",
+      sections: [
+        {
+          title: "Understanding Component Composition",
+          content: "Component composition means building complex UIs by combining simpler components. It's the foundation of React's component model.\n\nBenefits:\n• Reusability - Use components in different contexts\n• Flexibility - Combine components in various ways\n• Maintainability - Smaller, focused components\n• Testability - Test components in isolation\n• Readability - Clear component structure\n\nComposition vs Inheritance:\n• React favors composition over inheritance\n• Use composition to share behavior\n• Components can contain other components\n• Props allow flexible composition",
+          codeExample: {
+            code: `// Simple composition
+function Button({ children, onClick }) {
+  return <button onClick={onClick}>{children}</button>;
+}
+
+function App() {
+  return (
+    <div>
+      <Button onClick={() => console.log('Save')}>
+        Save
+      </Button>
+      <Button onClick={() => console.log('Cancel')}>
+        Cancel
+      </Button>
+    </div>
+  );
+}
+
+// Composing multiple components
+function Card({ title, children }) {
+  return (
+    <div className="card">
+      <h2>{title}</h2>
+      <div className="card-content">{children}</div>
+    </div>
+  );
+}
+
+function UserProfile({ user }) {
+  return (
+    <Card title="User Profile">
+      <p>Name: {user.name}</p>
+      <p>Email: {user.email}</p>
+    </Card>
+  );
+}
+
+// Nested composition
+function Layout({ header, sidebar, main, footer }) {
+  return (
+    <div className="layout">
+      <header>{header}</header>
+      <div className="body">
+        <aside>{sidebar}</aside>
+        <main>{main}</main>
+      </div>
+      <footer>{footer}</footer>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <Layout
+      header={<Header />}
+      sidebar={<Sidebar />}
+      main={<MainContent />}
+      footer={<Footer />}
+    />
+  );
+}`,
+            explanation: "Composition means building complex components from simpler ones. Use props to pass components and data. This creates flexible, reusable component structures."
+          }
+        },
+        {
+          title: "Using the Children Prop",
+          content: "The children prop is a special prop that allows you to pass components as data to other components. It's one of the most powerful composition patterns.\n\nWhat is Children:\n• Special prop that contains content between component tags\n• Can be any valid React node\n• Can be a single element, array, or even a function\n• Makes components more flexible and reusable\n\nUse Cases:\n• Wrapper components (Card, Modal, Layout)\n• Container components\n• Higher-order components\n• Flexible component APIs",
+          codeExample: {
+            code: `// Basic children usage
+function Container({ children }) {
+  return <div className="container">{children}</div>;
+}
+
+function App() {
+  return (
+    <Container>
+      <h1>Title</h1>
+      <p>Content</p>
+    </Container>
+  );
+}
+
+// Children can be anything
+function Alert({ type, children }) {
+  return (
+    <div className={\`alert alert-\${type}\`}>
+      {children}
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <Alert type="warning">
+      <strong>Warning!</strong> This is important.
+    </Alert>
+  );
+}
+
+// Multiple children
+function ButtonGroup({ children }) {
+  return <div className="button-group">{children}</div>;
+}
+
+function App() {
+  return (
+    <ButtonGroup>
+      <button>Save</button>
+      <button>Cancel</button>
+      <button>Delete</button>
+    </ButtonGroup>
+  );
+}
+
+// Children as function (render prop pattern)
+function DataFetcher({ url, children }) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        setData(data);
+        setLoading(false);
+      });
+  }, [url]);
+  
+  return children({ data, loading });
+}
+
+function App() {
+  return (
+    <DataFetcher url="/api/users">
+      {({ data, loading }) => {
+        if (loading) return <div>Loading...</div>;
+        return <UserList users={data} />;
+      }}
+    </DataFetcher>
+  );
+}
+
+// Using React.Children utilities
+function ButtonList({ children }) {
+  return (
+    <div>
+      {React.Children.map(children, (child, index) => (
+        <div key={index} className="button-wrapper">
+          {child}
+        </div>
+      ))}
+    </div>
+  );
+}`,
+            explanation: "The children prop allows flexible composition. You can pass any React node, use it in wrapper components, or even use it as a function for render props. React.Children utilities help manipulate children."
+          }
+        },
+        {
+          title: "Render Props Pattern",
+          content: "Render props is a pattern where a component receives a function as a prop that returns React elements. The component calls this function instead of implementing its own render logic.\n\nWhat are Render Props:\n• Component receives function as prop\n• Function receives data/state as arguments\n• Component calls function to render\n• Allows sharing logic between components\n\nBenefits:\n• Share stateful logic\n• Flexible rendering\n• Separation of concerns\n• Reusable logic\n\nCommon Use Cases:\n• Data fetching\n• Mouse tracking\n• Form state management\n• Theme providers",
+          codeExample: {
+            code: `// Basic render prop
+function MouseTracker({ render }) {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setPosition({ x: e.clientX, y: e.clientY });
+    };
+    
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+  
+  return render(position);
+}
+
+function App() {
+  return (
+    <MouseTracker
+      render={({ x, y }) => (
+        <div>
+          Mouse position: {x}, {y}
+        </div>
+      )}
+    />
+  );
+}
+
+// Render prop for data fetching
+function DataFetcher({ url, render }) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  useEffect(() => {
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        setData(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        setError(err);
+        setLoading(false);
+      });
+  }, [url]);
+  
+  return render({ data, loading, error });
+}
+
+function App() {
+  return (
+    <DataFetcher
+      url="/api/users"
+      render={({ data, loading, error }) => {
+        if (loading) return <div>Loading...</div>;
+        if (error) return <div>Error: {error.message}</div>;
+        return <UserList users={data} />;
+      }}
+    />
+  );
+}
+
+// Multiple render props
+function Toggle({ on, toggle, children }) {
+  return children({ on, toggle });
+}
+
+function App() {
+  return (
+    <Toggle>
+      {({ on, toggle }) => (
+        <div>
+          <button onClick={toggle}>
+            {on ? 'ON' : 'OFF'}
+          </button>
+          {on && <div>Content is visible</div>}
+        </div>
+      )}
+    </Toggle>
+  );
+}
+
+// Render prop vs children as function
+// These are equivalent:
+function Component1({ render }) {
+  return render({ data: 'test' });
+}
+
+function Component2({ children }) {
+  return children({ data: 'test' });
+}`,
+            explanation: "Render props allow sharing logic between components. The component receives a function that it calls with state/data. This pattern is powerful for reusable logic, though hooks often replace it in modern React."
+          }
+        },
+        {
+          title: "Compound Components Pattern",
+          content: "Compound components are a pattern where multiple components work together to form a complete UI. They share implicit state and provide a flexible API.\n\nWhat are Compound Components:\n• Multiple components that work together\n• Share implicit state via Context\n• Flexible composition\n• Better API than monolithic component\n\nBenefits:\n• Flexible component structure\n• Better separation of concerns\n• Intuitive API\n• Composable and reusable\n\nUse Cases:\n• Select/Dropdown components\n• Tabs\n• Accordion\n• Form fields with labels and errors",
+          codeExample: {
+            code: `// Compound Select component
+const SelectContext = createContext();
+
+function Select({ children, value, onChange }) {
+  const [isOpen, setIsOpen] = useState(false);
+  
+  return (
+    <SelectContext.Provider value={{ value, onChange, isOpen, setIsOpen }}>
+      <div className="select">{children}</div>
+    </SelectContext.Provider>
+  );
+}
+
+function SelectTrigger({ children }) {
+  const { isOpen, setIsOpen } = useContext(SelectContext);
+  return (
+    <button onClick={() => setIsOpen(!isOpen)}>
+      {children}
+    </button>
+  );
+}
+
+function SelectOptions({ children }) {
+  const { isOpen } = useContext(SelectContext);
+  if (!isOpen) return null;
+  return <div className="options">{children}</div>;
+}
+
+function SelectOption({ value, children }) {
+  const { value: selectedValue, onChange, setIsOpen } = useContext(SelectContext);
+  
+  return (
+    <div
+      className={\`option \${value === selectedValue ? 'selected' : ''}\`}
+      onClick={() => {
+        onChange(value);
+        setIsOpen(false);
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+// Usage
+function App() {
+  const [value, setValue] = useState('option1');
+  
+  return (
+    <Select value={value} onChange={setValue}>
+      <SelectTrigger>
+        {value || 'Select an option'}
+      </SelectTrigger>
+      <SelectOptions>
+        <SelectOption value="option1">Option 1</SelectOption>
+        <SelectOption value="option2">Option 2</SelectOption>
+        <SelectOption value="option3">Option 3</SelectOption>
+      </SelectOptions>
+    </Select>
+  );
+}
+
+// Compound Tabs component
+const TabsContext = createContext();
+
+function Tabs({ children, defaultTab }) {
+  const [activeTab, setActiveTab] = useState(defaultTab);
+  
+  return (
+    <TabsContext.Provider value={{ activeTab, setActiveTab }}>
+      <div className="tabs">{children}</div>
+    </TabsContext.Provider>
+  );
+}
+
+function TabsList({ children }) {
+  return <div className="tabs-list">{children}</div>;
+}
+
+function TabsTrigger({ value, children }) {
+  const { activeTab, setActiveTab } = useContext(TabsContext);
+  
+  return (
+    <button
+      className={\`tab \${activeTab === value ? 'active' : ''}\`}
+      onClick={() => setActiveTab(value)}
+    >
+      {children}
+    </button>
+  );
+}
+
+function TabsContent({ value, children }) {
+  const { activeTab } = useContext(TabsContext);
+  if (activeTab !== value) return null;
+  return <div className="tab-content">{children}</div>;
+}
+
+// Usage
+function App() {
+  return (
+    <Tabs defaultTab="tab1">
+      <TabsList>
+        <TabsTrigger value="tab1">Tab 1</TabsTrigger>
+        <TabsTrigger value="tab2">Tab 2</TabsTrigger>
+      </TabsList>
+      <TabsContent value="tab1">Content 1</TabsContent>
+      <TabsContent value="tab2">Content 2</TabsContent>
+    </Tabs>
+  );
+}`,
+            explanation: "Compound components share state via Context and provide flexible composition. They create intuitive APIs where components work together naturally. This pattern is great for complex UI components."
+          }
+        },
+        {
+          title: "Higher-Order Components (HOCs)",
+          content: "Higher-Order Components are functions that take a component and return a new component with additional functionality. They're a pattern for reusing component logic.\n\nWhat are HOCs:\n• Function that takes a component, returns a component\n• Adds functionality without modifying original\n• Shares logic between components\n• Common pattern before hooks\n\nBenefits:\n• Reusable logic\n• Separation of concerns\n• Can compose multiple HOCs\n• Works with any component\n\nNote: Hooks often replace HOCs in modern React, but HOCs are still useful in some cases.",
+          codeExample: {
+            code: `// Basic HOC
+function withLoading(Component) {
+  return function WithLoadingComponent({ isLoading, ...props }) {
+    if (isLoading) {
+      return <div>Loading...</div>;
+    }
+    return <Component {...props} />;
+  };
+}
+
+// Usage
+const UserProfile = ({ user }) => <div>{user.name}</div>;
+const UserProfileWithLoading = withLoading(UserProfile);
+
+function App() {
+  return <UserProfileWithLoading isLoading={true} user={null} />;
+}
+
+// HOC with data fetching
+function withData(url) {
+  return function(Component) {
+    return function WithDataComponent(props) {
+      const [data, setData] = useState(null);
+      const [loading, setLoading] = useState(true);
+      
+      useEffect(() => {
+        fetch(url)
+          .then(res => res.json())
+          .then(data => {
+            setData(data);
+            setLoading(false);
+          });
+      }, []);
+      
+      if (loading) return <div>Loading...</div>;
+      return <Component {...props} data={data} />;
+    };
+  };
+}
+
+// Usage
+const UserList = ({ data }) => (
+  <ul>
+    {data.map(user => <li key={user.id}>{user.name}</li>)}
+  </ul>
+);
+const UserListWithData = withData('/api/users')(UserList);
+
+// HOC for authentication
+function withAuth(Component) {
+  return function WithAuthComponent(props) {
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    
+    useEffect(() => {
+      // Check authentication
+      checkAuth().then(setIsAuthenticated);
+    }, []);
+    
+    if (!isAuthenticated) {
+      return <div>Please log in</div>;
+    }
+    
+    return <Component {...props} />;
+  };
+}
+
+// Composing HOCs
+const EnhancedComponent = withAuth(withLoading(MyComponent));
+
+// HOC vs Hook (modern approach)
+// HOC:
+const ComponentWithData = withData('/api/users')(MyComponent);
+
+// Hook (preferred):
+function MyComponent() {
+  const { data, loading } = useData('/api/users');
+  // ...
+}`,
+            explanation: "HOCs add functionality to components. They're useful for cross-cutting concerns but hooks often provide a cleaner solution. Use HOCs when you need to enhance components in a reusable way."
+          }
+        },
+        {
+          title: "Composition Best Practices",
+          content: "Following best practices makes your composed components more maintainable and easier to use.\n\nBest Practices:\n• Prefer composition over inheritance\n• Keep components small and focused\n• Use children for flexibility\n• Extract shared logic into hooks\n• Use compound components for complex UIs\n• Document component APIs\n• Provide sensible defaults\n• Make components composable\n\nCommon Patterns:\n• Container/Presentational pattern\n• Provider pattern\n• Slot pattern (multiple children props)\n• Configuration objects",
+          codeExample: {
+            code: `// ✅ GOOD: Small, focused components
+function Button({ children, variant, size, onClick }) {
+  return (
+    <button
+      className={\`btn btn-\${variant} btn-\${size}\`}
+      onClick={onClick}
+    >
+      {children}
+    </button>
+  );
+}
+
+function IconButton({ icon, children, ...props }) {
+  return (
+    <Button {...props}>
+      <Icon name={icon} />
+      {children}
+    </Button>
+  );
+}
+
+// ✅ GOOD: Container/Presentational pattern
+function UserListContainer() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    fetchUsers().then(users => {
+      setUsers(users);
+      setLoading(false);
+    });
+  }, []);
+  
+  return <UserList users={users} loading={loading} />;
+}
+
+function UserList({ users, loading }) {
+  if (loading) return <div>Loading...</div>;
+  return (
+    <ul>
+      {users.map(user => (
+        <li key={user.id}>{user.name}</li>
+      ))}
+    </ul>
+  );
+}
+
+// ✅ GOOD: Slot pattern
+function Card({ header, footer, children }) {
+  return (
+    <div className="card">
+      {header && <div className="card-header">{header}</div>}
+      <div className="card-body">{children}</div>
+      {footer && <div className="card-footer">{footer}</div>}
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <Card
+      header={<h2>Title</h2>}
+      footer={<button>Action</button>}
+    >
+      Content here
+    </Card>
+  );
+}
+
+// ✅ GOOD: Configuration object for flexibility
+function FormField({ label, error, children, config }) {
+  return (
+    <div className="form-field">
+      <label>{label}</label>
+      {children}
+      {error && <span className="error">{error}</span>}
+      {config?.helpText && <span className="help">{config.helpText}</span>}
+    </div>
+  );
+}`,
+            explanation: "Follow best practices: keep components small, use composition patterns appropriately, extract logic into hooks, and make components flexible and reusable. Document your component APIs clearly."
+          }
+        }
+      ],
+      conclusion: "Component composition is fundamental to building maintainable React applications. Use children for flexibility, render props for sharing logic, compound components for complex UIs, and HOCs when appropriate. Prefer composition over inheritance, keep components small and focused, and extract shared logic into hooks. Remember: good composition creates flexible, reusable components that are easy to understand and maintain."
+    }
+  },
+  {
+    id: "intermediate-8",
+    title: "Building Custom Hooks",
+    description: "Learn how to extract component logic into reusable custom hooks to share stateful logic between components.",
+    level: "intermediate",
+    estimatedTime: "60 min",
+    topics: ["Custom Hooks", "Hook Rules", "Reusable Logic", "Hook Composition", "Testing Hooks", "Hook Patterns"],
+    prerequisites: ["Managing State with useState", "Understanding useEffect", "Event Handling in React"],
+    content: {
+      overview: "Custom hooks are JavaScript functions that start with 'use' and can call other hooks. They allow you to extract component logic into reusable functions. Custom hooks are one of React's most powerful features for code reuse and organization. This tutorial covers how to create custom hooks, follow the rules of hooks, and build reusable logic that can be shared across components.",
+      sections: [
+        {
+          title: "What are Custom Hooks",
+          content: "Custom hooks are functions that encapsulate reusable logic using React hooks. They follow a simple naming convention and can use any React hooks inside them.\n\nKey Characteristics:\n• Functions that start with 'use'\n• Can call other hooks\n• Share stateful logic between components\n• Don't render anything themselves\n• Follow the same rules as regular hooks\n\nWhy Use Custom Hooks:\n• Reuse logic across components\n• Separate concerns\n• Make components cleaner\n• Test logic independently\n• Share logic with the community\n\nBenefits:\n• DRY (Don't Repeat Yourself)\n• Better organization\n• Easier testing\n• Reusable across projects",
+          codeExample: {
+            code: `// Simple custom hook
+function useCounter(initialValue = 0) {
+  const [count, setCount] = useState(initialValue);
+  
+  const increment = () => setCount(c => c + 1);
+  const decrement = () => setCount(c => c - 1);
+  const reset = () => setCount(initialValue);
+  
+  return { count, increment, decrement, reset };
+}
+
+// Using the custom hook
+function Counter() {
+  const { count, increment, decrement, reset } = useCounter(0);
+  
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={increment}>+</button>
+      <button onClick={decrement}>-</button>
+      <button onClick={reset}>Reset</button>
+    </div>
+  );
+}
+
+// Multiple components can use the same hook
+function AnotherCounter() {
+  const { count, increment } = useCounter(10);
+  return <button onClick={increment}>{count}</button>;
+}
+
+// Custom hook with parameters
+function useToggle(initialValue = false) {
+  const [value, setValue] = useState(initialValue);
+  
+  const toggle = () => setValue(v => !v);
+  const setTrue = () => setValue(true);
+  const setFalse = () => setValue(false);
+  
+  return { value, toggle, setTrue, setFalse };
+}
+
+// Usage
+function ToggleButton() {
+  const { value, toggle } = useToggle();
+  
+  return (
+    <button onClick={toggle}>
+      {value ? 'ON' : 'OFF'}
+    </button>
+  );
+}`,
+            explanation: "Custom hooks are functions starting with 'use' that can use React hooks. They return values and functions that components can use. This allows sharing logic between components."
+          }
+        },
+        {
+          title: "Rules of Hooks",
+          content: "Custom hooks must follow the same rules as regular hooks. Understanding these rules is crucial for writing correct custom hooks.\n\nRules of Hooks:\n1. Only call hooks at the top level\n   • Don't call inside loops, conditions, or nested functions\n   • Always call in the same order\n\n2. Only call hooks from React functions\n   • React function components\n   • Custom hooks (functions starting with 'use')\n   • Not from regular JavaScript functions\n\nWhy These Rules Exist:\n• React relies on call order to track hooks\n• Violating rules causes bugs\n• ESLint plugin helps catch violations\n\nCommon Mistakes:\n• Calling hooks conditionally\n• Calling hooks in loops\n• Calling hooks in regular functions\n• Calling hooks in event handlers",
+          codeExample: {
+            code: `// ❌ BAD: Conditional hook call
+function BadComponent({ condition }) {
+  if (condition) {
+    const [value, setValue] = useState(0); // ❌ Wrong!
+  }
+  return <div>Content</div>;
+}
+
+// ✅ GOOD: Always call hooks
+function GoodComponent({ condition }) {
+  const [value, setValue] = useState(0); // ✅ Always called
+  return <div>Content</div>;
+}
+
+// ❌ BAD: Hook in loop
+function BadList({ items }) {
+  const states = [];
+  items.forEach(item => {
+    states.push(useState(item)); // ❌ Wrong!
+  });
+  return <div>List</div>;
+}
+
+// ✅ GOOD: Extract to component
+function GoodList({ items }) {
+  return (
+    <div>
+      {items.map(item => (
+        <ListItem key={item.id} item={item} />
+      ))}
+    </div>
+  );
+}
+
+function ListItem({ item }) {
+  const [value, setValue] = useState(item); // ✅ OK in component
+  return <div>{value}</div>;
+}
+
+// ❌ BAD: Hook in regular function
+function regularFunction() {
+  const [value, setValue] = useState(0); // ❌ Wrong!
+}
+
+// ✅ GOOD: Custom hook
+function useCustomHook() {
+  const [value, setValue] = useState(0); // ✅ OK in custom hook
+  return value;
+}
+
+// ✅ GOOD: Conditional logic inside hook
+function useConditional(condition) {
+  const [value, setValue] = useState(0);
+  
+  useEffect(() => {
+    if (condition) {
+      // ✅ OK: conditional logic inside hook
+      setValue(1);
+    }
+  }, [condition]);
+  
+  return value;
+}`,
+            explanation: "Hooks must be called at the top level, in the same order every render. Don't call hooks conditionally, in loops, or in regular functions. Use conditional logic inside hooks, not around hook calls."
+          }
+        },
+        {
+          title: "Common Custom Hook Patterns",
+          content: "There are many common patterns for custom hooks. Learning these patterns helps you build reusable hooks effectively.\n\nCommon Patterns:\n• State management hooks (useToggle, useCounter)\n• Data fetching hooks (useFetch, useAPI)\n• DOM hooks (useWindowSize, useScrollPosition)\n• Form hooks (useForm, useInput)\n• Timer hooks (useInterval, useTimeout)\n• Storage hooks (useLocalStorage, useSessionStorage)\n• Media hooks (useMediaQuery, useAudio)\n\nPattern Structure:\n• Encapsulate related logic\n• Return values and functions\n• Handle cleanup\n• Provide sensible defaults",
+          codeExample: {
+            code: `// Data fetching hook
+function useFetch(url) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+    
+    fetch(url)
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch');
+        return res.json();
+      })
+      .then(data => {
+        setData(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        setError(err);
+        setLoading(false);
+      });
+  }, [url]);
+  
+  return { data, loading, error };
+}
+
+// Usage
+function UserProfile({ userId }) {
+  const { data: user, loading, error } = useFetch(\`/api/users/\${userId}\`);
+  
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+  return <div>{user.name}</div>;
+}
+
+// Local storage hook
+function useLocalStorage(key, initialValue) {
+  const [storedValue, setStoredValue] = useState(() => {
+    try {
+      const item = window.localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch (error) {
+      return initialValue;
+    }
+  });
+  
+  const setValue = (value) => {
+    try {
+      setStoredValue(value);
+      window.localStorage.setItem(key, JSON.stringify(value));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
+  return [storedValue, setValue];
+}
+
+// Usage
+function Settings() {
+  const [theme, setTheme] = useLocalStorage('theme', 'light');
+  
+  return (
+    <select value={theme} onChange={(e) => setTheme(e.target.value)}>
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+    </select>
+  );
+}
+
+// Window size hook
+function useWindowSize() {
+  const [size, setSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight
+  });
+  
+  useEffect(() => {
+    const handleResize = () => {
+      setSize({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+  return size;
+}
+
+// Usage
+function ResponsiveComponent() {
+  const { width } = useWindowSize();
+  return <div>{width < 768 ? 'Mobile' : 'Desktop'}</div>;
+}
+
+// Interval hook
+function useInterval(callback, delay) {
+  const savedCallback = useRef();
+  
+  useEffect(() => {
+    savedCallback.current = callback;
+  }, [callback]);
+  
+  useEffect(() => {
+    if (delay === null) return;
+    
+    const id = setInterval(() => {
+      savedCallback.current();
+    }, delay);
+    
+    return () => clearInterval(id);
+  }, [delay]);
+}
+
+// Usage
+function Timer() {
+  const [count, setCount] = useState(0);
+  
+  useInterval(() => {
+    setCount(c => c + 1);
+  }, 1000);
+  
+  return <div>Count: {count}</div>;
+}`,
+            explanation: "Common custom hook patterns include data fetching, local storage, window size, intervals, and more. These patterns encapsulate reusable logic that multiple components can use."
+          }
+        },
+        {
+          title: "Composing Custom Hooks",
+          content: "Custom hooks can call other custom hooks, allowing you to build complex functionality by composing simpler hooks.\n\nComposition Benefits:\n• Build complex hooks from simple ones\n• Reuse existing hooks\n• Create powerful abstractions\n• Keep hooks focused and testable\n\nComposition Patterns:\n• Chain hooks together\n• Combine multiple hooks\n• Create hook hierarchies\n• Share state between hooks",
+          codeExample: {
+            code: `// Simple hooks
+function useCounter(initial = 0) {
+  const [count, setCount] = useState(initial);
+  const increment = () => setCount(c => c + 1);
+  const decrement = () => setCount(c => c - 1);
+  return { count, increment, decrement };
+}
+
+function useToggle(initial = false) {
+  const [value, setValue] = useState(initial);
+  const toggle = () => setValue(v => !v);
+  return { value, toggle };
+}
+
+// Composed hook
+function useCounterWithToggle(initialCount = 0) {
+  const counter = useCounter(initialCount);
+  const toggle = useToggle();
+  
+  const reset = () => {
+    counter.setCount(initialCount);
+    toggle.setFalse();
+  };
+  
+  return {
+    ...counter,
+    isActive: toggle.value,
+    toggleActive: toggle.toggle,
+    reset
+  };
+}
+
+// Complex composition
+function useUserProfile(userId) {
+  const { data: user, loading, error } = useFetch(\`/api/users/\${userId}\`);
+  const [preferences, setPreferences] = useLocalStorage(\`user-\${userId}-prefs\`, {});
+  const { width } = useWindowSize();
+  
+  const updatePreferences = (newPrefs) => {
+    setPreferences({ ...preferences, ...newPrefs });
+  };
+  
+  const isMobile = width < 768;
+  
+  return {
+    user,
+    loading,
+    error,
+    preferences,
+    updatePreferences,
+    isMobile
+  };
+}
+
+// Usage
+function ProfilePage({ userId }) {
+  const {
+    user,
+    loading,
+    preferences,
+    updatePreferences,
+    isMobile
+  } = useUserProfile(userId);
+  
+  if (loading) return <div>Loading...</div>;
+  
+  return (
+    <div className={isMobile ? 'mobile' : 'desktop'}>
+      <h1>{user.name}</h1>
+      {/* ... */}
+    </div>
+  );
+}
+
+// Hook that uses other hooks
+function usePaginatedData(url, pageSize = 10) {
+  const [page, setPage] = useState(1);
+  const { data, loading, error } = useFetch(\`\${url}?page=\${page}&limit=\${pageSize}\`);
+  
+  const nextPage = () => setPage(p => p + 1);
+  const prevPage = () => setPage(p => Math.max(1, p - 1));
+  
+  return {
+    data,
+    loading,
+    error,
+    page,
+    nextPage,
+    prevPage,
+    hasNext: data?.hasMore || false
+  };
+}`,
+            explanation: "Compose custom hooks by calling other hooks inside them. This allows building complex functionality from simpler pieces. Keep hooks focused and compose them for more complex use cases."
+          }
+        },
+        {
+          title: "Testing Custom Hooks",
+          content: "Testing custom hooks requires special tools since hooks can only be called from React components. React Testing Library provides utilities for testing hooks.\n\nTesting Approaches:\n• Use @testing-library/react-hooks\n• Render hook in test component\n• Test return values\n• Test side effects\n• Test cleanup\n\nWhat to Test:\n• Return values\n• State updates\n• Side effects\n• Cleanup functions\n• Edge cases\n• Error handling",
+          codeExample: {
+            code: `// Custom hook to test
+function useCounter(initial = 0) {
+  const [count, setCount] = useState(initial);
+  const increment = () => setCount(c => c + 1);
+  const decrement = () => setCount(c => c - 1);
+  return { count, increment, decrement };
+}
+
+// Test using renderHook
+import { renderHook, act } from '@testing-library/react-hooks';
+
+describe('useCounter', () => {
+  it('should initialize with value', () => {
+    const { result } = renderHook(() => useCounter(5));
+    expect(result.current.count).toBe(5);
+  });
+  
+  it('should increment count', () => {
+    const { result } = renderHook(() => useCounter(0));
+    
+    act(() => {
+      result.current.increment();
+    });
+    
+    expect(result.current.count).toBe(1);
+  });
+  
+  it('should decrement count', () => {
+    const { result } = renderHook(() => useCounter(5));
+    
+    act(() => {
+      result.current.decrement();
+    });
+    
+    expect(result.current.count).toBe(4);
+  });
+});
+
+// Testing hook with dependencies
+function useFetch(url) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    fetch(url).then(res => res.json()).then(setData).finally(() => setLoading(false));
+  }, [url]);
+  
+  return { data, loading };
+}
+
+// Mock fetch for testing
+global.fetch = jest.fn();
+
+describe('useFetch', () => {
+  it('should fetch data', async () => {
+    const mockData = { id: 1, name: 'Test' };
+    fetch.mockResolvedValueOnce({
+      json: async () => mockData
+    });
+    
+    const { result, waitForNextUpdate } = renderHook(() => 
+      useFetch('/api/test')
+    );
+    
+    expect(result.current.loading).toBe(true);
+    
+    await waitForNextUpdate();
+    
+    expect(result.current.loading).toBe(false);
+    expect(result.current.data).toEqual(mockData);
+  });
+});`,
+            explanation: "Test custom hooks using renderHook from React Testing Library. Use act() for state updates, mock external dependencies, and test all return values and side effects."
+          }
+        },
+        {
+          title: "Best Practices for Custom Hooks",
+          content: "Following best practices makes your custom hooks more maintainable, reusable, and easier to understand.\n\nBest Practices:\n• Start hook names with 'use'\n• Keep hooks focused on single responsibility\n• Return objects for multiple values, arrays for pairs\n• Handle cleanup properly\n• Provide sensible defaults\n• Document hook behavior\n• Handle edge cases\n• Make hooks composable\n\nCommon Patterns:\n• Return object for flexibility\n• Return array for destructuring (like useState)\n• Use useCallback/useMemo when needed\n• Handle loading and error states\n• Provide reset/clear functions",
+          codeExample: {
+            code: `// ✅ GOOD: Focused, single responsibility
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+  
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+    
+    return () => clearTimeout(handler);
+  }, [value, delay]);
+  
+  return debouncedValue;
+}
+
+// ✅ GOOD: Return object for flexibility
+function useForm(initialValues) {
+  const [values, setValues] = useState(initialValues);
+  const [errors, setErrors] = useState({});
+  
+  const setValue = (name, value) => {
+    setValues(prev => ({ ...prev, [name]: value }));
+  };
+  
+  const setError = (name, error) => {
+    setErrors(prev => ({ ...prev, [name]: error }));
+  };
+  
+  const reset = () => {
+    setValues(initialValues);
+    setErrors({});
+  };
+  
+  return {
+    values,
+    errors,
+    setValue,
+    setError,
+    reset
+  };
+}
+
+// ✅ GOOD: Handle edge cases
+function useLocalStorage(key, initialValue) {
+  const [storedValue, setStoredValue] = useState(() => {
+    if (typeof window === 'undefined') {
+      return initialValue; // SSR safety
+    }
+    
+    try {
+      const item = window.localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch (error) {
+      console.error(\`Error reading localStorage key "\${key}":\`, error);
+      return initialValue;
+    }
+  });
+  
+  const setValue = (value) => {
+    try {
+      setStoredValue(value);
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(key, JSON.stringify(value));
+      }
+    } catch (error) {
+      console.error(\`Error setting localStorage key "\${key}":\`, error);
+    }
+  };
+  
+  return [storedValue, setValue];
+}
+
+// ✅ GOOD: Document with JSDoc
+/**
+ * Custom hook for managing a counter
+ * @param {number} initialValue - Initial counter value
+ * @returns {Object} Object with count, increment, decrement, and reset
+ */
+function useCounter(initialValue = 0) {
+  // Implementation
+}
+
+// ✅ GOOD: Use useCallback for stable references
+function useApiCall(url) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      setData(data);
+    } finally {
+      setLoading(false);
+    }
+  }, [url]);
+  
+  return { data, loading, fetchData };
+}`,
+            explanation: "Follow best practices: keep hooks focused, return appropriate structures, handle edge cases, provide cleanup, and document your hooks. Use useCallback/useMemo when needed for performance."
+          }
+        }
+      ],
+      conclusion: "Custom hooks are a powerful way to share logic between components. Start hook names with 'use', keep them focused, handle cleanup properly, and compose them for complex functionality. Follow the rules of hooks, test your hooks thoroughly, and document their behavior. Remember: custom hooks let you extract and reuse stateful logic, making your components cleaner and more maintainable."
+    }
+  },
+  {
+    id: "intermediate-9",
+    title: "Error Boundaries in React",
+    description: "Learn how to catch and handle errors in React component trees using Error Boundaries to prevent entire applications from crashing.",
+    level: "intermediate",
+    estimatedTime: "50 min",
+    topics: ["Error Boundaries", "Error Handling", "Component Lifecycle", "Error Recovery", "Error Logging", "Fallback UI"],
+    prerequisites: ["Understanding Props", "Managing State with useState", "Understanding useEffect"],
+    content: {
+      overview: "Error Boundaries are React components that catch JavaScript errors anywhere in their child component tree, log those errors, and display a fallback UI instead of crashing the entire application. They're essential for building robust production applications. This tutorial covers how to create Error Boundaries, handle different types of errors, and implement error recovery strategies.",
+      sections: [
+        {
+          title: "Understanding Error Boundaries",
+          content: "Error Boundaries are React components that catch errors in their child component tree. They're like try-catch blocks, but for React components.\n\nWhat Error Boundaries Do:\n• Catch errors during rendering\n• Catch errors in lifecycle methods\n• Catch errors in constructors\n• Display fallback UI\n• Log errors for debugging\n\nWhat They DON'T Catch:\n• Errors in event handlers\n• Errors in async code (setTimeout, promises)\n• Errors during server-side rendering\n• Errors in the Error Boundary itself\n\nWhy We Need Them:\n• Prevent entire app from crashing\n• Provide better user experience\n• Isolate errors to specific parts\n• Enable error recovery",
+          codeExample: {
+            code: `// Basic Error Boundary (class component)
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  
+  static getDerivedStateFromError(error) {
+    // Update state to show fallback UI
+    return { hasError: true, error };
+  }
+  
+  componentDidCatch(error, errorInfo) {
+    // Log error to error reporting service
+    console.error('Error caught by boundary:', error, errorInfo);
+    // You can log to service like Sentry, LogRocket, etc.
+  }
+  
+  render() {
+    if (this.state.hasError) {
+      // Fallback UI
+      return (
+        <div>
+          <h2>Something went wrong.</h2>
+          <details>
+            {this.state.error && this.state.error.toString()}
+          </details>
+        </div>
+      );
+    }
+    
+    return this.props.children;
+  }
+}
+
+// Usage
+function App() {
+  return (
+    <ErrorBoundary>
+      <MyComponent />
+    </ErrorBoundary>
+  );
+}
+
+// Error Boundary with recovery
+class ErrorBoundaryWithRecovery extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null, errorCount: 0 };
+  }
+  
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  
+  componentDidCatch(error, errorInfo) {
+    this.setState(prev => ({
+      errorCount: prev.errorCount + 1
+    }));
+    console.error('Error:', error, errorInfo);
+  }
+  
+  handleReset = () => {
+    this.setState({ hasError: false, error: null });
+  };
+  
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div>
+          <h2>Something went wrong</h2>
+          <p>Error count: {this.state.errorCount}</p>
+          <button onClick={this.handleReset}>Try again</button>
+        </div>
+      );
+    }
+    
+    return this.props.children;
+  }
+}`,
+            explanation: "Error Boundaries are class components that implement getDerivedStateFromError and componentDidCatch. They catch errors in their child tree and display fallback UI instead of crashing the app."
+          }
+        },
+        {
+          title: "Creating Error Boundaries",
+          content: "Error Boundaries must be class components (as of React 16+). However, you can create reusable Error Boundary components and use them throughout your app.\n\nError Boundary Requirements:\n• Must be a class component\n• Must implement getDerivedStateFromError\n• Should implement componentDidCatch\n• Can have custom fallback UI\n• Can support error recovery\n\nBest Practices:\n• Create reusable Error Boundary components\n• Place them strategically in component tree\n• Provide helpful error messages\n• Log errors to monitoring service\n• Allow error recovery when possible",
+          codeExample: {
+            code: `// Reusable Error Boundary component
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      hasError: false,
+      error: null,
+      errorInfo: null
+    };
+  }
+  
+  static getDerivedStateFromError(error) {
+    return {
+      hasError: true,
+      error
+    };
+  }
+  
+  componentDidCatch(error, errorInfo) {
+    this.setState({
+      errorInfo
+    });
+    
+    // Log to error reporting service
+    if (this.props.onError) {
+      this.props.onError(error, errorInfo);
+    }
+  }
+  
+  handleReset = () => {
+    this.setState({
+      hasError: false,
+      error: null,
+      errorInfo: null
+    });
+  };
+  
+  render() {
+    if (this.state.hasError) {
+      if (this.props.fallback) {
+        return this.props.fallback(this.state.error, this.handleReset);
+      }
+      
+      return (
+        <div className="error-boundary">
+          <h2>{this.props.title || 'Something went wrong'}</h2>
+          {this.props.showDetails && (
+            <details>
+              <summary>Error details</summary>
+              <pre>{this.state.error?.toString()}</pre>
+              <pre>{this.state.errorInfo?.componentStack}</pre>
+            </details>
+          )}
+          {this.props.onReset && (
+            <button onClick={this.handleReset}>
+              {this.props.resetButtonText || 'Try again'}
+            </button>
+          )}
+        </div>
+      );
+    }
+    
+    return this.props.children;
+  }
+}
+
+// Usage with custom fallback
+function App() {
+  return (
+    <ErrorBoundary
+      fallback={(error, reset) => (
+        <div>
+          <h2>Custom Error UI</h2>
+          <button onClick={reset}>Reset</button>
+        </div>
+      )}
+      onError={(error, errorInfo) => {
+        // Send to error tracking service
+        console.error('Error:', error, errorInfo);
+      }}
+    >
+      <MyComponent />
+    </ErrorBoundary>
+  );
+}
+
+// Multiple Error Boundaries for different sections
+function App() {
+  return (
+    <div>
+      <ErrorBoundary title="Header Error">
+        <Header />
+      </ErrorBoundary>
+      
+      <ErrorBoundary title="Sidebar Error">
+        <Sidebar />
+      </ErrorBoundary>
+      
+      <ErrorBoundary title="Main Content Error">
+        <MainContent />
+      </ErrorBoundary>
+    </div>
+  );
+}`,
+            explanation: "Create reusable Error Boundary components with customizable fallback UI and error handling. Place them strategically throughout your app to isolate errors to specific sections."
+          }
+        },
+        {
+          title: "Error Boundary Patterns",
+          content: "There are several patterns for using Error Boundaries effectively in your application.\n\nCommon Patterns:\n• Top-level Error Boundary (catches all errors)\n• Section-level Error Boundaries (isolate errors)\n• Feature-level Error Boundaries (per feature)\n• Component-level Error Boundaries (wrap risky components)\n\nWhen to Use Each:\n• Top-level: Catch-all safety net\n• Section-level: Isolate major app sections\n• Feature-level: Isolate features\n• Component-level: Wrap components that might fail\n\nBest Practices:\n• Use multiple boundaries at different levels\n• Provide context-specific error messages\n• Allow partial app functionality\n• Log errors appropriately",
+          codeExample: {
+            code: `// Pattern 1: Top-level boundary
+function App() {
+  return (
+    <ErrorBoundary>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+        </Routes>
+      </Router>
+    </ErrorBoundary>
+  );
+}
+
+// Pattern 2: Section-level boundaries
+function Dashboard() {
+  return (
+    <div>
+      <ErrorBoundary title="Navigation Error">
+        <Navigation />
+      </ErrorBoundary>
+      
+      <ErrorBoundary title="Content Error">
+        <DashboardContent />
+      </ErrorBoundary>
+      
+      <ErrorBoundary title="Sidebar Error">
+        <Sidebar />
+      </ErrorBoundary>
+    </div>
+  );
+}
+
+// Pattern 3: Feature-level boundaries
+function UserProfile({ userId }) {
+  return (
+    <ErrorBoundary>
+      <UserHeader userId={userId} />
+      <ErrorBoundary title="Posts Error">
+        <UserPosts userId={userId} />
+      </ErrorBoundary>
+      <ErrorBoundary title="Friends Error">
+        <UserFriends userId={userId} />
+      </ErrorBoundary>
+    </ErrorBoundary>
+  );
+}
+
+// Pattern 4: Component-level (risky components)
+function DataVisualization({ data }) {
+  return (
+    <ErrorBoundary title="Chart Error">
+      <ComplexChart data={data} />
+    </ErrorBoundary>
+  );
+}
+
+// Pattern 5: Nested boundaries
+function App() {
+  return (
+    <ErrorBoundary title="App Error">
+      <Header />
+      <ErrorBoundary title="Content Error">
+        <MainContent>
+          <ErrorBoundary title="Widget Error">
+            <RiskyWidget />
+          </ErrorBoundary>
+        </MainContent>
+      </ErrorBoundary>
+      <Footer />
+    </ErrorBoundary>
+  );
+}`,
+            explanation: "Use Error Boundaries at different levels: top-level for safety net, section-level to isolate major parts, feature-level for features, and component-level for risky components. This provides graceful degradation."
+          }
+        },
+        {
+          title: "Handling Different Error Types",
+          content: "Different types of errors require different handling strategies. Understanding what Error Boundaries catch and what they don't is crucial.\n\nWhat Error Boundaries Catch:\n• Errors during render\n• Errors in lifecycle methods\n• Errors in constructors\n• Errors in child components\n\nWhat They DON'T Catch:\n• Errors in event handlers (use try-catch)\n• Errors in async code (use try-catch)\n• Errors in setTimeout/setInterval\n• Errors during server-side rendering\n• Errors in the Error Boundary itself\n\nHandling Strategies:\n• Use Error Boundaries for render errors\n• Use try-catch for event handlers\n• Use try-catch for async operations\n• Combine both approaches",
+          codeExample: {
+            code: `// Error Boundary catches render errors
+function ComponentWithRenderError() {
+  const data = null;
+  return <div>{data.items.map(...)}</div>; // Error caught by boundary
+}
+
+// ❌ Error Boundary does NOT catch event handler errors
+function ComponentWithEventHandlerError() {
+  const handleClick = () => {
+    throw new Error('Event handler error'); // NOT caught by boundary
+  };
+  
+  return <button onClick={handleClick}>Click</button>;
+}
+
+// ✅ Use try-catch for event handlers
+function SafeEventHandler() {
+  const handleClick = () => {
+    try {
+      // Risky operation
+      riskyOperation();
+    } catch (error) {
+      console.error('Error in handler:', error);
+      // Show error to user
+    }
+  };
+  
+  return <button onClick={handleClick}>Click</button>;
+}
+
+// ❌ Error Boundary does NOT catch async errors
+function ComponentWithAsyncError() {
+  useEffect(() => {
+    fetch('/api/data')
+      .then(() => {
+        throw new Error('Async error'); // NOT caught by boundary
+      });
+  }, []);
+  
+  return <div>Content</div>;
+}
+
+// ✅ Handle async errors properly
+function SafeAsyncComponent() {
+  const [error, setError] = useState(null);
+  
+  useEffect(() => {
+    fetch('/api/data')
+      .then(res => res.json())
+      .then(data => {
+        // Process data
+      })
+      .catch(err => {
+        setError(err); // Handle error in state
+      });
+  }, []);
+  
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
+  
+  return <div>Content</div>;
+}
+
+// Combined approach: Error Boundary + try-catch
+function RobustComponent() {
+  const [error, setError] = useState(null);
+  
+  const handleAsyncAction = async () => {
+    try {
+      await riskyAsyncOperation();
+    } catch (err) {
+      setError(err);
+    }
+  };
+  
+  // Render errors caught by Error Boundary
+  if (someCondition) {
+    throw new Error('Render error'); // Caught by boundary
+  }
+  
+  return (
+    <div>
+      {error && <div>Action error: {error.message}</div>}
+      <button onClick={handleAsyncAction}>Action</button>
+    </div>
+  );
+}`,
+            explanation: "Error Boundaries only catch render/lifecycle errors. Use try-catch for event handlers and async code. Combine both approaches for comprehensive error handling."
+          }
+        },
+        {
+          title: "Error Logging and Monitoring",
+          content: "Logging errors to monitoring services is crucial for production applications. Error Boundaries provide the perfect place to integrate error logging.\n\nError Logging Services:\n• Sentry - Popular error tracking\n• LogRocket - Session replay + errors\n• Bugsnag - Error monitoring\n• Rollbar - Error tracking\n• Custom logging service\n\nWhat to Log:\n• Error message and stack trace\n• Component stack\n• User context\n• Browser information\n• User actions leading to error\n\nBest Practices:\n• Log to external service\n• Don't log sensitive data\n• Include helpful context\n• Set up alerts for critical errors\n• Track error frequency",
+          codeExample: {
+            code: `// Error Boundary with Sentry integration
+import * as Sentry from '@sentry/react';
+
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+  
+  componentDidCatch(error, errorInfo) {
+    // Log to Sentry
+    Sentry.captureException(error, {
+      contexts: {
+        react: {
+          componentStack: errorInfo.componentStack
+        }
+      },
+      tags: {
+        errorBoundary: true
+      },
+      extra: {
+        errorInfo
+      }
+    });
+    
+    // Also log to console in development
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error caught by boundary:', error, errorInfo);
+    }
+  }
+  
+  render() {
+    if (this.state.hasError) {
+      return <FallbackUI />;
+    }
+    return this.props.children;
+  }
+}
+
+// Error Boundary with custom logging
+class ErrorBoundaryWithLogging extends React.Component {
+  componentDidCatch(error, errorInfo) {
+    // Log to custom service
+    this.logError({
+      message: error.message,
+      stack: error.stack,
+      componentStack: errorInfo.componentStack,
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent,
+      url: window.location.href,
+      userId: this.getUserId(), // If available
+    });
+  }
+  
+  logError = async (errorData) => {
+    try {
+      await fetch('/api/errors', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(errorData)
+      });
+    } catch (err) {
+      console.error('Failed to log error:', err);
+    }
+  };
+  
+  getUserId = () => {
+    // Get user ID from context, state, etc.
+    return null;
+  };
+  
+  // ... rest of Error Boundary
+}
+
+// Error Boundary with error reporting hook
+function useErrorReporting() {
+  const reportError = useCallback((error, errorInfo) => {
+    // Send to multiple services
+    Sentry.captureException(error, { contexts: { react: errorInfo } });
+    
+    // Custom logging
+    console.error('Error:', error);
+    
+    // Analytics
+    analytics.track('error_occurred', {
+      error_message: error.message,
+      error_type: error.name
+    });
+  }, []);
+  
+  return { reportError };
+}
+
+class ErrorBoundary extends React.Component {
+  // ... use useErrorReporting hook
+}`,
+            explanation: "Integrate error logging into Error Boundaries. Use services like Sentry for production error tracking. Log helpful context but avoid sensitive data. Set up alerts for critical errors."
+          }
+        },
+        {
+          title: "Error Recovery Strategies",
+          content: "Allowing users to recover from errors improves user experience. Error Boundaries can support various recovery strategies.\n\nRecovery Strategies:\n• Reset button - Clear error state\n• Retry mechanism - Try operation again\n• Fallback to cached data\n• Redirect to safe page\n• Show partial content\n• Allow user to continue\n\nImplementation:\n• Store recovery function in state\n• Provide UI for recovery\n• Reset error state\n• Re-render component tree\n\nBest Practices:\n• Always provide recovery option when possible\n• Make recovery action clear\n• Preserve user data when possible\n• Log recovery attempts",
+          codeExample: {
+            code: `// Error Boundary with reset
+class ErrorBoundaryWithReset extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  
+  handleReset = () => {
+    this.setState({ hasError: false, error: null });
+  };
+  
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div>
+          <h2>Something went wrong</h2>
+          <button onClick={this.handleReset}>Try again</button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+// Error Boundary with retry
+class ErrorBoundaryWithRetry extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { 
+      hasError: false, 
+      error: null,
+      retryCount: 0 
+    };
+  }
+  
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error: error };
+  }
+  
+  handleRetry = () => {
+    this.setState(prev => ({
+      hasError: false,
+      error: null,
+      retryCount: prev.retryCount + 1
+    }));
+  };
+  
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div>
+          <h2>Error occurred</h2>
+          <p>Retry count: {this.state.retryCount}</p>
+          <button onClick={this.handleRetry}>
+            Retry
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+// Error Boundary with fallback content
+class ErrorBoundaryWithFallback extends React.Component {
+  state = { hasError: false };
+  
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback || <DefaultFallback />;
+    }
+    return this.props.children;
+  }
+}
+
+// Usage with fallback
+function App() {
+  return (
+    <ErrorBoundaryWithFallback
+      fallback={
+        <div>
+          <h2>Content unavailable</h2>
+          <p>Please try again later</p>
+          <Link to="/">Go to home</Link>
+        </div>
+      }
+    >
+      <RiskyComponent />
+    </ErrorBoundaryWithFallback>
+  );
+}
+
+// Error Boundary with key-based reset
+function App() {
+  const [key, setKey] = useState(0);
+  
+  const handleReset = () => {
+    setKey(prev => prev + 1); // Force remount
+  };
+  
+  return (
+    <ErrorBoundary
+      key={key}
+      onReset={handleReset}
+    >
+      <RiskyComponent />
+    </ErrorBoundary>
+  );
+}`,
+            explanation: "Implement error recovery by allowing users to reset error state, retry operations, or navigate away. Use key prop to force component remount for complete reset. Always provide clear recovery options."
+          }
+        }
+      ],
+      conclusion: "Error Boundaries are essential for building robust React applications. They catch render and lifecycle errors, display fallback UI, and prevent entire apps from crashing. Use them at multiple levels, integrate error logging, and provide recovery options. Remember: Error Boundaries only catch render/lifecycle errors - use try-catch for event handlers and async code. Combine both approaches for comprehensive error handling."
+    }
+  },
+  {
+    id: "intermediate-10",
+    title: "React.memo and Performance Optimization",
+    description: "Learn how to optimize React component performance using React.memo, useMemo, useCallback, and other performance optimization techniques.",
+    level: "intermediate",
+    estimatedTime: "70 min",
+    topics: ["React.memo", "useMemo", "useCallback", "Performance Optimization", "Re-render Prevention", "Profiling"],
+    prerequisites: ["Managing State with useState", "Understanding useEffect", "Understanding Props"],
+    content: {
+      overview: "Performance optimization is crucial for building fast React applications. React.memo, useMemo, and useCallback are powerful tools for preventing unnecessary re-renders and expensive recalculations. This tutorial covers when and how to use these optimization techniques, how to measure performance, and best practices for optimizing React applications.",
+      sections: [
+        {
+          title: "Understanding React Re-renders",
+          content: "Understanding when and why components re-render is the first step to optimization.\n\nWhen Components Re-render:\n• State changes (useState, useReducer)\n• Props change\n• Parent component re-renders\n• Context value changes\n• Force update (rarely used)\n\nWhy Re-renders Matter:\n• Can cause performance issues\n• Unnecessary re-renders waste resources\n• Can cause UI flickering\n• Impact user experience\n\nWhen Re-renders are Expensive:\n• Large component trees\n• Complex calculations\n• Heavy DOM manipulations\n• Many child components\n\nOptimization Goal:\n• Prevent unnecessary re-renders\n• Memoize expensive calculations\n• Optimize only when needed\n• Measure before optimizing",
+          codeExample: {
+            code: `// Component re-renders on every parent render
+function ExpensiveComponent({ data }) {
+  console.log('Rendering ExpensiveComponent');
+  
+  // Expensive calculation runs on every render
+  const result = expensiveCalculation(data);
+  
+  return <div>{result}</div>;
+}
+
+function Parent() {
+  const [count, setCount] = useState(0);
+  const [otherState, setOtherState] = useState(0);
+  
+  return (
+    <div>
+      <button onClick={() => setCount(c => c + 1)}>Count: {count}</button>
+      <button onClick={() => setOtherState(s => s + 1)}>Other: {otherState}</button>
+      {/* ExpensiveComponent re-renders even when data doesn't change */}
+      <ExpensiveComponent data={{ value: 42 }} />
+    </div>
+  );
+}
+
+// Tracking re-renders
+function ComponentWithRenderTracking() {
+  const renderCount = useRef(0);
+  renderCount.current += 1;
+  
+  console.log(\`Rendered \${renderCount.current} times\`);
+  
+  return <div>Render count: {renderCount.current}</div>;
+}
+
+// When props change
+function Child({ value }) {
+  console.log('Child rendered with value:', value);
+  return <div>{value}</div>;
+}
+
+function Parent() {
+  const [value, setValue] = useState(0);
+  const [other, setOther] = useState(0);
+  
+  return (
+    <div>
+      <button onClick={() => setValue(v => v + 1)}>Value: {value}</button>
+      <button onClick={() => setOther(o => o + 1)}>Other: {other}</button>
+      {/* Child re-renders when value changes, but also when other changes */}
+      <Child value={value} />
+    </div>
+  );
+}`,
+            explanation: "Components re-render when state or props change, or when parent re-renders. Understanding re-render triggers is essential for optimization. Track renders to identify unnecessary re-renders."
+          }
+        },
+        {
+          title: "Using React.memo",
+          content: "React.memo is a higher-order component that memoizes the result of a component. It only re-renders if props have changed.\n\nWhat React.memo Does:\n• Memoizes component render result\n• Compares props (shallow comparison by default)\n• Skips re-render if props unchanged\n• Only works for functional components\n\nWhen to Use:\n• Component receives same props frequently\n• Component is expensive to render\n• Parent re-renders often\n• Props are primitive or stable references\n\nWhen NOT to Use:\n• Component always receives new props\n• Props change frequently\n• Optimization overhead > benefit\n• Premature optimization",
+          codeExample: {
+            code: `// Component without memo (re-renders on every parent render)
+function ExpensiveChild({ name, age }) {
+  console.log('Rendering ExpensiveChild');
+  return (
+    <div>
+      <p>Name: {name}</p>
+      <p>Age: {age}</p>
+    </div>
+  );
+}
+
+// Component with memo (only re-renders when props change)
+const MemoizedChild = React.memo(function ExpensiveChild({ name, age }) {
+  console.log('Rendering MemoizedChild');
+  return (
+    <div>
+      <p>Name: {name}</p>
+      <p>Age: {age}</p>
+    </div>
+  );
+});
+
+function Parent() {
+  const [count, setCount] = useState(0);
+  const [name, setName] = useState('Alice');
+  
+  return (
+    <div>
+      <button onClick={() => setCount(c => c + 1)}>Count: {count}</button>
+      {/* MemoizedChild only re-renders when name changes, not when count changes */}
+      <MemoizedChild name={name} age={25} />
+    </div>
+  );
+}
+
+// Custom comparison function
+const CustomMemoized = React.memo(
+  function Component({ user, settings }) {
+    return (
+      <div>
+        <p>{user.name}</p>
+        <p>{settings.theme}</p>
+      </div>
+    );
+  },
+  (prevProps, nextProps) => {
+    // Return true if props are equal (skip re-render)
+    // Return false if props are different (re-render)
+    return (
+      prevProps.user.id === nextProps.user.id &&
+      prevProps.settings.theme === nextProps.settings.theme
+    );
+  }
+);
+
+// Memo with object props (be careful!)
+function Parent() {
+  const [count, setCount] = useState(0);
+  
+  // ❌ BAD: New object created every render
+  return <MemoizedChild data={{ value: 42 }} />;
+  
+  // ✅ GOOD: Stable reference
+  const data = useMemo(() => ({ value: 42 }), []);
+  return <MemoizedChild data={data} />;
+}`,
+            explanation: "React.memo prevents re-renders when props haven't changed. Use it for expensive components that receive stable props. Be careful with object/array props - they need stable references."
+          }
+        },
+        {
+          title: "Using useMemo for Expensive Calculations",
+          content: "useMemo memoizes the result of expensive calculations, only recalculating when dependencies change.\n\nWhat useMemo Does:\n• Memoizes calculation result\n• Only recalculates when dependencies change\n• Returns cached value otherwise\n• Helps prevent expensive recalculations\n\nWhen to Use:\n• Expensive calculations\n• Derived state from props/state\n• Creating objects/arrays for props\n• Filtering/sorting large arrays\n\nWhen NOT to Use:\n• Simple calculations\n• Values that change frequently\n• Premature optimization\n• When overhead > benefit",
+          codeExample: {
+            code: `// Expensive calculation without memo
+function ProductList({ products, filter }) {
+  // ❌ BAD: Recalculates on every render
+  const filteredProducts = products.filter(p => 
+    p.category === filter
+  ).sort((a, b) => a.price - b.price);
+  
+  return (
+    <ul>
+      {filteredProducts.map(product => (
+        <li key={product.id}>{product.name}</li>
+      ))}
+    </ul>
+  );
+}
+
+// With useMemo
+function ProductList({ products, filter }) {
+  // ✅ GOOD: Only recalculates when products or filter change
+  const filteredProducts = useMemo(() => {
+    return products
+      .filter(p => p.category === filter)
+      .sort((a, b) => a.price - b.price);
+  }, [products, filter]);
+  
+  return (
+    <ul>
+      {filteredProducts.map(product => (
+        <li key={product.id}>{product.name}</li>
+      ))}
+    </ul>
+  );
+}
+
+// Creating stable object references
+function Component({ userId }) {
+  const [count, setCount] = useState(0);
+  
+  // ❌ BAD: New object every render
+  const config = { userId, theme: 'dark' };
+  
+  // ✅ GOOD: Stable reference
+  const config = useMemo(
+    () => ({ userId, theme: 'dark' }),
+    [userId] // Only recreate when userId changes
+  );
+  
+  return <Child config={config} />;
+}
+
+// Expensive computation
+function ExpensiveCalculation({ n }) {
+  const [otherState, setOtherState] = useState(0);
+  
+  // Expensive calculation only runs when n changes
+  const result = useMemo(() => {
+    console.log('Calculating...');
+    let sum = 0;
+    for (let i = 0; i < n * 1000000; i++) {
+      sum += i;
+    }
+    return sum;
+  }, [n]); // Only recalculate when n changes
+  
+  return (
+    <div>
+      <p>Result: {result}</p>
+      <button onClick={() => setOtherState(s => s + 1)}>
+        Other: {otherState}
+      </button>
+    </div>
+  );
+}`,
+            explanation: "useMemo memoizes expensive calculations. Only recalculates when dependencies change. Use it for expensive operations and creating stable object/array references for props."
+          }
+        },
+        {
+          title: "Using useCallback for Stable Function References",
+          content: "useCallback memoizes functions, returning the same function reference when dependencies haven't changed. This is crucial when passing functions as props to memoized components.\n\nWhat useCallback Does:\n• Memoizes function\n• Returns same reference if dependencies unchanged\n• Prevents unnecessary re-renders of child components\n• Works with React.memo\n\nWhen to Use:\n• Function passed to memoized component\n• Function in dependency array\n• Function passed to child via props\n• Expensive function creation\n\nWhen NOT to Use:\n• Function not passed as prop\n• Dependencies change frequently\n• Simple function creation\n• Premature optimization",
+          codeExample: {
+            code: `// Function without useCallback
+function Parent() {
+  const [count, setCount] = useState(0);
+  const [name, setName] = useState('Alice');
+  
+  // ❌ BAD: New function every render
+  const handleClick = () => {
+    console.log('Clicked');
+  };
+  
+  return (
+    <div>
+      <button onClick={() => setCount(c => c + 1)}>Count: {count}</button>
+      {/* MemoizedChild re-renders because handleClick is new every time */}
+      <MemoizedChild name={name} onClick={handleClick} />
+    </div>
+  );
+}
+
+// With useCallback
+function Parent() {
+  const [count, setCount] = useState(0);
+  const [name, setName] = useState('Alice');
+  
+  // ✅ GOOD: Stable function reference
+  const handleClick = useCallback(() => {
+    console.log('Clicked');
+  }, []); // Empty deps = function never changes
+  
+  return (
+    <div>
+      <button onClick={() => setCount(c => c + 1)}>Count: {count}</button>
+      {/* MemoizedChild doesn't re-render when count changes */}
+      <MemoizedChild name={name} onClick={handleClick} />
+    </div>
+  );
+}
+
+// useCallback with dependencies
+function Parent({ userId }) {
+  const [count, setCount] = useState(0);
+  
+  // Function depends on userId
+  const handleUserAction = useCallback((action) => {
+    console.log(\`User \${userId} performed \${action}\`);
+    // Do something with userId
+  }, [userId]); // Recreate when userId changes
+  
+  return <MemoizedChild onAction={handleUserAction} />;
+}
+
+// useCallback in custom hooks
+function useApiCall(url) {
+  const [data, setData] = useState(null);
+  
+  const fetchData = useCallback(async () => {
+    const response = await fetch(url);
+    const data = await response.json();
+    setData(data);
+  }, [url]); // Recreate when url changes
+  
+  return { data, fetchData };
+}
+
+// useCallback with event handlers
+function Form() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  
+  const handleSubmit = useCallback((e) => {
+    e.preventDefault();
+    // Submit form
+    console.log({ email, password });
+  }, [email, password]); // Recreate when email/password change
+  
+  return (
+    <form onSubmit={handleSubmit}>
+      <input value={email} onChange={(e) => setEmail(e.target.value)} />
+      <input value={password} onChange={(e) => setPassword(e.target.value)} />
+      <button type="submit">Submit</button>
+    </form>
+  );
+}`,
+            explanation: "useCallback memoizes functions to provide stable references. Essential when passing functions to memoized components. Include all dependencies in the dependency array."
+          }
+        },
+        {
+          title: "Combining Optimization Techniques",
+          content: "Often you need to combine React.memo, useMemo, and useCallback for optimal performance. Understanding how they work together is crucial.\n\nCombination Patterns:\n• React.memo + useCallback for props\n• React.memo + useMemo for object props\n• useMemo + useCallback together\n• Multiple optimizations in one component\n\nBest Practices:\n• Optimize only when needed\n• Measure performance first\n• Don't over-optimize\n• Use React DevTools Profiler\n• Test with realistic data",
+          codeExample: {
+            code: `// Optimized component with all techniques
+const OptimizedChild = React.memo(function Child({ 
+  user, 
+  settings, 
+  onAction 
+}) {
+  // Expensive calculation memoized
+  const processedData = useMemo(() => {
+    return expensiveProcessing(user.data);
+  }, [user.data]);
+  
+  return (
+    <div>
+      <p>{user.name}</p>
+      <p>{settings.theme}</p>
+      <p>{processedData}</p>
+      <button onClick={onAction}>Action</button>
+    </div>
+  );
+});
+
+function Parent() {
+  const [count, setCount] = useState(0);
+  const [user, setUser] = useState({ id: 1, name: 'Alice', data: [1, 2, 3] });
+  const [theme, setTheme] = useState('dark');
+  
+  // Stable object references
+  const settings = useMemo(
+    () => ({ theme, language: 'en' }),
+    [theme]
+  );
+  
+  // Stable function reference
+  const handleAction = useCallback(() => {
+    console.log('Action performed');
+  }, []);
+  
+  return (
+    <div>
+      <button onClick={() => setCount(c => c + 1)}>Count: {count}</button>
+      {/* OptimizedChild only re-renders when user or settings actually change */}
+      <OptimizedChild 
+        user={user} 
+        settings={settings} 
+        onAction={handleAction} 
+      />
+    </div>
+  );
+}
+
+// Complex optimization example
+const ExpensiveListItem = React.memo(function ListItem({ 
+  item, 
+  onSelect, 
+  isSelected 
+}) {
+  const formattedData = useMemo(() => {
+    return formatItemData(item);
+  }, [item]);
+  
+  const handleClick = useCallback(() => {
+    onSelect(item.id);
+  }, [item.id, onSelect]);
+  
+  return (
+    <div 
+      className={\`item \${isSelected ? 'selected' : ''}\`}
+      onClick={handleClick}
+    >
+      {formattedData}
+    </div>
+  );
+});
+
+function List({ items, selectedId, onSelect }) {
+  const handleSelect = useCallback((id) => {
+    onSelect(id);
+  }, [onSelect]);
+  
+  return (
+    <div>
+      {items.map(item => (
+        <ExpensiveListItem
+          key={item.id}
+          item={item}
+          isSelected={item.id === selectedId}
+          onSelect={handleSelect}
+        />
+      ))}
+    </div>
+  );
+}`,
+            explanation: "Combine React.memo, useMemo, and useCallback for optimal performance. Memoize components, calculations, and functions. Use stable references for object/function props passed to memoized components."
+          }
+        },
+        {
+          title: "Performance Profiling and Best Practices",
+          content: "Measuring performance is essential before optimizing. React DevTools Profiler helps identify performance bottlenecks.\n\nProfiling Tools:\n• React DevTools Profiler\n• Chrome DevTools Performance tab\n• Lighthouse\n• Web Vitals\n\nWhat to Measure:\n• Component render times\n• Re-render frequency\n• Time to interactive\n• Bundle size\n• Memory usage\n\nBest Practices:\n• Measure before optimizing\n• Optimize only when needed\n• Use React.memo sparingly\n• Don't over-optimize\n• Test with realistic data\n• Monitor in production\n\nCommon Mistakes:\n• Optimizing too early\n• Memoizing everything\n• Forgetting dependencies\n• Creating new objects in render\n• Not measuring impact",
+          codeExample: {
+            code: `// Using React DevTools Profiler
+// 1. Install React DevTools browser extension
+// 2. Open DevTools > Profiler tab
+// 3. Click record, interact with app, stop recording
+// 4. Analyze which components re-render and why
+
+// Performance measurement hook
+function useRenderTime(componentName) {
+  const renderStart = useRef(performance.now());
+  
+  useEffect(() => {
+    const renderTime = performance.now() - renderStart.current;
+    console.log(\`\${componentName} rendered in \${renderTime.toFixed(2)}ms\`);
+  });
+  
+  useEffect(() => {
+    renderStart.current = performance.now();
+  });
+}
+
+// Usage
+function ExpensiveComponent() {
+  useRenderTime('ExpensiveComponent');
+  // Component logic
+}
+
+// Performance monitoring
+function usePerformanceMonitor() {
+  useEffect(() => {
+    // Monitor Web Vitals
+    if ('PerformanceObserver' in window) {
+      const observer = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          console.log('Performance entry:', entry);
+        }
+      });
+      
+      observer.observe({ entryTypes: ['measure', 'navigation'] });
+      
+      return () => observer.disconnect();
+    }
+  }, []);
+}
+
+// ✅ GOOD: Measure first, then optimize
+function Component() {
+  // 1. Measure performance
+  // 2. Identify bottlenecks
+  // 3. Apply optimizations
+  // 4. Measure again to verify improvement
+}
+
+// ❌ BAD: Optimize without measuring
+function OverOptimizedComponent() {
+  // Memoizing everything without knowing if it helps
+  const value = useMemo(() => simpleCalculation(), []);
+  const handler = useCallback(() => {}, []);
+  // ...
+}
+
+// ✅ GOOD: Optimize only expensive operations
+function SmartComponent({ data }) {
+  // Only memoize if calculation is actually expensive
+  const result = data.length > 1000 
+    ? useMemo(() => expensiveCalculation(data), [data])
+    : simpleCalculation(data);
+  
+  return <div>{result}</div>;
+}
+
+// Performance best practices checklist
+const OPTIMIZATION_CHECKLIST = {
+  // Before optimizing:
+  measure: 'Use React DevTools Profiler',
+  identify: 'Find actual bottlenecks',
+  test: 'Test with realistic data',
+  
+  // When optimizing:
+  memoize: 'Use React.memo for expensive components',
+  calculations: 'Use useMemo for expensive calculations',
+  functions: 'Use useCallback for function props',
+  stable: 'Provide stable object/array references',
+  
+  // After optimizing:
+  verify: 'Measure again to confirm improvement',
+  monitor: 'Monitor in production',
+  document: 'Document why optimization was needed'
+};`,
+            explanation: "Measure performance before optimizing. Use React DevTools Profiler to identify bottlenecks. Optimize only when needed and measure again to verify improvements. Don't over-optimize."
+          }
+        }
+      ],
+      conclusion: "Performance optimization is important but should be done carefully. Use React.memo for expensive components with stable props, useMemo for expensive calculations, and useCallback for stable function references. Always measure performance before optimizing, use React DevTools Profiler, and verify that optimizations actually help. Remember: premature optimization is the root of all evil - optimize only when you have evidence of a performance problem."
+    }
+  },
+  {
+    id: "intermediate-11",
+    title: "TypeScript Interfaces: Comprehensive Guide",
+    description: "Master TypeScript interfaces - learn how to declare, extend, and use interfaces effectively in React applications for type safety and better code organization.",
+    level: "intermediate",
+    estimatedTime: "75 min",
+    topics: ["Interfaces", "Interface Declaration", "Extending Interfaces", "Optional Properties", "Readonly Properties", "Index Signatures", "Interface Merging"],
+    prerequisites: ["TypeScript Basics for React Developers", "Understanding Props"],
+    content: {
+      overview: "Interfaces are one of TypeScript's most powerful features for defining object shapes and contracts. They provide a way to describe the structure of objects, function parameters, and return types. This comprehensive tutorial covers everything you need to know about interfaces: declaring them, extending them, using optional and readonly properties, index signatures, and best practices for using interfaces in React applications.",
+      sections: [
+        {
+          title: "Understanding Interfaces",
+          content: "Interfaces define the shape of objects in TypeScript. They describe what properties an object should have and their types.\n\nWhat are Interfaces:\n• Contracts that objects must follow\n• Define object structure\n• Provide type checking\n• Enable autocomplete in IDEs\n• Serve as documentation\n\nWhy Use Interfaces:\n• Type safety at compile time\n• Better IDE support\n• Self-documenting code\n• Catch errors early\n• Refactoring safety\n\nInterface vs Type:\n• Interfaces: Can be extended and merged\n• Types: More flexible, can represent unions, intersections, etc.\n• Both can describe object shapes\n• Choose based on use case",
+          codeExample: {
+            code: `// Basic interface declaration
+interface User {
+  name: string;
+  age: number;
+  email: string;
+}
+
+// Using the interface
+const user: User = {
+  name: "Alice",
+  age: 30,
+  email: "alice@example.com"
+};
+
+// TypeScript enforces the interface
+const invalidUser: User = {
+  name: "Bob",
+  // age: 25, // Error: Property 'age' is missing
+  email: "bob@example.com"
+};
+
+// Interface for function parameters
+function greetUser(user: User) {
+  console.log(\`Hello, \${user.name}!\`);
+}
+
+greetUser(user); // ✅ Valid
+greetUser({ name: "Charlie" }); // ❌ Error: Missing age and email
+
+// Interface for return types
+function createUser(name: string, age: number, email: string): User {
+  return {
+    name,
+    age,
+    email
+  };
+}
+
+// Interface for React component props
+interface ButtonProps {
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+}
+
+function Button({ label, onClick, disabled = false }: ButtonProps) {
+  return (
+    <button onClick={onClick} disabled={disabled}>
+      {label}
+    </button>
+  );
+}`,
+            explanation: "Interfaces define object shapes. Use them for props, function parameters, return types, and any object structure. TypeScript enforces interface contracts at compile time."
+          }
+        },
+        {
+          title: "Optional and Readonly Properties",
+          content: "Interfaces support optional properties (using ?) and readonly properties (using readonly). These modifiers provide flexibility and immutability.\n\nOptional Properties:\n• Marked with ? after property name\n• Can be omitted when creating object\n• Useful for props that aren't always needed\n• Can have default values\n\nReadonly Properties:\n• Marked with readonly keyword\n• Cannot be reassigned after initialization\n• Useful for immutable data\n• Prevents accidental mutations\n\nCombining Modifiers:\n• Properties can be both optional and readonly\n• readonly applies to the property itself\n• Optional applies to whether property must be present",
+          codeExample: {
+            code: `// Optional properties
+interface UserProfile {
+  name: string;
+  age: number;
+  email?: string; // Optional - may or may not be present
+  phone?: string; // Optional
+  bio?: string; // Optional
+}
+
+const user1: UserProfile = {
+  name: "Alice",
+  age: 30,
+  email: "alice@example.com"
+  // phone and bio are optional, so we can omit them
+};
+
+const user2: UserProfile = {
+  name: "Bob",
+  age: 25
+  // All optional properties omitted
+};
+
+// Readonly properties
+interface Config {
+  readonly apiUrl: string;
+  readonly timeout: number;
+  environment: string; // Not readonly, can be changed
+}
+
+const config: Config = {
+  apiUrl: "https://api.example.com",
+  timeout: 5000,
+  environment: "production"
+};
+
+config.apiUrl = "https://other.com"; // ❌ Error: Cannot assign to 'apiUrl' because it is a read-only property
+config.environment = "development"; // ✅ OK - not readonly
+
+// Combining optional and readonly
+interface Settings {
+  readonly theme: string;
+  readonly language?: string; // Optional AND readonly
+  notifications: boolean;
+}
+
+const settings: Settings = {
+  theme: "dark",
+  notifications: true
+  // language is optional, so we can omit it
+};
+
+settings.theme = "light"; // ❌ Error: readonly
+settings.language = "en"; // ❌ Error: readonly (if it exists)
+settings.notifications = false; // ✅ OK
+
+// React component with optional props
+interface CardProps {
+  title: string;
+  description?: string; // Optional
+  readonly id: string; // Readonly - cannot be changed
+  onClick?: () => void; // Optional function
+}
+
+function Card({ title, description, id, onClick }: CardProps) {
+  // id is readonly, so we can read it but not modify it
+  return (
+    <div onClick={onClick} data-id={id}>
+      <h2>{title}</h2>
+      {description && <p>{description}</p>}
+    </div>
+  );
+}`,
+            explanation: "Use ? for optional properties that may be omitted. Use readonly for properties that shouldn't change after initialization. Combine both when needed for immutable optional properties."
+          }
+        },
+        {
+          title: "Extending and Implementing Interfaces",
+          content: "Interfaces can extend other interfaces, allowing you to build complex type hierarchies and reuse interface definitions.\n\nExtending Interfaces:\n• Use extends keyword\n• Inherit all properties from parent\n• Can add new properties\n• Can override property types (with constraints)\n• Supports multiple inheritance\n\nInterface Inheritance:\n• Child interface includes all parent properties\n• Can add additional properties\n• Type-safe and checked at compile time\n• Useful for component prop hierarchies\n\nMultiple Inheritance:\n• Interfaces can extend multiple interfaces\n• Combine properties from multiple sources\n• Order matters for property conflicts\n\nBest Practices:\n• Keep interfaces focused\n• Use composition over deep inheritance\n• Name interfaces clearly\n• Document complex interfaces",
+          codeExample: {
+            code: `// Basic interface extension
+interface Animal {
+  name: string;
+  age: number;
+}
+
+interface Dog extends Animal {
+  breed: string;
+  bark: () => void;
+}
+
+const myDog: Dog = {
+  name: "Buddy",
+  age: 3,
+  breed: "Golden Retriever",
+  bark: () => console.log("Woof!")
+};
+
+// Multiple interface extension
+interface Flyable {
+  fly: () => void;
+}
+
+interface Swimmable {
+  swim: () => void;
+}
+
+interface Duck extends Animal, Flyable, Swimmable {
+  quack: () => void;
+}
+
+const myDuck: Duck = {
+  name: "Donald",
+  age: 2,
+  fly: () => console.log("Flying"),
+  swim: () => console.log("Swimming"),
+  quack: () => console.log("Quack!")
+};
+
+// React component prop hierarchies
+interface BaseButtonProps {
+  disabled?: boolean;
+  className?: string;
+}
+
+interface PrimaryButtonProps extends BaseButtonProps {
+  variant: "primary";
+  onClick: () => void;
+}
+
+interface SecondaryButtonProps extends BaseButtonProps {
+  variant: "secondary";
+  onClick?: () => void;
+}
+
+// Using extended interfaces
+function Button(props: PrimaryButtonProps | SecondaryButtonProps) {
+  return (
+    <button
+      className={props.className}
+      disabled={props.disabled}
+      onClick={props.onClick}
+    >
+      {props.variant}
+    </button>
+  );
+}
+
+// Extending with additional properties
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
+interface AdminUser extends User {
+  permissions: string[];
+  role: "admin";
+}
+
+interface RegularUser extends User {
+  role: "user";
+  subscription?: string;
+}
+
+// Conditional types with extended interfaces
+function getUserDisplay(user: AdminUser | RegularUser) {
+  if (user.role === "admin") {
+    // TypeScript knows this is AdminUser
+    console.log(\`Admin: \${user.name} with \${user.permissions.length} permissions\`);
+  } else {
+    // TypeScript knows this is RegularUser
+    console.log(\`User: \${user.name}\`);
+  }
+}`,
+            explanation: "Extend interfaces using the extends keyword. Interfaces can extend multiple interfaces. Use extension to build type hierarchies and reuse common properties. This is especially useful for React component prop types."
+          }
+        },
+        {
+          title: "Index Signatures and Dynamic Properties",
+          content: "Index signatures allow interfaces to have properties with dynamic names. This is useful for objects with unknown property names at compile time.\n\nIndex Signatures:\n• Allow properties with dynamic names\n• Syntax: [key: type]: valueType\n• Can have string or number keys\n• Useful for dictionaries and maps\n\nString Index Signatures:\n• Most common type\n• Keys must be strings\n• Allows any string key\n• Can combine with known properties\n\nNumber Index Signatures:\n• Keys must be numbers\n• Less common\n• Useful for arrays-like objects\n\nCombining with Known Properties:\n• Can have both known and index properties\n• Known properties must match index signature\n• Index signature is fallback for unknown keys",
+          codeExample: {
+            code: `// String index signature
+interface StringDictionary {
+  [key: string]: string;
+}
+
+const colors: StringDictionary = {
+  red: "#ff0000",
+  blue: "#0000ff",
+  green: "#00ff00"
+  // Can add any string key
+};
+
+colors.yellow = "#ffff00"; // ✅ OK
+colors["purple"] = "#800080"; // ✅ OK
+
+// Number index signature
+interface NumberDictionary {
+  [index: number]: string;
+}
+
+const items: NumberDictionary = {
+  0: "first",
+  1: "second",
+  2: "third"
+};
+
+// Combining known properties with index signature
+interface UserPreferences {
+  theme: string; // Known property
+  language: string; // Known property
+  [key: string]: string | number; // Index signature - allows any other string key
+}
+
+const prefs: UserPreferences = {
+  theme: "dark",
+  language: "en",
+  fontSize: 14, // ✅ OK - matches index signature
+  customSetting: "value" // ✅ OK
+};
+
+// React component with dynamic props
+interface FlexibleComponentProps {
+  title: string; // Required known property
+  [propName: string]: string | number | boolean | undefined; // Dynamic props
+}
+
+function FlexibleComponent({ title, ...rest }: FlexibleComponentProps) {
+  return (
+    <div>
+      <h2>{title}</h2>
+      {Object.entries(rest).map(([key, value]) => (
+        <div key={key}>
+          {key}: {String(value)}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// API response with dynamic properties
+interface ApiResponse {
+  status: number;
+  message: string;
+  [key: string]: unknown; // Can have any additional properties
+}
+
+function handleResponse(response: ApiResponse) {
+  console.log(response.status);
+  console.log(response.message);
+  // Can access any other properties
+  if ('data' in response) {
+    console.log(response.data);
+  }
+}
+
+// Dictionary with typed values
+interface Cache<T> {
+  [key: string]: T;
+}
+
+const stringCache: Cache<string> = {
+  user1: "Alice,
+  user2: "Bob"
+};
+
+const numberCache: Cache<number> = {
+  count1: 10,
+  count2: 20
+};`,
+            explanation: "Index signatures allow dynamic property names. Use string index signatures for dictionaries and objects with unknown keys. Combine with known properties for flexible but type-safe interfaces."
+          }
+        },
+        {
+          title: "Interface Merging and Declaration Merging",
+          content: "TypeScript supports interface merging, where multiple declarations of the same interface are automatically merged. This is a powerful feature for extending interfaces.\n\nInterface Merging:\n• Multiple declarations with same name merge\n• Properties are combined\n• Later declarations can add properties\n• Useful for extending library types\n• Declaration merging is TypeScript-specific\n\nWhen Merging Happens:\n• Multiple interface declarations with same name\n• In same file or across files\n• Properties are merged together\n• Conflicts cause errors\n\nUse Cases:\n• Extending third-party library types\n• Adding properties to global types\n• Module augmentation\n• Building up interfaces incrementally",
+          codeExample: {
+            code: `// Interface merging - same name, different declarations
+interface User {
+  name: string;
+  age: number;
+}
+
+interface User {
+  email: string; // Merged with previous declaration
+}
+
+// Result: User has name, age, and email
+const user: User = {
+  name: "Alice",
+  age: 30,
+  email: "alice@example.com"
+};
+
+// Merging across files
+// file1.ts
+interface Config {
+  apiUrl: string;
+}
+
+// file2.ts
+interface Config {
+  timeout: number; // Merged with file1's Config
+}
+
+// Result: Config has both apiUrl and timeout
+
+// Extending library types (module augmentation)
+// Extending Window interface
+interface Window {
+  myCustomProperty: string;
+  myCustomMethod: () => void;
+}
+
+// Now you can use
+window.myCustomProperty = "value";
+window.myCustomMethod();
+
+// Extending React types
+declare module 'react' {
+  interface HTMLAttributes<T> {
+    customAttr?: string;
+  }
+}
+
+// Now all HTML elements can have customAttr
+<div customAttr="value">Content</div>
+
+// Merging with method overloads
+interface Calculator {
+  add(a: number, b: number): number;
+}
+
+interface Calculator {
+  add(a: string, b: string): string; // Method overload
+}
+
+// Result: Calculator.add can accept numbers or strings
+
+// Merging with different property types (causes error)
+interface Conflicting {
+  value: string;
+}
+
+interface Conflicting {
+  value: number; // ❌ Error: Property 'value' of type 'number' is not assignable to type 'string'
+}
+
+// Merging with compatible types
+interface Compatible {
+  value: string | number; // Union type allows both
+}
+
+interface Compatible {
+  value: string | number | boolean; // ✅ OK - extends the union
+}`,
+            explanation: "Interface merging combines multiple declarations of the same interface. Use it to extend third-party types, add global properties, and build interfaces incrementally. Be careful with type conflicts."
+          }
+        },
+        {
+          title: "Function Types and Call Signatures in Interfaces",
+          content: "Interfaces can describe function shapes using call signatures. This is useful for typing functions, callbacks, and event handlers.\n\nFunction Types in Interfaces:\n• Describe function shapes\n• Can have multiple call signatures (overloads)\n• Useful for callbacks and event handlers\n• Can combine with properties\n\nCall Signatures:\n• Syntax: (param: type) => returnType\n• Can have multiple overloads\n• Parameters can be optional\n• Return types are enforced\n\nMethod Signatures:\n• Shorthand for methods in interfaces\n• Syntax: methodName(param: type): returnType\n• Can be optional\n• Useful for object methods",
+          codeExample: {
+            code: `// Function type in interface
+interface SearchFunction {
+  (query: string): string[];
+}
+
+const search: SearchFunction = (query) => {
+  return [\`Result for \${query}\`];
+};
+
+// Interface with both properties and function
+interface Calculator {
+  value: number;
+  add: (a: number, b: number) => number;
+  subtract(a: number, b: number): number; // Method signature syntax
+}
+
+const calc: Calculator = {
+  value: 0,
+  add: (a, b) => a + b,
+  subtract: (a, b) => a - b
+};
+
+// Function with multiple call signatures (overloads)
+interface StringOrNumberProcessor {
+  (value: string): string;
+  (value: number): number;
+}
+
+// Implementing the overloaded function
+const process: StringOrNumberProcessor = (value: string | number) => {
+  if (typeof value === "string") {
+    return value.toUpperCase();
+  }
+  return value * 2;
+};
+
+// React event handler types
+interface ButtonProps {
+  onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  onHover?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  children: React.ReactNode;
+}
+
+function Button({ onClick, onHover, children }: ButtonProps) {
+  return (
+    <button onClick={onClick} onMouseEnter={onHover}>
+      {children}
+    </button>
+  );
+}
+
+// Callback interface
+interface DataFetcher {
+  fetch: (url: string) => Promise<unknown>;
+  onSuccess: (data: unknown) => void;
+  onError: (error: Error) => void;
+}
+
+// Generic function interface
+interface Transformer<T, U> {
+  (input: T): U;
+}
+
+const stringToNumber: Transformer<string, number> = (str) => 
+  parseInt(str, 10);
+
+const numberToString: Transformer<number, string> = (num) => 
+  String(num);
+
+// Interface with constructor signature
+interface UserConstructor {
+  new (name: string, age: number): User;
+}
+
+class User {
+  constructor(public name: string, public age: number) {}
+}
+
+function createUser(ctor: UserConstructor, name: string, age: number) {
+  return new ctor(name, age);
+}
+
+const user = createUser(User, "Alice", 30);`,
+            explanation: "Interfaces can describe function shapes using call signatures. Use them for typing functions, callbacks, event handlers, and methods. Support multiple overloads for flexible function types."
+          }
+        },
+        {
+          title: "Best Practices for Interfaces",
+          content: "Following best practices makes your interfaces more maintainable, reusable, and easier to understand.\n\nBest Practices:\n• Use descriptive names (PascalCase)\n• Keep interfaces focused (single responsibility)\n• Prefer interfaces over types for object shapes\n• Use readonly for immutable properties\n• Document complex interfaces\n• Group related interfaces together\n• Use generic interfaces for reusability\n• Avoid deep nesting\n\nNaming Conventions:\n• PascalCase for interface names\n• Descriptive names that indicate purpose\n• Props interfaces: ComponentNameProps\n• Data interfaces: clear domain names\n\nOrganization:\n• Group related interfaces\n• Export from appropriate modules\n• Use index files for public API\n• Keep interfaces close to usage",
+          codeExample: {
+            code: `// ✅ GOOD: Descriptive, focused interface
+interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  avatarUrl?: string;
+}
+
+// ✅ GOOD: Props interface with clear naming
+interface UserCardProps {
+  user: UserProfile;
+  onEdit?: (user: UserProfile) => void;
+  showActions?: boolean;
+}
+
+// ✅ GOOD: Grouped related interfaces
+// types/user.ts
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
+export interface UserPreferences {
+  userId: string;
+  theme: "light" | "dark";
+  language: string;
+}
+
+export interface UserWithPreferences extends User {
+  preferences: UserPreferences;
+}
+
+// ✅ GOOD: Generic interface for reusability
+interface ApiResponse<T> {
+  data: T;
+  status: number;
+  message: string;
+}
+
+interface UserResponse extends ApiResponse<User> {}
+interface ProductResponse extends ApiResponse<Product> {}
+
+// ✅ GOOD: Documented interface
+/**
+ * Represents a user in the system
+ * @property id - Unique identifier
+ * @property name - User's full name
+ * @property email - User's email address
+ * @property role - User's role in the system
+ */
+interface User {
+  /** Unique identifier */
+  id: string;
+  /** User's full name */
+  name: string;
+  /** User's email address */
+  email: string;
+  /** User's role */
+  role: "admin" | "user" | "guest";
+}
+
+// ✅ GOOD: Readonly for immutability
+interface Config {
+  readonly apiUrl: string;
+  readonly version: string;
+  environment: string; // Can be changed
+}
+
+// ❌ BAD: Too broad, unclear purpose
+interface Data {
+  // What kind of data? Too vague
+}
+
+// ❌ BAD: Deep nesting
+interface BadStructure {
+  user: {
+    profile: {
+      settings: {
+        theme: string; // Too nested
+      };
+    };
+  };
+}
+
+// ✅ GOOD: Flattened structure
+interface UserSettings {
+  theme: string;
+}
+
+interface UserProfile {
+  settings: UserSettings;
+}
+
+interface User {
+  profile: UserProfile;
+}`,
+            explanation: "Follow best practices: use descriptive names, keep interfaces focused, prefer interfaces for object shapes, use readonly for immutability, document complex interfaces, and organize related interfaces together."
+          }
+        }
+      ],
+      conclusion: "Interfaces are fundamental to TypeScript and essential for building type-safe React applications. Use them to define object shapes, component props, function signatures, and data structures. Leverage optional and readonly properties, extend interfaces for hierarchies, use index signatures for dynamic properties, and take advantage of interface merging. Remember: interfaces provide contracts that TypeScript enforces, making your code safer and more maintainable. Follow best practices for naming, organization, and documentation to keep your interfaces clear and useful."
+    }
+  },
+  {
+    id: "intermediate-12",
+    title: "Type Aliases and Advanced Type Declarations",
+    description: "Master TypeScript type aliases, union types, intersection types, and advanced type declaration patterns for flexible and powerful type definitions.",
+    level: "intermediate",
+    estimatedTime: "80 min",
+    topics: ["Type Aliases", "Union Types", "Intersection Types", "Literal Types", "Template Literal Types", "Mapped Types", "Conditional Types"],
+    prerequisites: ["TypeScript Basics for React Developers", "TypeScript Interfaces: Comprehensive Guide"],
+    content: {
+      overview: "Type aliases provide a way to create new names for types, making complex types reusable and readable. Combined with union types, intersection types, and advanced TypeScript features, type aliases enable powerful type declarations. This tutorial covers everything from basic type aliases to advanced patterns like conditional types and template literal types, giving you the tools to create flexible and expressive type systems.",
+      sections: [
+        {
+          title: "Understanding Type Aliases",
+          content: "Type aliases create new names for types. They're similar to interfaces but more flexible, supporting unions, intersections, and other complex types.\n\nWhat are Type Aliases:\n• New names for existing types\n• Created with type keyword\n• Can represent any type\n• More flexible than interfaces\n• Cannot be merged (unlike interfaces)\n\nWhen to Use Type Aliases:\n• Union types\n• Intersection types\n• Complex type combinations\n• Primitive type aliases\n• Function types\n• Tuple types\n\nType Alias vs Interface:\n• Interfaces: Object shapes, can be merged, extended\n• Type aliases: Any type, cannot be merged, more flexible\n• Use interfaces for object shapes\n• Use type aliases for unions, intersections, primitives",
+          codeExample: {
+            code: `// Basic type alias
+type UserID = string;
+type Age = number;
+type IsActive = boolean;
+
+// Using type aliases
+const userId: UserID = "user-123";
+const age: Age = 30;
+const isActive: IsActive = true;
+
+// Type alias for object (similar to interface)
+type User = {
+  id: UserID;
+  name: string;
+  age: Age;
+  isActive: IsActive;
+};
+
+// Type alias for function
+type GreetFunction = (name: string) => string;
+
+const greet: GreetFunction = (name) => \`Hello, \${name}!\`;
+
+// Type alias for array
+type StringArray = string[];
+type NumberList = number[];
+
+const names: StringArray = ["Alice", "Bob"];
+const numbers: NumberList = [1, 2, 3];
+
+// Type alias for tuple
+type Coordinate = [number, number];
+type RGB = [number, number, number];
+
+const point: Coordinate = [10, 20];
+const color: RGB = [255, 0, 0];
+
+// Type alias for React component props
+type ButtonProps = {
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+};
+
+function Button({ label, onClick, disabled }: ButtonProps) {
+  return (
+    <button onClick={onClick} disabled={disabled}>
+      {label}
+    </button>
+  );
+}
+
+// Type alias vs Interface
+// Interface (can be extended and merged)
+interface IUser {
+  name: string;
+}
+
+// Type alias (cannot be merged)
+type TUser = {
+  name: string;
+};
+
+// Both work similarly, but interfaces have merging capability`,
+            explanation: "Type aliases create reusable names for types. Use them for any type, especially unions, intersections, and complex combinations. They're more flexible than interfaces but cannot be merged."
+          }
+        },
+        {
+          title: "Union Types",
+          content: "Union types allow a value to be one of several types. They're created using the | operator and are one of TypeScript's most powerful features.\n\nWhat are Union Types:\n• Value can be one of multiple types\n• Created with | operator\n• TypeScript narrows type based on usage\n• Essential for flexible APIs\n• Enable type-safe alternatives\n\nUse Cases:\n• Function parameters that accept multiple types\n• API responses with different shapes\n• Component props with variants\n• State that can be different types\n• Error handling\n\nType Narrowing:\n• TypeScript narrows union types\n• Use typeof, instanceof, or type guards\n• Enables type-safe code\n• Prevents runtime errors",
+          codeExample: {
+            code: `// Basic union type
+type StringOrNumber = string | number;
+
+function processValue(value: StringOrNumber) {
+  // TypeScript knows value is string OR number
+  if (typeof value === "string") {
+    // TypeScript narrows to string here
+    return value.toUpperCase();
+  } else {
+    // TypeScript narrows to number here
+    return value * 2;
+  }
+}
+
+// Union of literal types
+type Status = "pending" | "success" | "error";
+type Theme = "light" | "dark";
+
+function setStatus(status: Status) {
+  console.log(\`Status: \${status}\`);
+}
+
+setStatus("pending"); // ✅ OK
+setStatus("success"); // ✅ OK
+setStatus("invalid"); // ❌ Error
+
+// Union with null/undefined
+type MaybeString = string | null | undefined;
+
+function getValue(): MaybeString {
+  return Math.random() > 0.5 ? "value" : null;
+}
+
+// React component with union props
+type ButtonVariant = "primary" | "secondary" | "outline";
+type ButtonSize = "sm" | "md" | "lg";
+
+type ButtonProps = {
+  variant: ButtonVariant;
+  size: ButtonSize;
+  onClick: () => void;
+};
+
+function Button({ variant, size, onClick }: ButtonProps) {
+  return (
+    <button
+      className={\`btn btn-\${variant} btn-\${size}\`}
+      onClick={onClick}
+    >
+      Click me
+    </button>
+  );
+}
+
+// Union for API responses
+type ApiResponse = 
+  | { status: "success"; data: User }
+  | { status: "error"; message: string };
+
+function handleResponse(response: ApiResponse) {
+  if (response.status === "success") {
+    // TypeScript knows response.data exists
+    console.log(response.data);
+  } else {
+    // TypeScript knows response.message exists
+    console.error(response.message);
+  }
+}
+
+// Multiple unions
+type ID = string | number;
+type Value = string | number | boolean | null;
+
+// Union in arrays
+type MixedArray = (string | number)[];
+
+const arr: MixedArray = ["hello", 42, "world", 100];`,
+            explanation: "Union types allow values to be one of several types. Use | to combine types. TypeScript narrows unions based on type guards. Essential for flexible, type-safe code."
+          }
+        },
+        {
+          title: "Intersection Types",
+          content: "Intersection types combine multiple types into one. A value must satisfy all types in the intersection. Created using the & operator.\n\nWhat are Intersection Types:\n• Combines multiple types\n• Value must satisfy ALL types\n• Created with & operator\n• Useful for mixing types\n• Similar to extending interfaces\n\nUse Cases:\n• Combining object types\n• Mixing interfaces\n• Adding properties to existing types\n• Creating complex types from simple ones\n• Extending types without modification\n\nIntersection vs Union:\n• Intersection (&): Must satisfy ALL types\n• Union (|): Must satisfy ONE type\n• Use intersection to combine\n• Use union for alternatives",
+          codeExample: {
+            code: `// Basic intersection type
+type Person = {
+  name: string;
+  age: number;
+};
+
+type Employee = {
+  employeeId: string;
+  department: string;
+};
+
+type EmployeePerson = Person & Employee;
+
+const employee: EmployeePerson = {
+  name: "Alice",
+  age: 30,
+  employeeId: "EMP-001",
+  department: "Engineering"
+  // Must have properties from both Person and Employee
+};
+
+// Intersection with multiple types
+type Flyable = {
+  fly: () => void;
+};
+
+type Swimmable = {
+  swim: () => void;
+};
+
+type Duck = Person & Flyable & Swimmable;
+
+const duck: Duck = {
+  name: "Donald",
+  age: 2,
+  fly: () => console.log("Flying"),
+  swim: () => console.log("Swimming")
+};
+
+// Intersection for React component props
+type BaseProps = {
+  className?: string;
+  id?: string;
+};
+
+type ButtonProps = {
+  onClick: () => void;
+  disabled?: boolean;
+};
+
+type LinkProps = {
+  href: string;
+  target?: string;
+};
+
+// Component that can be button or link
+type FlexibleComponentProps = BaseProps & (ButtonProps | LinkProps);
+
+function FlexibleComponent(props: FlexibleComponentProps) {
+  if ("href" in props) {
+    // TypeScript knows this is LinkProps
+    return <a href={props.href} target={props.target}>Link</a>;
+  } else {
+    // TypeScript knows this is ButtonProps
+    return <button onClick={props.onClick} disabled={props.disabled}>Button</button>;
+  }
+}
+
+// Intersection with primitives (results in never)
+type Impossible = string & number; // never - nothing can be both string and number
+
+// Intersection for extending types
+type ReadonlyUser = {
+  readonly id: string;
+  readonly name: string;
+};
+
+type MutableUser = {
+  id: string;
+  name: string;
+  email: string;
+};
+
+// Combine readonly base with mutable extension
+type ExtendedUser = ReadonlyUser & {
+  email: string;
+  age: number;
+};
+
+// Intersection with function types
+type Loggable = {
+  log: (message: string) => void;
+};
+
+type Cacheable = {
+  cache: Map<string, unknown>;
+};
+
+type LoggerWithCache = Loggable & Cacheable;
+
+const logger: LoggerWithCache = {
+  log: (message) => console.log(message),
+  cache: new Map()
+};`,
+            explanation: "Intersection types combine multiple types using &. A value must satisfy all types in the intersection. Use intersections to combine object types, mix interfaces, and create complex types from simpler ones."
+          }
+        },
+        {
+          title: "Literal Types and Template Literal Types",
+          content: "Literal types are types that represent exact values. Template literal types combine string literals, enabling powerful string manipulation at the type level.\n\nLiteral Types:\n• Exact value as type\n• String, number, or boolean literals\n• Very specific types\n• Used in unions for enums-like behavior\n\nTemplate Literal Types:\n• Combine string literal types\n• Use template literal syntax\n• Enable string pattern matching\n• Powerful for API routes, CSS classes, etc.\n\nUse Cases:\n• Status values\n• Theme values\n• API endpoint types\n• CSS class combinations\n• Event name patterns",
+          codeExample: {
+            code: `// Literal types
+type Status = "pending" | "success" | "error";
+type Answer = "yes" | "no";
+type Number = 42; // Literal number type
+
+const status: Status = "pending"; // ✅ OK
+const status2: Status = "invalid"; // ❌ Error
+
+// Literal types in functions
+function setTheme(theme: "light" | "dark") {
+  console.log(\`Theme set to \${theme}\`);
+}
+
+setTheme("light"); // ✅ OK
+setTheme("blue"); // ❌ Error
+
+// Template literal types
+type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
+type ApiRoute = "/users" | "/posts" | "/comments";
+
+type ApiEndpoint = \`\${HttpMethod} \${ApiRoute}\`;
+
+// Results in: "GET /users" | "GET /posts" | "GET /comments" | "POST /users" | ...
+
+const endpoint: ApiEndpoint = "GET /users"; // ✅ OK
+const endpoint2: ApiEndpoint = "PATCH /users"; // ❌ Error
+
+// Template literals with variables
+type EventName = "click" | "hover" | "focus";
+type ElementType = "button" | "input" | "div";
+
+type EventHandlerName = \`on\${Capitalize<EventName>}\`;
+
+// Results in: "onClick" | "onHover" | "onFocus"
+
+// CSS class combinations
+type Color = "red" | "blue" | "green";
+type Size = "sm" | "md" | "lg";
+
+type ButtonClass = \`btn-\${Color}-\${Size}\`;
+
+// Results in: "btn-red-sm" | "btn-red-md" | "btn-red-lg" | "btn-blue-sm" | ...
+
+// API route patterns
+type Resource = "user" | "post" | "comment";
+type Action = "create" | "read" | "update" | "delete";
+
+type ApiRoute = \`/api/\${Resource}/\${Action}\`;
+
+// Results in: "/api/user/create" | "/api/user/read" | "/api/post/create" | ...
+
+// Template literal with unions
+type Lang = "en" | "fr" | "es";
+type Page = "home" | "about" | "contact";
+
+type LocalizedRoute = \`/\${Lang}/\${Page}\`;
+
+// Results in: "/en/home" | "/en/about" | "/fr/home" | ...
+
+// Advanced template literal patterns
+type EmailDomain = "gmail.com" | "yahoo.com" | "example.com";
+type Email = \`\${string}@\${EmailDomain}\`;
+
+const email: Email = "user@gmail.com"; // ✅ OK
+const email2: Email = "user@invalid.com"; // ❌ Error
+
+// React component with literal types
+type ButtonVariant = "primary" | "secondary" | "danger";
+type ButtonSize = "small" | "medium" | "large";
+
+type ButtonProps = {
+  variant: ButtonVariant;
+  size: ButtonSize;
+  className?: string;
+};
+
+function Button({ variant, size, className }: ButtonProps) {
+  return (
+    <button
+      className={\`btn btn-\${variant} btn-\${size} \${className || ""}\`}
+    >
+      Click me
+    </button>
+  );
+}`,
+            explanation: "Literal types represent exact values. Template literal types combine string literals using template syntax. Use them for status values, API routes, CSS classes, and any string pattern matching needs."
+          }
+        },
+        {
+          title: "Mapped Types",
+          content: "Mapped types create new types by transforming properties of existing types. They're powerful for creating variations of types.\n\nWhat are Mapped Types:\n• Transform properties of existing types\n• Create new types from old ones\n• Use keyof to iterate over properties\n• Enable type transformations\n• Built-in utility types use mapped types\n\nCommon Patterns:\n• Making all properties optional\n• Making all properties readonly\n• Making all properties required\n• Transforming property types\n• Filtering properties\n\nBuilt-in Mapped Types:\n• Partial<T> - All properties optional\n• Required<T> - All properties required\n• Readonly<T> - All properties readonly\n• Pick<T, K> - Select properties\n• Omit<T, K> - Exclude properties",
+          codeExample: {
+            code: `// Basic mapped type
+type Optional<T> = {
+  [K in keyof T]?: T[K];
+};
+
+type User = {
+  id: string;
+  name: string;
+  email: string;
+};
+
+type OptionalUser = Optional<User>;
+// Result: { id?: string; name?: string; email?: string; }
+
+// Readonly mapped type
+type Readonly<T> = {
+  readonly [K in keyof T]: T[K];
+};
+
+type ReadonlyUser = Readonly<User>;
+// Result: { readonly id: string; readonly name: string; readonly email: string; }
+
+// Transforming property types
+type Nullable<T> = {
+  [K in keyof T]: T[K] | null;
+};
+
+type NullableUser = Nullable<User>;
+// Result: { id: string | null; name: string | null; email: string | null; }
+
+// Conditional transformation
+type Stringify<T> = {
+  [K in keyof T]: string;
+};
+
+type StringifiedUser = Stringify<User>;
+// Result: { id: string; name: string; email: string; } (all become string)
+
+// Filtering properties
+type StringKeys<T> = {
+  [K in keyof T as K extends string ? K : never]: T[K];
+};
+
+// Pick specific properties
+type Pick<T, K extends keyof T> = {
+  [P in K]: T[P];
+};
+
+type UserName = Pick<User, "name" | "email">;
+// Result: { name: string; email: string; }
+
+// Omit properties
+type Omit<T, K extends keyof T> = {
+  [P in Exclude<keyof T, K>]: T[P];
+};
+
+type UserWithoutEmail = Omit<User, "email">;
+// Result: { id: string; name: string; }
+
+// React component props transformation
+type ComponentProps<T> = {
+  [K in keyof T]: T[K] | React.ReactNode;
+};
+
+type UserComponentProps = ComponentProps<User>;
+// All properties can now be React nodes
+
+// Making nested properties optional
+type DeepPartial<T> = {
+  [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K];
+};
+
+type NestedUser = {
+  id: string;
+  profile: {
+    name: string;
+    age: number;
+  };
+};
+
+type PartialNestedUser = DeepPartial<NestedUser>;
+// Result: { id?: string; profile?: { name?: string; age?: number; } }`,
+            explanation: "Mapped types transform properties of existing types. Use them to make properties optional, readonly, or transform their types. Built-in utility types like Partial, Required, and Readonly are implemented using mapped types."
+          }
+        },
+        {
+          title: "Conditional Types",
+          content: "Conditional types select types based on conditions. They're TypeScript's way of doing type-level if/else statements.\n\nWhat are Conditional Types:\n• Types that depend on other types\n• Syntax: T extends U ? X : Y\n• Type-level conditionals\n• Enable powerful type inference\n• Used in utility types\n\nBasic Syntax:\n• T extends U ? X : Y\n• If T extends U, result is X\n• Otherwise, result is Y\n• Can be nested\n• Can use infer keyword\n\nUse Cases:\n• Type extraction\n• Type filtering\n• Function overloads\n• Utility type creation\n• API response typing",
+          codeExample: {
+            code: `// Basic conditional type
+type IsString<T> = T extends string ? true : false;
+
+type Test1 = IsString<string>; // true
+type Test2 = IsString<number>; // false
+
+// Extract array element type
+type ArrayElement<T> = T extends (infer U)[] ? U : never;
+
+type StringArrayElement = ArrayElement<string[]>; // string
+type NumberArrayElement = ArrayElement<number[]>; // number
+
+// Extract function return type
+type ReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
+
+type FuncReturn = ReturnType<() => string>; // string
+type AsyncReturn = ReturnType<() => Promise<number>>; // Promise<number>
+
+// Extract function parameters
+type Parameters<T> = T extends (...args: infer P) => any ? P : never;
+
+type FuncParams = Parameters<(a: string, b: number) => void>; // [string, number]
+
+// Non-nullable type
+type NonNullable<T> = T extends null | undefined ? never : T;
+
+type CleanString = NonNullable<string | null>; // string
+type CleanNumber = NonNullable<number | undefined>; // number
+
+// Flatten array type
+type Flatten<T> = T extends (infer U)[] ? U : T;
+
+type Flat = Flatten<string[]>; // string
+type NotFlat = Flatten<string>; // string
+
+// Extract promise type
+type Awaited<T> = T extends Promise<infer U> ? U : T;
+
+type Resolved = Awaited<Promise<string>>; // string
+type NotPromise = Awaited<string>; // string
+
+// React component props extraction
+type ComponentProps<T> = T extends React.ComponentType<infer P> ? P : never;
+
+function MyComponent({ name }: { name: string }) {
+  return <div>{name}</div>;
+}
+
+type Props = ComponentProps<typeof MyComponent>; // { name: string }
+
+// Conditional type with union distribution
+type ToArray<T> = T extends any ? T[] : never;
+
+type StringOrNumberArray = ToArray<string | number>; // string[] | number[]
+
+// Exclude type
+type Exclude<T, U> = T extends U ? never : T;
+
+type WithoutString = Exclude<string | number | boolean, string>; // number | boolean
+
+// Extract type
+type Extract<T, U> = T extends U ? T : never;
+
+type OnlyStrings = Extract<string | number | boolean, string>; // string`,
+            explanation: "Conditional types select types based on conditions using T extends U ? X : Y syntax. Use them with infer to extract types, create utility types, and build powerful type systems."
+          }
+        },
+        {
+          title: "Advanced Type Patterns and Best Practices",
+          content: "Combining type aliases, unions, intersections, and conditional types enables powerful type patterns. Understanding when and how to use these patterns is key to effective TypeScript.\n\nAdvanced Patterns:\n• Discriminated unions\n• Branded types\n• Recursive types\n• Type guards\n• Type assertions\n• Const assertions\n\nBest Practices:\n• Use type aliases for unions/intersections\n• Use interfaces for object shapes\n• Prefer type inference when possible\n• Use const assertions for literals\n• Create utility types for reuse\n• Document complex types\n• Keep types focused and composable",
+          codeExample: {
+            code: `// Discriminated union (tagged union)
+type LoadingState = {
+  status: "loading";
+};
+
+type SuccessState<T> = {
+  status: "success";
+  data: T;
+};
+
+type ErrorState = {
+  status: "error";
+  error: string;
+};
+
+type AsyncState<T> = LoadingState | SuccessState<T> | ErrorState;
+
+function handleState<T>(state: AsyncState<T>) {
+  switch (state.status) {
+    case "loading":
+      return "Loading...";
+    case "success":
+      return state.data; // TypeScript knows data exists
+    case "error":
+      return state.error; // TypeScript knows error exists
+  }
+}
+
+// Branded types (nominal typing)
+type UserID = string & { readonly brand: unique symbol };
+type ProductID = string & { readonly brand: unique symbol };
+
+function createUserID(id: string): UserID {
+  return id as UserID;
+}
+
+function createProductID(id: string): ProductID {
+  return id as ProductID;
+}
+
+// Prevents mixing up IDs
+const userId = createUserID("user-123");
+const productId = createProductID("prod-456");
+
+// userId = productId; // ❌ Error: types are incompatible
+
+// Recursive types
+type TreeNode<T> = {
+  value: T;
+  children?: TreeNode<T>[];
+};
+
+const tree: TreeNode<string> = {
+  value: "root",
+  children: [
+    { value: "child1" },
+    {
+      value: "child2",
+      children: [{ value: "grandchild" }]
+    }
+  ]
+};
+
+// Type guards
+function isString(value: unknown): value is string {
+  return typeof value === "string";
+}
+
+function process(value: unknown) {
+  if (isString(value)) {
+    // TypeScript knows value is string here
+    return value.toUpperCase();
+  }
+  return String(value);
+}
+
+// Const assertions
+const config = {
+  apiUrl: "https://api.example.com",
+  timeout: 5000
+} as const;
+
+// config.apiUrl = "other"; // ❌ Error: cannot assign
+
+// Type for exact values
+type Config = typeof config;
+// Result: { readonly apiUrl: "https://api.example.com"; readonly timeout: 5000; }
+
+// Utility type composition
+type PartialExcept<T, K extends keyof T> = Partial<T> & Pick<T, K>;
+
+type User = {
+  id: string;
+  name: string;
+  email: string;
+};
+
+type UpdateUser = PartialExcept<User, "id">;
+// Result: { id: string; name?: string; email?: string; }
+
+// React component with advanced types
+type ComponentVariant = "primary" | "secondary";
+type ComponentSize = "sm" | "md" | "lg";
+
+type ComponentProps = {
+  variant: ComponentVariant;
+  size: ComponentSize;
+  children: React.ReactNode;
+} & (
+  | { as: "button"; onClick: () => void }
+  | { as: "div"; onClick?: never }
+);
+
+function FlexibleComponent(props: ComponentProps) {
+  if (props.as === "button") {
+    return (
+      <button onClick={props.onClick} className={\`\${props.variant} \${props.size}\`}>
+        {props.children}
+      </button>
+    );
+  }
+  return <div className={\`\${props.variant} \${props.size}\`}>{props.children}</div>;
+}`,
+            explanation: "Combine type features for powerful patterns: discriminated unions for type-safe state, branded types for nominal typing, recursive types for nested structures, and type guards for runtime type checking. Follow best practices for maintainable type systems."
+          }
+        }
+      ],
+      conclusion: "Type aliases and advanced type declarations provide powerful tools for creating flexible, expressive type systems. Use type aliases for unions, intersections, and complex types. Leverage union types for alternatives, intersection types for combinations, literal types for exact values, and template literal types for string patterns. Mapped types transform existing types, and conditional types enable type-level logic. Combine these features to build sophisticated type systems that catch errors at compile time and provide excellent developer experience. Remember: use type aliases for flexibility, interfaces for object shapes, and always prefer composition and clarity over complexity."
+    }
+  },
+  {
+    id: "intermediate-13",
+    title: "TypeScript Generics: Creating Functions with Dynamic Typing",
+    description: "Learn how to create functions with dynamic typing using TypeScript generics, similar to createContext. Master generic functions, type inference, and how to build flexible, reusable functions.",
+    level: "intermediate",
+    estimatedTime: "70 min",
+    topics: ["Generics", "Generic Functions", "Type Inference", "Generic Constraints", "createContext Pattern", "Type Parameters"],
+    prerequisites: ["TypeScript Basics for React Developers", "TypeScript Interfaces: Comprehensive Guide"],
+    content: {
+      overview: "Generics allow you to create functions, components, and types that work with multiple types while maintaining type safety. They enable dynamic typing where the type is determined by how the function is called. This tutorial covers how to create generic functions like React's createContext, understand type inference, use generic constraints, and build flexible, reusable functions that adapt to different types.",
+      sections: [
+        {
+          title: "Understanding Generics",
+          content: "Generics are TypeScript's way of creating reusable code that works with multiple types. They allow you to write functions and types that are flexible yet type-safe.\n\nWhat are Generics:\n• Type parameters that make code flexible\n• Written with angle brackets: <T>\n• Type is determined when function is called\n• Maintains type safety\n• Enables code reuse\n\nWhy Use Generics:\n• Write code once, use with many types\n• Maintain type safety\n• Better than using 'any'\n• Enables type inference\n• Common in libraries and frameworks\n\nBasic Syntax:\n• function name<T>(param: T): T\n• T is a type variable\n• Can use any name (T, U, V, Item, Value, etc.)\n• Type is inferred from usage",
+          codeExample: {
+            code: `// Function without generics (not flexible)
+function getFirst(arr: number[]): number {
+  return arr[0];
+}
+
+const num = getFirst([1, 2, 3]); // ✅ Works
+const str = getFirst(["a", "b", "c"]); // ❌ Error: expects number[]
+
+// Function with generics (flexible and type-safe)
+function getFirst<T>(arr: T[]): T {
+  return arr[0];
+}
+
+const num = getFirst([1, 2, 3]); // TypeScript infers T as number
+const str = getFirst(["a", "b", "c"]); // TypeScript infers T as string
+const user = getFirst([{ id: 1, name: "Alice" }]); // TypeScript infers T as { id: number; name: string }
+
+// Explicit type parameter (optional, usually inferred)
+const num = getFirst<number>([1, 2, 3]);
+const str = getFirst<string>(["a", "b", "c"]);
+
+// Multiple type parameters
+function pair<T, U>(first: T, second: U): [T, U] {
+  return [first, second];
+}
+
+const p1 = pair("hello", 42); // [string, number]
+const p2 = pair(1, true); // [number, boolean]
+
+// Generic function for React state
+function useState<T>(initial: T): [T, (value: T) => void] {
+  // Implementation
+  return [initial, () => {}];
+}
+
+const [count, setCount] = useState(0); // T inferred as number
+const [name, setName] = useState(""); // T inferred as string
+const [user, setUser] = useState<User | null>(null); // T is User | null`,
+            explanation: "Generics use type parameters (like <T>) to make functions work with multiple types. TypeScript infers the type from usage, maintaining type safety while providing flexibility."
+          }
+        },
+        {
+          title: "How createContext Works with Generics",
+          content: "React's createContext is a perfect example of a generic function. It creates a context that can hold any type, and TypeScript infers the type from the initial value you provide.\n\ncreateContext Pattern:\n• Generic function: createContext<T>\n• Takes initial value of type T\n• Returns Context with type T\n• Type is inferred from initial value\n• Can be explicitly typed\n\nUnderstanding the Pattern:\n• Function accepts type parameter\n• Type can be inferred or explicit\n• Return type uses the type parameter\n• Maintains type safety throughout\n\nWhy This Pattern is Powerful:\n• One function works with any type\n• Type safety is maintained\n• TypeScript knows the exact type\n• Autocomplete works perfectly",
+          codeExample: {
+            code: `// How createContext is defined (simplified)
+function createContext<T>(defaultValue: T): Context<T> {
+  // Implementation
+  return context;
+}
+
+// Usage with type inference
+const ThemeContext = createContext('light');
+// TypeScript infers: Context<string>
+
+const CountContext = createContext(0);
+// TypeScript infers: Context<number>
+
+const UserContext = createContext(null);
+// TypeScript infers: Context<null> (not very useful)
+
+// Usage with explicit type
+const ThemeContext = createContext<'light' | 'dark' | undefined>(undefined);
+// Type is explicitly: Context<'light' | 'dark' | undefined>
+
+const UserContext = createContext<User | null>(null);
+// Type is: Context<User | null>
+
+// Complete example
+type Theme = 'light' | 'dark';
+
+const ThemeContext = createContext<Theme | undefined>(undefined);
+
+function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [theme, setTheme] = useState<Theme>('light');
+  
+  return (
+    <ThemeContext.Provider value={theme}>
+      {children}
+    </ThemeContext.Provider>
+  );
+}
+
+function useTheme() {
+  const context = useContext(ThemeContext);
+  if (context === undefined) {
+    throw new Error('useTheme must be used within ThemeProvider');
+  }
+  return context; // Type is Theme
+}
+
+// Creating your own createContext-like function
+function createTypedContext<T>() {
+  const Context = createContext<T | undefined>(undefined);
+  
+  const useTypedContext = () => {
+    const context = useContext(Context);
+    if (context === undefined) {
+      throw new Error('Context must be used within Provider');
+    }
+    return context; // Type is T
+  };
+  
+  return [Context, useTypedContext] as const;
+}
+
+// Usage
+const [UserContext, useUser] = createTypedContext<User>();
+
+function UserProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  
+  return (
+    <UserContext.Provider value={user || undefined}>
+      {children}
+    </UserContext.Provider>
+  );
+}
+
+function UserDisplay() {
+  const user = useUser(); // Type is User
+  return <div>{user.name}</div>;
+}`,
+            explanation: "createContext uses generics to create a context for any type. The type is inferred from the initial value or can be explicitly provided. This pattern enables type-safe context usage throughout your app."
+          }
+        },
+        {
+          title: "Creating Your Own Generic Functions",
+          content: "You can create your own generic functions following the same patterns. This enables you to build flexible, reusable utilities.\n\nCreating Generic Functions:\n• Add type parameter in angle brackets\n• Use type parameter in function signature\n• Type is inferred from arguments\n• Can have constraints\n• Can have default types\n\nCommon Patterns:\n• Identity function (returns same type)\n• Array utilities\n• Object utilities\n• API functions\n• React hooks\n• Utility functions\n\nBest Practices:\n• Use descriptive type parameter names\n• Let TypeScript infer when possible\n• Use constraints when needed\n• Document complex generics",
+          codeExample: {
+            code: `// Simple generic function
+function identity<T>(value: T): T {
+  return value;
+}
+
+const num = identity(42); // number
+const str = identity("hello"); // string
+const user = identity({ id: 1, name: "Alice" }); // { id: number; name: string }
+
+// Generic array function
+function getLast<T>(arr: T[]): T | undefined {
+  return arr[arr.length - 1];
+}
+
+const lastNum = getLast([1, 2, 3]); // number | undefined
+const lastStr = getLast(["a", "b"]); // string | undefined
+
+// Generic object function
+function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {
+  return obj[key];
+}
+
+const user = { id: 1, name: "Alice", age: 30 };
+const name = getProperty(user, "name"); // string
+const id = getProperty(user, "id"); // number
+
+// Generic API function
+async function fetchData<T>(url: string): Promise<T> {
+  const response = await fetch(url);
+  return response.json();
+}
+
+interface User {
+  id: number;
+  name: string;
+}
+
+const user = await fetchData<User>("/api/user"); // Type is User
+const users = await fetchData<User[]>("/api/users"); // Type is User[]
+
+// Generic React hook
+function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T) => void] {
+  const [storedValue, setStoredValue] = useState<T>(() => {
+    try {
+      const item = window.localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch {
+      return initialValue;
+    }
+  });
+  
+  const setValue = (value: T) => {
+    setStoredValue(value);
+    window.localStorage.setItem(key, JSON.stringify(value));
+  };
+  
+  return [storedValue, setValue];
+}
+
+// Usage
+const [theme, setTheme] = useLocalStorage<'light' | 'dark'>('theme', 'light');
+const [count, setCount] = useLocalStorage<number>('count', 0);
+const [user, setUser] = useLocalStorage<User | null>('user', null);
+
+// Generic utility function
+function createCache<T>() {
+  const cache = new Map<string, T>();
+  
+  return {
+    get(key: string): T | undefined {
+      return cache.get(key);
+    },
+    set(key: string, value: T): void {
+      cache.set(key, value);
+    },
+    has(key: string): boolean {
+      return cache.has(key);
+    }
+  };
+}
+
+const stringCache = createCache<string>();
+stringCache.set('user1', 'Alice');
+const user = stringCache.get('user1'); // string | undefined
+
+const numberCache = createCache<number>();
+numberCache.set('count', 42);
+const count = numberCache.get('count'); // number | undefined`,
+            explanation: "Create generic functions by adding type parameters. Use them for arrays, objects, API calls, React hooks, and utilities. TypeScript infers types from usage, maintaining type safety."
+          }
+        },
+        {
+          title: "Type Inference in Generic Functions",
+          content: "TypeScript's type inference is powerful with generics. Understanding how inference works helps you write better generic functions.\n\nHow Type Inference Works:\n• TypeScript infers type from arguments\n• Inference flows from arguments to return type\n• Can infer from multiple arguments\n• Sometimes needs explicit type\n• Inference works left to right\n\nWhen Inference Works:\n• Simple generic functions\n• Functions with clear argument types\n• When type can be determined from usage\n• Most common cases\n\nWhen You Need Explicit Types:\n• Complex generic functions\n• When inference is ambiguous\n• When you want specific type\n• Union types that need narrowing",
+          codeExample: {
+            code: `// Type inference from single argument
+function getValue<T>(value: T): T {
+  return value;
+}
+
+const str = getValue("hello"); // T inferred as string
+const num = getValue(42); // T inferred as number
+
+// Type inference from multiple arguments
+function combine<T, U>(first: T, second: U): [T, U] {
+  return [first, second];
+}
+
+const pair = combine("hello", 42); // [string, number]
+const pair2 = combine(1, true); // [number, boolean]
+
+// Inference from array
+function getFirst<T>(arr: T[]): T | undefined {
+  return arr[0];
+}
+
+const first = getFirst([1, 2, 3]); // number | undefined
+const firstStr = getFirst(["a", "b"]); // string | undefined
+
+// Inference from object
+function getKeys<T extends object>(obj: T): (keyof T)[] {
+  return Object.keys(obj) as (keyof T)[];
+}
+
+const user = { id: 1, name: "Alice" };
+const keys = getKeys(user); // ("id" | "name")[]
+
+// When explicit type is needed
+function createContext<T>(defaultValue: T): Context<T> {
+  return context;
+}
+
+// Inference might not work as expected
+const ThemeContext = createContext(null); // Context<null> - not useful
+
+// Explicit type is better
+const ThemeContext = createContext<'light' | 'dark' | undefined>(undefined);
+// Context<'light' | 'dark' | undefined>
+
+// Inference in React hooks
+function useState<T>(initial: T): [T, (value: T) => void] {
+  // Implementation
+}
+
+const [count, setCount] = useState(0); // T is number
+const [name, setName] = useState(""); // T is string
+
+// Explicit type when needed
+const [user, setUser] = useState<User | null>(null); // T is User | null
+
+// Inference with constraints
+function getLength<T extends { length: number }>(item: T): number {
+  return item.length;
+}
+
+const strLen = getLength("hello"); // T inferred as string
+const arrLen = getLength([1, 2, 3]); // T inferred as number[]
+const objLen = getLength({ length: 5 }); // T inferred as { length: number }`,
+            explanation: "TypeScript infers generic types from function arguments. Inference works automatically in most cases, but sometimes you need to provide explicit types for clarity or when inference is ambiguous."
+          }
+        },
+        {
+          title: "Generic Constraints",
+          content: "Generic constraints limit what types can be used with a generic function. They ensure type parameters have certain properties or extend certain types.\n\nWhat are Constraints:\n• Limit possible types for generic parameter\n• Use extends keyword\n• Ensure type has certain properties\n• Enable access to properties\n• Maintain type safety\n\nCommon Constraint Patterns:\n• extends object - must be object\n• extends keyof T - must be key of T\n• extends { property: type } - must have property\n• extends SomeInterface - must implement interface\n• Multiple constraints with intersection\n\nUse Cases:\n• Access properties safely\n• Ensure type compatibility\n• Create type-safe utilities\n• Build on existing types",
+          codeExample: {
+            code: `// Constraint: T must have length property
+function getLength<T extends { length: number }>(item: T): number {
+  return item.length;
+}
+
+getLength("hello"); // ✅ string has length
+getLength([1, 2, 3]); // ✅ array has length
+getLength({ length: 5 }); // ✅ object has length
+getLength(42); // ❌ number doesn't have length
+
+// Constraint: K must be key of T
+function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {
+  return obj[key];
+}
+
+const user = { id: 1, name: "Alice", age: 30 };
+getProperty(user, "name"); // ✅ "name" is key of user
+getProperty(user, "email"); // ❌ "email" is not a key
+
+// Constraint: T must extend User interface
+interface User {
+  id: number;
+  name: string;
+}
+
+function getUserName<T extends User>(user: T): string {
+  return user.name; // Safe because T extends User
+}
+
+const admin = { id: 1, name: "Alice", role: "admin" };
+getUserName(admin); // ✅ admin has id and name
+
+// Multiple constraints
+function process<T extends User & { active: boolean }>(user: T): string {
+  if (user.active) {
+    return \`\${user.name} is active\`;
+  }
+  return \`\${user.name} is inactive\`;
+}
+
+// Constraint with default type
+function createArray<T = string>(length: number, value: T): T[] {
+  return Array(length).fill(value);
+}
+
+const strings = createArray(5, "hello"); // string[]
+const numbers = createArray(5, 0); // number[]
+const explicit = createArray<number>(5, 0); // number[]
+
+// Constraint for React component props
+interface BaseProps {
+  className?: string;
+}
+
+function createComponent<T extends BaseProps>(
+  Component: React.ComponentType<T>
+) {
+  return (props: T) => {
+    return <Component {...props} className={\`base \${props.className || ""}\`} />;
+  };
+}
+
+// Constraint ensuring type has certain methods
+interface Serializable {
+  toJSON(): string;
+}
+
+function serialize<T extends Serializable>(item: T): string {
+  return item.toJSON();
+}
+
+class User implements Serializable {
+  constructor(public name: string) {}
+  toJSON() {
+    return JSON.stringify({ name: this.name });
+  }
+}
+
+serialize(new User("Alice")); // ✅ User implements Serializable`,
+            explanation: "Generic constraints use extends to limit possible types. They ensure type parameters have required properties, enabling safe property access and maintaining type safety."
+          }
+        },
+        {
+          title: "Advanced Generic Patterns",
+          content: "Advanced generic patterns enable powerful type-safe abstractions. These patterns are used in libraries and complex applications.\n\nAdvanced Patterns:\n• Generic classes\n• Generic interfaces\n• Conditional generics\n• Mapped types with generics\n• Recursive generics\n• Generic utility types\n\nCommon Advanced Patterns:\n• Factory functions\n• Builder patterns\n• Repository patterns\n• API client patterns\n• State management patterns\n\nBest Practices:\n• Keep generics simple when possible\n• Use constraints appropriately\n• Document complex generics\n• Test with multiple types\n• Consider readability",
+          codeExample: {
+            code: `// Generic class
+class Box<T> {
+  private value: T;
+  
+  constructor(value: T) {
+    this.value = value;
+  }
+  
+  getValue(): T {
+    return this.value;
+  }
+  
+  setValue(value: T): void {
+    this.value = value;
+  }
+}
+
+const stringBox = new Box("hello");
+const numberBox = new Box(42);
+
+// Generic interface
+interface Repository<T> {
+  findById(id: string): Promise<T | null>;
+  findAll(): Promise<T[]>;
+  save(entity: T): Promise<T>;
+  delete(id: string): Promise<void>;
+}
+
+class UserRepository implements Repository<User> {
+  async findById(id: string): Promise<User | null> {
+    // Implementation
+    return null;
+  }
+  
+  async findAll(): Promise<User[]> {
+    return [];
+  }
+  
+  async save(user: User): Promise<User> {
+    return user;
+  }
+  
+  async delete(id: string): Promise<void> {
+    // Implementation
+  }
+}
+
+// Factory function pattern
+function createApiClient<T>(baseUrl: string) {
+  return {
+    async get(endpoint: string): Promise<T> {
+      const response = await fetch(\`\${baseUrl}\${endpoint}\`);
+      return response.json();
+    },
+    
+    async post(endpoint: string, data: unknown): Promise<T> {
+      const response = await fetch(\`\${baseUrl}\${endpoint}\`, {
+        method: 'POST',
+        body: JSON.stringify(data)
+      });
+      return response.json();
+    }
+  };
+}
+
+const userApi = createApiClient<User>('/api');
+const user = await userApi.get('/user/1'); // Type is User
+
+// Generic React hook factory
+function createUseState<T>(initialValue: T) {
+  return function useTypedState() {
+    return useState<T>(initialValue);
+  };
+}
+
+const useCount = createUseState(0);
+const [count, setCount] = useCount(); // count is number
+
+// Generic with conditional types
+type NonNullable<T> = T extends null | undefined ? never : T;
+
+function requireValue<T>(value: T): NonNullable<T> {
+  if (value === null || value === undefined) {
+    throw new Error('Value cannot be null or undefined');
+  }
+  return value as NonNullable<T>;
+}
+
+// Generic utility type
+type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
+type UserUpdate = Optional<User, 'id'>;
+// Result: { name?: string; email?: string; } (id is omitted)
+
+// Recursive generic
+type DeepReadonly<T> = {
+  readonly [P in keyof T]: T[P] extends object ? DeepReadonly<T[P]> : T[P];
+};
+
+type Nested = {
+  user: {
+    profile: {
+      name: string;
+    };
+  };
+};
+
+type ReadonlyNested = DeepReadonly<Nested>;
+// All nested properties are readonly
+
+// Generic React context pattern (like createContext)
+function createTypedContext<T>() {
+  const Context = createContext<T | undefined>(undefined);
+  
+  const Provider = ({ value, children }: { 
+    value: T; 
+    children: React.ReactNode 
+  }) => {
+    return <Context.Provider value={value}>{children}</Context.Provider>;
+  };
+  
+  const useTypedContext = () => {
+    const context = useContext(Context);
+    if (context === undefined) {
+      throw new Error('Context must be used within Provider');
+    }
+    return context;
+  };
+  
+  return { Context, Provider, useTypedContext };
+}
+
+// Usage
+const { Provider: ThemeProvider, useTypedContext: useTheme } = 
+  createTypedContext<'light' | 'dark'>();
+
+function App() {
+  return (
+    <ThemeProvider value="light">
+      <Component />
+    </ThemeProvider>
+  );
+}
+
+function Component() {
+  const theme = useTheme(); // Type is 'light' | 'dark'
+  return <div className={theme}>Content</div>;
+}`,
+            explanation: "Advanced generic patterns include generic classes, interfaces, factory functions, and utility types. These patterns enable powerful, type-safe abstractions used in libraries and complex applications."
+          }
+        },
+        {
+          title: "Real-World Examples: Building Generic Utilities",
+          content: "Let's build real-world generic utilities that you can use in your React applications. These examples demonstrate practical uses of generics.\n\nPractical Examples:\n• Generic API hooks\n• Generic form handlers\n• Generic state management\n• Generic data transformers\n• Generic validation functions\n\nBuilding Blocks:\n• Start with simple generics\n• Add constraints as needed\n• Use type inference when possible\n• Provide explicit types for clarity\n• Test with multiple types",
+          codeExample: {
+            code: `// Generic API hook
+function useFetch<T>(url: string) {
+  const [data, setData] = useState<T | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  
+  useEffect(() => {
+    fetch(url)
+      .then(res => res.json())
+      .then((data: T) => {
+        setData(data);
+        setLoading(false);
+      })
+      .catch((err: Error) => {
+        setError(err);
+        setLoading(false);
+      });
+  }, [url]);
+  
+  return { data, loading, error };
+}
+
+// Usage
+interface User {
+  id: number;
+  name: string;
+}
+
+const { data: user } = useFetch<User>('/api/user'); // data is User | null
+
+// Generic form handler
+function useForm<T extends Record<string, unknown>>(initialValues: T) {
+  const [values, setValues] = useState<T>(initialValues);
+  const [errors, setErrors] = useState<Partial<Record<keyof T, string>>>({});
+  
+  const setValue = <K extends keyof T>(key: K, value: T[K]) => {
+    setValues(prev => ({ ...prev, [key]: value }));
+  };
+  
+  const setError = <K extends keyof T>(key: K, error: string) => {
+    setErrors(prev => ({ ...prev, [key]: error }));
+  };
+  
+  const reset = () => {
+    setValues(initialValues);
+    setErrors({});
+  };
+  
+  return { values, errors, setValue, setError, reset };
+}
+
+// Usage
+const { values, setValue } = useForm({
+  name: '',
+  email: '',
+  age: 0
+});
+
+setValue('name', 'Alice'); // ✅ Type-safe
+setValue('invalid', 'value'); // ❌ Error
+
+// Generic data transformer
+function transformArray<T, U>(
+  arr: T[],
+  transformer: (item: T) => U
+): U[] {
+  return arr.map(transformer);
+}
+
+const numbers = [1, 2, 3];
+const strings = transformArray(numbers, n => String(n)); // string[]
+
+// Generic validation
+function createValidator<T>(
+  rules: Record<keyof T, (value: T[keyof T]) => boolean>
+) {
+  return (data: T): Partial<Record<keyof T, string>> => {
+    const errors: Partial<Record<keyof T, string>> = {};
+    
+    for (const key in rules) {
+      if (!rules[key](data[key])) {
+        errors[key] = \`\${String(key)} is invalid\`;
+      }
+    }
+    
+    return errors;
+  };
+}
+
+// Usage
+const validateUser = createValidator<User>({
+  id: (value) => typeof value === 'number' && value > 0,
+  name: (value) => typeof value === 'string' && value.length > 0
+});
+
+const errors = validateUser({ id: 1, name: 'Alice' }); // {}
+
+// Generic context creator (like createContext)
+function createContext<T>(defaultValue: T) {
+  const Context = React.createContext<T>(defaultValue);
+  
+  const Provider = ({ 
+    value, 
+    children 
+  }: { 
+    value: T; 
+    children: React.ReactNode 
+  }) => {
+    return <Context.Provider value={value}>{children}</Context.Provider>;
+  };
+  
+  const useContext = () => {
+    return React.useContext(Context);
+  };
+  
+  return { Context, Provider, useContext };
+}
+
+// Usage
+const { Provider: ThemeProvider, useContext: useTheme } = 
+  createContext<'light' | 'dark'>('light');
+
+function App() {
+  return (
+    <ThemeProvider value="dark">
+      <Component />
+    </ThemeProvider>
+  );
+}
+
+function Component() {
+  const theme = useTheme(); // Type is 'light' | 'dark'
+  return <div className={theme}>Content</div>;
+}
+
+// Generic cache
+function createCache<T>() {
+  const cache = new Map<string, T>();
+  
+  return {
+    get(key: string): T | undefined {
+      return cache.get(key);
+    },
+    set(key: string, value: T): void {
+      cache.set(key, value);
+    },
+    clear(): void {
+      cache.clear();
+    }
+  };
+}
+
+const userCache = createCache<User>();
+userCache.set('user1', { id: 1, name: 'Alice' });
+const user = userCache.get('user1'); // User | undefined`,
+            explanation: "Real-world generic utilities include API hooks, form handlers, data transformers, validators, and context creators. These demonstrate practical uses of generics in React applications, providing type safety and code reuse."
+          }
+        }
+      ],
+      conclusion: "Generics enable you to create functions with dynamic typing that maintain type safety. Functions like createContext use generics to work with any type while TypeScript infers and enforces the correct types. Use generics for reusable functions, add constraints when needed, and leverage type inference. Remember: generics make your code flexible and type-safe - write once, use with many types. Start simple, add constraints as needed, and let TypeScript's inference do the work when possible."
+    }
   }
 ];
 
