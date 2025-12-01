@@ -1,5 +1,6 @@
 import { Tutorial } from "@/lib/types/tutorial";
 import { cn } from "@/lib/utils";
+import { YouTubeEmbed } from "./YouTubeEmbed";
 
 interface TutorialDetailProps {
   tutorial: Tutorial;
@@ -66,6 +67,13 @@ export function TutorialDetail({ tutorial }: TutorialDetailProps) {
         )}
       </div>
 
+      {tutorial.videoUrl && (
+        <div className="mb-6">
+          <h2 className="mb-4 text-xl font-semibold">Video Tutorial</h2>
+          <YouTubeEmbed videoUrl={tutorial.videoUrl} title={tutorial.title} />
+        </div>
+      )}
+
       <div className="mb-6">
         <h2 className="mb-4 text-xl font-semibold">Overview</h2>
         <p className="text-muted-foreground">{tutorial.content.overview}</p>
@@ -79,6 +87,9 @@ export function TutorialDetail({ tutorial }: TutorialDetailProps) {
               <p className="mb-4 text-muted-foreground whitespace-pre-line">
                 {section.content}
               </p>
+              {section.videoUrl && (
+                <YouTubeEmbed videoUrl={section.videoUrl} title={section.title} />
+              )}
               {section.codeExample && (
                 <div className="mb-4 rounded-lg bg-background p-4">
                   <div className="mb-2 text-sm font-medium">Code Example:</div>

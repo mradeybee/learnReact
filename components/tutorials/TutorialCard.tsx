@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Tutorial } from "@/lib/types/tutorial";
 import { cn } from "@/lib/utils";
+import { PlayCircle } from "lucide-react";
 
 interface TutorialCardProps {
   tutorial: Tutorial;
@@ -29,14 +30,25 @@ export function TutorialCard({ tutorial }: TutorialCardProps) {
     <Link href={`/tutorials/${tutorial.id}`}>
       <div className="group rounded-lg border border-border bg-card p-6 transition-all hover:border-primary hover:shadow-md">
         <div className="mb-3 flex items-start justify-between">
-          <span
-            className={cn(
-              "rounded-full px-2.5 py-0.5 text-xs font-semibold",
-              levelColors[tutorial.level]
+          <div className="flex items-center gap-2">
+            <span
+              className={cn(
+                "rounded-full px-2.5 py-0.5 text-xs font-semibold",
+                levelColors[tutorial.level]
+              )}
+            >
+              {levelLabels[tutorial.level]}
+            </span>
+            {tutorial.videoUrl && (
+              <span
+                className="flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700 dark:bg-red-900/20 dark:text-red-400"
+                title="Includes video tutorial"
+              >
+                <PlayCircle className="h-3 w-3" />
+                Video
+              </span>
             )}
-          >
-            {levelLabels[tutorial.level]}
-          </span>
+          </div>
           <span className="text-xs text-muted-foreground">{tutorial.estimatedTime}</span>
         </div>
         <h3 className="mb-2 text-lg font-semibold group-hover:text-primary transition-colors">

@@ -1,7 +1,3135 @@
 import { Tutorial } from "@/lib/types/tutorial";
 
 export const tutorials: Tutorial[] = [
-  // BEGINNER LEVEL
+  // BEGINNER LEVEL - JavaScript Fundamentals
+  {
+    id: "js-1",
+    title: "JavaScript Fundamentals: Getting Started",
+    description: "Learn the fundamentals of JavaScript - variables, data types, operators, and basic syntax. Essential foundation for React development.",
+    level: "beginner",
+    estimatedTime: "60 min",
+    topics: ["Variables", "Data Types", "Operators", "Basic Syntax", "Console", "Comments"],
+    prerequisites: ["Basic HTML & CSS knowledge"],
+    videoUrl: "https://www.youtube.com/watch?v=W6NZfCO5SIk", // JavaScript Tutorial for Beginners - Programming with Mosh
+    content: {
+      overview: "JavaScript is a versatile programming language that powers interactive web applications. Understanding JavaScript fundamentals is essential before learning React, as React is built on JavaScript. This tutorial covers the core concepts you need: variables, data types, operators, and basic syntax. You'll learn how to write JavaScript code, understand different data types, and use operators to manipulate values.",
+      sections: [
+        {
+          title: "What is JavaScript?",
+          content: "JavaScript is a high-level, interpreted programming language that makes web pages interactive. It's one of the core technologies of the web, alongside HTML and CSS.\n\nKey Characteristics:\n• Runs in the browser (client-side)\n• Can also run on servers (Node.js)\n• Dynamic and loosely typed\n• Supports multiple programming paradigms\n• Essential for modern web development\n\nWhy Learn JavaScript:\n• Required for React development\n• Powers interactive web applications\n• Most popular programming language\n• Runs everywhere (browser, server, mobile)\n• Large ecosystem and community",
+          videoUrl: "https://www.youtube.com/watch?v=W6NZfCO5SIk",
+          codeExample: {
+            code: `// JavaScript can be embedded in HTML
+<script>
+  console.log("Hello, JavaScript!");
+</script>
+
+// Or in separate .js files
+// script.js
+console.log("Hello from external file!");`,
+            explanation: "JavaScript can be written inline in HTML using <script> tags or in separate .js files. The console.log() function outputs messages to the browser console."
+          }
+        },
+        {
+          title: "Variables: let, const, and var",
+          content: "Variables store data that can be used and changed throughout your program. JavaScript has three ways to declare variables.\n\nVariable Declaration:\n• let - Block-scoped, can be reassigned\n• const - Block-scoped, cannot be reassigned (constant)\n• var - Function-scoped, older way (avoid in modern code)\n\nBest Practices:\n• Use const by default\n• Use let when you need to reassign\n• Avoid var (legacy)\n• Use descriptive names\n• Follow camelCase convention",
+          videoUrl: "https://www.youtube.com/watch?v=W6NZfCO5SIk",
+          codeExample: {
+            code: `// Using const (preferred for values that don't change)
+const name = "Alice";
+const age = 30;
+// name = "Bob"; // ❌ Error: Cannot reassign const
+
+// Using let (for values that change)
+let count = 0;
+count = 1; // ✅ OK
+count = count + 1; // ✅ OK
+
+// Using var (avoid in modern JavaScript)
+var oldWay = "Don't use this";
+// var is function-scoped, not block-scoped
+
+// Variable naming
+const firstName = "John"; // ✅ Good: camelCase, descriptive
+const x = 5; // ❌ Bad: not descriptive
+const user_name = "Jane"; // ❌ Bad: use camelCase, not snake_case`,
+            explanation: "Use const for values that don't change, let for values that do change. Avoid var. Use descriptive, camelCase names for variables."
+          }
+        },
+        {
+          title: "Data Types in JavaScript",
+          content: "JavaScript has several built-in data types. Understanding these is crucial for working with data.\n\nPrimitive Types:\n• string - Text data\n• number - Numbers (integers and decimals)\n• boolean - true or false\n• undefined - Variable declared but not assigned\n• null - Explicitly empty value\n• symbol - Unique identifier (advanced)\n\nSpecial Values:\n• null - Intentional absence of value\n• undefined - Variable not initialized\n• NaN - Not a Number (result of invalid math)\n\nType Checking:\n• Use typeof operator\n• JavaScript is dynamically typed\n• Types are determined at runtime",
+          videoExample: {
+            code: `// String
+const name = "Alice";
+const greeting = 'Hello';
+const template = \`Hello, \${name}!\`; // Template literal
+
+// Number
+const age = 30;
+const price = 19.99;
+const negative = -5;
+
+// Boolean
+const isActive = true;
+const isComplete = false;
+
+// Undefined
+let value; // undefined
+console.log(value); // undefined
+
+// Null
+const empty = null; // Explicitly empty
+
+// Type checking
+console.log(typeof name); // "string"
+console.log(typeof age); // "number"
+console.log(typeof isActive); // "boolean"
+console.log(typeof value); // "undefined"
+console.log(typeof empty); // "object" (quirk of JavaScript)
+
+// Type conversion
+const numString = "42";
+const num = Number(numString); // Convert to number
+const str = String(42); // Convert to string
+const bool = Boolean(1); // Convert to boolean (true)`,
+            explanation: "JavaScript has several data types. Use typeof to check types. JavaScript automatically converts types in some situations (type coercion)."
+          }
+        },
+        {
+          title: "Operators",
+          content: "Operators perform operations on values. JavaScript has many operators for different purposes.\n\nArithmetic Operators:\n• + Addition\n• - Subtraction\n• * Multiplication\n• / Division\n• % Modulo (remainder)\n• ** Exponentiation\n\nComparison Operators:\n• == Equal to (loose)\n• === Equal to (strict)\n• != Not equal (loose)\n• !== Not equal (strict)\n• > Greater than\n• < Less than\n• >= Greater than or equal\n• <= Less than or equal\n\nLogical Operators:\n• && AND\n• || OR\n• ! NOT\n\nAssignment Operators:\n• = Assignment\n• += Add and assign\n• -= Subtract and assign",
+          videoUrl: "https://www.youtube.com/watch?v=W6NZfCO5SIk",
+          codeExample: {
+            code: `// Arithmetic operators
+const sum = 10 + 5; // 15
+const difference = 10 - 5; // 5
+const product = 10 * 5; // 50
+const quotient = 10 / 5; // 2
+const remainder = 10 % 3; // 1
+const power = 2 ** 3; // 8
+
+// Comparison operators
+console.log(5 == "5"); // true (loose equality)
+console.log(5 === "5"); // false (strict equality - preferred)
+console.log(5 !== "5"); // true
+console.log(10 > 5); // true
+console.log(10 < 5); // false
+
+// Logical operators
+const isAdult = true;
+const hasLicense = false;
+console.log(isAdult && hasLicense); // false (both must be true)
+console.log(isAdult || hasLicense); // true (either can be true)
+console.log(!isAdult); // false (negation)
+
+// Assignment operators
+let count = 5;
+count += 3; // count = count + 3 (8)
+count -= 2; // count = count - 2 (6)
+count *= 2; // count = count * 2 (12)
+count /= 3; // count = count / 3 (4)`,
+            explanation: "Operators perform operations on values. Use === for strict equality checks. Logical operators combine boolean values. Assignment operators modify variables."
+          }
+        },
+        {
+          title: "Working with Strings",
+          content: "Strings are sequences of characters. JavaScript provides many ways to work with strings.\n\nString Creation:\n• Single quotes: 'text'\n• Double quotes: \"text\"\n• Template literals: `text` (ES6+)\n\nString Methods:\n• length - Get string length\n• toUpperCase() - Convert to uppercase\n• toLowerCase() - Convert to lowercase\n• includes() - Check if contains substring\n• indexOf() - Find position of substring\n• slice() - Extract portion of string\n• replace() - Replace substring\n\nTemplate Literals:\n• Use backticks (`)\n• Allow interpolation with ${}\n• Support multi-line strings",
+          videoUrl: "https://www.youtube.com/watch?v=W6NZfCO5SIk",
+          codeExample: {
+            code: `// String creation
+const name1 = 'Alice';
+const name2 = "Bob";
+const name3 = \`Charlie\`; // Template literal
+
+// String properties and methods
+const text = "Hello World";
+console.log(text.length); // 11
+console.log(text.toUpperCase()); // "HELLO WORLD"
+console.log(text.toLowerCase()); // "hello world"
+console.log(text.includes("World")); // true
+console.log(text.indexOf("World")); // 6
+console.log(text.slice(0, 5)); // "Hello"
+console.log(text.replace("World", "JavaScript")); // "Hello JavaScript"
+
+// Template literals (ES6+)
+const firstName = "Alice";
+const age = 30;
+const greeting = \`Hello, my name is \${firstName} and I am \${age} years old.\`;
+// "Hello, my name is Alice and I am 30 years old."
+
+// Multi-line strings with template literals
+const message = \`This is a
+multi-line
+string\`;`,
+            explanation: "Strings can be created with quotes or template literals. Template literals allow interpolation and multi-line strings. Use string methods to manipulate text."
+          }
+        },
+        {
+          title: "Control Flow: if/else and switch",
+          content: "Control flow allows your program to make decisions and execute different code based on conditions.\n\nif/else Statements:\n• Execute code conditionally\n• Can chain multiple conditions\n• Use logical operators for complex conditions\n\nswitch Statements:\n• Alternative to multiple if/else\n• Compare value against multiple cases\n• Use break to prevent fall-through\n• Include default case\n\nTernary Operator:\n• Shorthand for simple if/else\n• Syntax: condition ? valueIfTrue : valueIfFalse",
+          videoUrl: "https://www.youtube.com/watch?v=W6NZfCO5SIk",
+          codeExample: {
+            code: `// if/else statements
+const age = 20;
+
+if (age >= 18) {
+  console.log("You are an adult");
+} else {
+  console.log("You are a minor");
+}
+
+// Multiple conditions
+const score = 85;
+
+if (score >= 90) {
+  console.log("Grade: A");
+} else if (score >= 80) {
+  console.log("Grade: B");
+} else if (score >= 70) {
+  console.log("Grade: C");
+} else {
+  console.log("Grade: F");
+}
+
+// Logical operators in conditions
+const isLoggedIn = true;
+const hasPermission = false;
+
+if (isLoggedIn && hasPermission) {
+  console.log("Access granted");
+} else {
+  console.log("Access denied");
+}
+
+// switch statement
+const day = "Monday";
+
+switch (day) {
+  case "Monday":
+    console.log("Start of work week");
+    break;
+  case "Friday":
+    console.log("End of work week");
+    break;
+  default:
+    console.log("Mid week");
+}
+
+// Ternary operator
+const age = 20;
+const status = age >= 18 ? "adult" : "minor";
+console.log(status); // "adult"`,
+            explanation: "Use if/else for conditional logic. Switch statements are useful for multiple value comparisons. Ternary operator provides concise conditional expressions."
+          }
+        }
+      ],
+      conclusion: "JavaScript fundamentals are the foundation for React development. You've learned about variables (let, const), data types, operators, strings, and control flow. These concepts are essential for understanding React code. Practice writing JavaScript code and experiment with different operators and control structures. Next, you'll learn about functions, arrays, and objects - the building blocks of JavaScript applications."
+    }
+  },
+  {
+    id: "js-2",
+    title: "JavaScript Functions and Scope",
+    description: "Master JavaScript functions - function declarations, expressions, arrow functions, parameters, and scope. Essential for understanding React components.",
+    level: "beginner",
+    estimatedTime: "50 min",
+    topics: ["Functions", "Arrow Functions", "Parameters", "Return Values", "Scope", "Closures"],
+    prerequisites: ["JavaScript Fundamentals: Getting Started"],
+    videoUrl: "https://www.youtube.com/watch?v=N8ap4k_1QEQ", // JavaScript Functions Tutorial
+    content: {
+      overview: "Functions are reusable blocks of code that perform specific tasks. They're fundamental to JavaScript and essential for React development, as React components are functions. This tutorial covers function declarations, expressions, arrow functions, parameters, return values, and scope. Understanding functions deeply will help you understand React components and hooks.",
+      sections: [
+        {
+          title: "Function Declarations",
+          content: "Function declarations define named functions that can be called anywhere in your code.\n\nFunction Declaration Syntax:\n• function keyword\n• Function name\n• Parameters in parentheses\n• Function body in curly braces\n• Optional return statement\n\nCharacteristics:\n• Hoisted (can be called before declaration)\n• Named function\n• Can be called multiple times\n• Can return values\n\nUse Cases:\n• Reusable code blocks\n• Organizing code\n• Breaking down complex problems",
+          videoUrl: "https://www.youtube.com/watch?v=N8ap4k_1QEQ",
+          codeExample: {
+            code: `// Basic function declaration
+function greet() {
+  console.log("Hello!");
+}
+
+greet(); // Call the function
+
+// Function with parameters
+function greetPerson(name) {
+  console.log(\`Hello, \${name}!\`);
+}
+
+greetPerson("Alice"); // "Hello, Alice!"
+
+// Function with return value
+function add(a, b) {
+  return a + b;
+}
+
+const result = add(5, 3); // result is 8
+console.log(result);
+
+// Function with multiple parameters
+function createUser(name, age, email) {
+  return {
+    name: name,
+    age: age,
+    email: email
+  };
+}
+
+const user = createUser("Alice", 30, "alice@example.com");
+console.log(user); // { name: "Alice", age: 30, email: "alice@example.com" }
+
+// Function hoisting
+sayHello(); // ✅ Works! Function is hoisted
+
+function sayHello() {
+  console.log("Hello!");
+}`,
+            explanation: "Function declarations use the function keyword. They can take parameters and return values. Functions are hoisted, meaning they can be called before they're declared in the code."
+          }
+        },
+        {
+          title: "Function Expressions and Arrow Functions",
+          content: "Function expressions and arrow functions are alternative ways to define functions. Arrow functions are especially important in React.\n\nFunction Expressions:\n• Assign function to variable\n• Not hoisted\n• Can be anonymous or named\n\nArrow Functions (ES6+):\n• Shorter syntax\n• Implicit return for single expressions\n• Lexical this binding\n• Preferred in React\n\nWhen to Use:\n• Arrow functions: Modern code, React components\n• Function expressions: When you need hoisting behavior\n• Function declarations: Traditional approach",
+          videoUrl: "https://www.youtube.com/watch?v=N8ap4k_1QEQ",
+          codeExample: {
+            code: `// Function expression
+const greet = function(name) {
+  console.log(\`Hello, \${name}!\`);
+};
+
+greet("Bob");
+
+// Arrow function (ES6+)
+const greetArrow = (name) => {
+  console.log(\`Hello, \${name}!\`);
+};
+
+greetArrow("Charlie");
+
+// Arrow function with implicit return
+const add = (a, b) => a + b;
+// Equivalent to:
+// const add = (a, b) => { return a + b; };
+
+console.log(add(5, 3)); // 8
+
+// Arrow function with single parameter (no parentheses needed)
+const square = x => x * x;
+console.log(square(5)); // 25
+
+// Arrow function with no parameters
+const sayHello = () => console.log("Hello!");
+sayHello();
+
+// Arrow functions in React (preview)
+const Button = ({ label, onClick }) => {
+  return (
+    <button onClick={onClick}>
+      {label}
+    </button>
+  );
+};
+
+// Or with implicit return
+const Button = ({ label, onClick }) => (
+  <button onClick={onClick}>
+    {label}
+  </button>
+);`,
+            explanation: "Arrow functions provide concise syntax and are preferred in modern JavaScript and React. They have implicit return for single expressions and lexical this binding."
+          }
+        },
+        {
+          title: "Parameters and Arguments",
+          content: "Functions can accept parameters (inputs) to make them more flexible and reusable.\n\nParameters vs Arguments:\n• Parameters: Variables in function definition\n• Arguments: Values passed when calling function\n\nDefault Parameters:\n• Provide default values\n• Used when argument not provided\n• ES6+ feature\n\nRest Parameters:\n• Accept variable number of arguments\n• Collects into array\n• Useful for flexible functions",
+          videoUrl: "https://www.youtube.com/watch?v=N8ap4k_1QEQ",
+          codeExample: {
+            code: `// Function with parameters
+function greet(name, greeting) {
+  console.log(\`\${greeting}, \${name}!\`);
+}
+
+greet("Alice", "Hello"); // "Hello, Alice!"
+
+// Default parameters
+function greet(name, greeting = "Hello") {
+  console.log(\`\${greeting}, \${name}!\`);
+}
+
+greet("Bob"); // "Hello, Bob!" (uses default)
+greet("Charlie", "Hi"); // "Hi, Charlie!" (uses provided value)
+
+// Rest parameters (collect remaining arguments)
+function sum(...numbers) {
+  return numbers.reduce((total, num) => total + num, 0);
+}
+
+console.log(sum(1, 2, 3)); // 6
+console.log(sum(1, 2, 3, 4, 5)); // 15
+
+// Arrow function with default and rest
+const createUser = (name, age = 18, ...hobbies) => {
+  return {
+    name,
+    age,
+    hobbies
+  };
+};
+
+const user = createUser("Alice", 30, "reading", "coding", "gaming");
+console.log(user);
+// { name: "Alice", age: 30, hobbies: ["reading", "coding", "gaming"] }`,
+            explanation: "Parameters make functions flexible. Use default parameters for optional values. Rest parameters allow functions to accept variable numbers of arguments."
+          }
+        },
+        {
+          title: "Understanding Scope",
+          content: "Scope determines where variables can be accessed in your code. Understanding scope is crucial for React development.\n\nTypes of Scope:\n• Global scope - Accessible everywhere\n• Function scope - Accessible within function\n• Block scope - Accessible within block (let, const)\n\nScope Rules:\n• Variables declared with var are function-scoped\n• Variables declared with let/const are block-scoped\n• Inner scopes can access outer scopes\n• Outer scopes cannot access inner scopes\n\nWhy It Matters:\n• Prevents variable conflicts\n• Controls variable visibility\n• Important for React state management",
+          videoUrl: "https://www.youtube.com/watch?v=N8ap4k_1QEQ",
+          codeExample: {
+            code: `// Global scope
+const globalVar = "I'm global";
+
+function myFunction() {
+  // Function scope
+  const functionVar = "I'm in function scope";
+  console.log(globalVar); // ✅ Can access global
+  
+  if (true) {
+    // Block scope
+    const blockVar = "I'm in block scope";
+    console.log(functionVar); // ✅ Can access function scope
+    console.log(globalVar); // ✅ Can access global
+  }
+  
+  // console.log(blockVar); // ❌ Error: blockVar not accessible here
+}
+
+// console.log(functionVar); // ❌ Error: functionVar not accessible here
+
+// var vs let/const scope
+function scopeExample() {
+  if (true) {
+    var varVariable = "I'm var";
+    let letVariable = "I'm let";
+    const constVariable = "I'm const";
+  }
+  
+  console.log(varVariable); // ✅ Works (var is function-scoped)
+  // console.log(letVariable); // ❌ Error (let is block-scoped)
+  // console.log(constVariable); // ❌ Error (const is block-scoped)
+}
+
+// Scope in React (preview)
+function Component() {
+  const [count, setCount] = useState(0); // count is scoped to Component
+  
+  const handleClick = () => {
+    // Can access count here
+    setCount(count + 1);
+  };
+  
+  return <button onClick={handleClick}>{count}</button>;
+}`,
+            explanation: "Scope determines variable accessibility. let and const are block-scoped (preferred). var is function-scoped (avoid). Understanding scope is essential for React state management."
+          }
+        },
+        {
+          title: "Higher-Order Functions",
+          content: "Higher-order functions are functions that operate on other functions, either by taking them as arguments or returning them. They're fundamental to functional programming and React.\n\nWhat are Higher-Order Functions:\n• Functions that take functions as arguments\n• Functions that return functions\n• Enable powerful abstractions\n• Common in React (map, filter, etc.)\n\nCommon Examples:\n• Array methods (map, filter, reduce)\n• Event handlers\n• Callback functions\n• Function factories",
+          videoUrl: "https://www.youtube.com/watch?v=N8ap4k_1QEQ",
+          codeExample: {
+            code: `// Function that takes a function as argument
+function operate(a, b, operation) {
+  return operation(a, b);
+}
+
+const add = (x, y) => x + y;
+const multiply = (x, y) => x * y;
+
+console.log(operate(5, 3, add)); // 8
+console.log(operate(5, 3, multiply)); // 15
+
+// Function that returns a function
+function createMultiplier(multiplier) {
+  return function(number) {
+    return number * multiplier;
+  };
+}
+
+const double = createMultiplier(2);
+const triple = createMultiplier(3);
+
+console.log(double(5)); // 10
+console.log(triple(5)); // 15
+
+// Arrow function version
+const createMultiplier = (multiplier) => (number) => number * multiplier;
+
+// Higher-order functions in React (preview)
+function TodoList({ todos }) {
+  return (
+    <ul>
+      {todos.map(todo => (
+        <li key={todo.id}>{todo.text}</li>
+      ))}
+    </ul>
+  );
+}
+
+// Event handler (function passed as prop)
+function Button({ onClick }) {
+  return <button onClick={onClick}>Click me</button>;
+}`,
+            explanation: "Higher-order functions take or return functions. They enable powerful patterns and are essential in React for event handlers, array methods, and component composition."
+          }
+        }
+      ],
+      conclusion: "Functions are the building blocks of JavaScript and React. You've learned function declarations, expressions, arrow functions, parameters, scope, and higher-order functions. These concepts are directly applicable to React - React components are functions, hooks are functions, and event handlers are functions. Practice writing different types of functions and understand how scope affects variable access. Next, you'll learn about arrays and objects, which are essential data structures in JavaScript and React."
+    }
+  },
+  {
+    id: "js-3",
+    title: "JavaScript Arrays and Objects",
+    description: "Master JavaScript arrays and objects - the primary data structures used in React. Learn array methods, object manipulation, and destructuring.",
+    level: "beginner",
+    estimatedTime: "70 min",
+    topics: ["Arrays", "Array Methods", "Objects", "Object Methods", "Destructuring", "Spread Operator"],
+    prerequisites: ["JavaScript Functions and Scope"],
+    videoUrl: "https://www.youtube.com/watch?v=oigfaZ5AqM4", // JavaScript Arrays and Objects Tutorial
+    content: {
+      overview: "Arrays and objects are the primary data structures in JavaScript and React. You'll use them constantly - arrays for lists of data, objects for structured data. This tutorial covers creating and manipulating arrays and objects, essential array methods (map, filter, reduce), object methods, destructuring, and the spread operator. These concepts are fundamental to React development.",
+      sections: [
+        {
+          title: "Working with Arrays",
+          content: "Arrays store ordered collections of values. They're essential for rendering lists in React.\n\nArray Creation:\n• Array literal: [1, 2, 3]\n• Array constructor: new Array()\n• Can contain any data types\n• Zero-indexed (first item is index 0)\n\nArray Properties:\n• length - Number of elements\n• Access elements with bracket notation\n• Arrays are mutable\n\nCommon Operations:\n• Access elements by index\n• Modify elements\n• Add/remove elements\n• Iterate over elements",
+          videoUrl: "https://www.youtube.com/watch?v=oigfaZ5AqM4",
+          codeExample: {
+            code: `// Creating arrays
+const numbers = [1, 2, 3, 4, 5];
+const fruits = ["apple", "banana", "orange"];
+const mixed = [1, "hello", true, null];
+
+// Accessing elements
+console.log(fruits[0]); // "apple"
+console.log(fruits[1]); // "banana"
+console.log(fruits.length); // 3
+
+// Modifying arrays
+fruits[0] = "grape";
+console.log(fruits); // ["grape", "banana", "orange"]
+
+// Adding elements
+fruits.push("mango"); // Add to end
+fruits.unshift("kiwi"); // Add to beginning
+console.log(fruits); // ["kiwi", "grape", "banana", "orange", "mango"]
+
+// Removing elements
+fruits.pop(); // Remove from end
+fruits.shift(); // Remove from beginning
+console.log(fruits); // ["grape", "banana", "orange"]
+
+// Iterating over arrays
+for (let i = 0; i < fruits.length; i++) {
+  console.log(fruits[i]);
+}
+
+// for...of loop (modern)
+for (const fruit of fruits) {
+  console.log(fruit);
+}
+
+// Arrays in React (preview)
+function FruitList() {
+  const fruits = ["apple", "banana", "orange"];
+  return (
+    <ul>
+      {fruits.map(fruit => (
+        <li key={fruit}>{fruit}</li>
+      ))}
+    </ul>
+  );
+}`,
+            explanation: "Arrays store ordered collections. Access elements by index (starting at 0). Arrays are mutable - you can modify them. Arrays are essential for rendering lists in React."
+          }
+        },
+        {
+          title: "Essential Array Methods",
+          content: "JavaScript provides powerful array methods that are essential for React development. These methods create new arrays without mutating the original.\n\nImportant Array Methods:\n• map() - Transform each element\n• filter() - Select elements that match condition\n• reduce() - Combine elements into single value\n• find() - Find first matching element\n• forEach() - Execute function for each element\n• includes() - Check if array contains value\n• slice() - Extract portion of array\n• concat() - Combine arrays\n\nWhy These Matter:\n• Used constantly in React\n• Functional programming style\n• Don't mutate original array\n• Return new arrays",
+          videoUrl: "https://www.youtube.com/watch?v=R8rmfD9Y5c8", // JavaScript Array Methods Tutorial
+          codeExample: {
+            code: `const numbers = [1, 2, 3, 4, 5];
+
+// map() - Transform each element
+const doubled = numbers.map(num => num * 2);
+console.log(doubled); // [2, 4, 6, 8, 10]
+
+// filter() - Select matching elements
+const evens = numbers.filter(num => num % 2 === 0);
+console.log(evens); // [2, 4]
+
+// reduce() - Combine into single value
+const sum = numbers.reduce((total, num) => total + num, 0);
+console.log(sum); // 15
+
+// find() - Find first matching element
+const found = numbers.find(num => num > 3);
+console.log(found); // 4
+
+// forEach() - Execute for each element
+numbers.forEach(num => console.log(num));
+
+// includes() - Check if contains value
+console.log(numbers.includes(3)); // true
+console.log(numbers.includes(10)); // false
+
+// slice() - Extract portion
+const firstThree = numbers.slice(0, 3);
+console.log(firstThree); // [1, 2, 3]
+
+// Array methods in React (preview)
+function UserList({ users }) {
+  // Filter active users
+  const activeUsers = users.filter(user => user.isActive);
+  
+  // Map to JSX elements
+  return (
+    <ul>
+      {activeUsers.map(user => (
+        <li key={user.id}>{user.name}</li>
+      ))}
+    </ul>
+  );
+}
+
+// Chaining array methods
+const result = numbers
+  .filter(num => num > 2)
+  .map(num => num * 2)
+  .reduce((sum, num) => sum + num, 0);
+console.log(result); // 24 (3*2 + 4*2 + 5*2)`,
+            explanation: "Array methods like map, filter, and reduce are essential for React. They don't mutate the original array and return new arrays. These methods are used constantly in React for transforming and filtering data."
+          }
+        },
+        {
+          title: "Working with Objects",
+          content: "Objects store key-value pairs and represent structured data. They're fundamental to JavaScript and React.\n\nObject Creation:\n• Object literal: { key: value }\n• Object constructor: new Object()\n• Keys are strings (or symbols)\n• Values can be any type\n\nAccessing Properties:\n• Dot notation: obj.property\n• Bracket notation: obj['property']\n• Use bracket notation for dynamic keys\n\nObject Methods:\n• Object.keys() - Get all keys\n• Object.values() - Get all values\n• Object.entries() - Get key-value pairs\n• Object.assign() - Copy properties",
+          videoUrl: "https://www.youtube.com/watch?v=oigfaZ5AqM4",
+          codeExample: {
+            code: `// Creating objects
+const user = {
+  name: "Alice",
+  age: 30,
+  email: "alice@example.com"
+};
+
+// Accessing properties
+console.log(user.name); // "Alice"
+console.log(user["age"]); // 30
+
+// Dynamic property access
+const key = "email";
+console.log(user[key]); // "alice@example.com"
+
+// Adding properties
+user.city = "New York";
+user["country"] = "USA";
+
+// Modifying properties
+user.age = 31;
+
+// Nested objects
+const user = {
+  name: "Alice",
+  address: {
+    street: "123 Main St",
+    city: "New York"
+  }
+};
+
+console.log(user.address.city); // "New York"
+
+// Object methods
+const keys = Object.keys(user); // ["name", "age", "email"]
+const values = Object.values(user); // ["Alice", 30, "alice@example.com"]
+const entries = Object.entries(user); // [["name", "Alice"], ["age", 30], ...]
+
+// Objects in React (preview)
+function UserCard({ user }) {
+  return (
+    <div>
+      <h2>{user.name}</h2>
+      <p>Age: {user.age}</p>
+      <p>Email: {user.email}</p>
+    </div>
+  );
+}`,
+            explanation: "Objects store key-value pairs. Use dot notation or bracket notation to access properties. Objects are essential for representing structured data in React components."
+          }
+        },
+        {
+          title: "Destructuring Arrays and Objects",
+          content: "Destructuring allows you to extract values from arrays and objects into variables. It's heavily used in React.\n\nArray Destructuring:\n• Extract values by position\n• Skip values with commas\n• Use rest operator for remaining\n\nObject Destructuring:\n• Extract by property name\n• Rename with alias\n• Default values\n• Nested destructuring\n\nWhy It's Important:\n• Used extensively in React\n• Cleaner code\n• Easier to work with props\n• Functional programming style",
+          videoUrl: "https://www.youtube.com/watch?v=NIq3qLaHCIs", // JavaScript Destructuring Tutorial
+          codeExample: {
+            code: `// Array destructuring
+const numbers = [1, 2, 3];
+const [first, second, third] = numbers;
+console.log(first); // 1
+console.log(second); // 2
+
+// Skip values
+const [a, , c] = numbers; // Skip second value
+console.log(a, c); // 1, 3
+
+// Rest operator
+const [first, ...rest] = numbers;
+console.log(first); // 1
+console.log(rest); // [2, 3]
+
+// Object destructuring
+const user = {
+  name: "Alice",
+  age: 30,
+  email: "alice@example.com"
+};
+
+const { name, age } = user;
+console.log(name); // "Alice"
+console.log(age); // 30
+
+// Rename variables
+const { name: userName, age: userAge } = user;
+console.log(userName); // "Alice"
+
+// Default values
+const { name, age, city = "Unknown" } = user;
+console.log(city); // "Unknown"
+
+// Nested destructuring
+const user = {
+  name: "Alice",
+  address: {
+    city: "New York",
+    country: "USA"
+  }
+};
+
+const { address: { city, country } } = user;
+console.log(city); // "New York"
+
+// Destructuring in React (preview)
+function UserCard({ name, age, email }) {
+  // Instead of: const name = props.name;
+  return (
+    <div>
+      <h2>{name}</h2>
+      <p>{age} years old</p>
+      <p>{email}</p>
+    </div>
+  );
+}
+
+// Destructuring function parameters
+function greet({ name, greeting = "Hello" }) {
+  console.log(\`\${greeting}, \${name}!\`);
+}
+
+greet({ name: "Alice" }); // "Hello, Alice!"`,
+            explanation: "Destructuring extracts values from arrays and objects. It's used extensively in React for props, state, and function parameters. Makes code cleaner and more readable."
+          }
+        },
+        {
+          title: "Spread Operator",
+          content: "The spread operator (...) expands arrays and objects. It's essential for React state management.\n\nSpread Operator Uses:\n• Copy arrays/objects\n• Combine arrays/objects\n• Pass array elements as arguments\n• Add properties to objects\n\nWhy It's Important:\n• Essential for React state updates\n• Immutability in React\n• Combining data\n• Creating new arrays/objects",
+          videoUrl: "https://www.youtube.com/watch?v=NIq3qLaHCIs",
+          codeExample: {
+            code: `// Spread with arrays
+const arr1 = [1, 2, 3];
+const arr2 = [4, 5, 6];
+const combined = [...arr1, ...arr2];
+console.log(combined); // [1, 2, 3, 4, 5, 6]
+
+// Copy array
+const original = [1, 2, 3];
+const copy = [...original];
+copy.push(4);
+console.log(original); // [1, 2, 3] (unchanged)
+console.log(copy); // [1, 2, 3, 4]
+
+// Spread with objects
+const user = { name: "Alice", age: 30 };
+const updated = { ...user, age: 31 };
+console.log(updated); // { name: "Alice", age: 31 }
+
+// Combine objects
+const defaults = { theme: "light", language: "en" };
+const userPrefs = { theme: "dark" };
+const merged = { ...defaults, ...userPrefs };
+console.log(merged); // { theme: "dark", language: "en" }
+
+// Spread in function calls
+const numbers = [1, 2, 3];
+console.log(Math.max(...numbers)); // 3
+
+// Spread in React (preview)
+function Component() {
+  const [user, setUser] = useState({ name: "Alice", age: 30 });
+  
+  const updateAge = () => {
+    // Create new object instead of mutating
+    setUser({ ...user, age: user.age + 1 });
+  };
+  
+  return <button onClick={updateAge}>Age: {user.age}</button>;
+}
+
+// Adding to array in React
+function TodoList() {
+  const [todos, setTodos] = useState([]);
+  
+  const addTodo = (newTodo) => {
+    // Create new array instead of mutating
+    setTodos([...todos, newTodo]);
+  };
+}`,
+            explanation: "The spread operator creates copies and combines arrays/objects. Essential for React state updates - always create new objects/arrays instead of mutating existing ones."
+          }
+        }
+      ],
+      conclusion: "Arrays and objects are the primary data structures in JavaScript and React. You've learned array methods (map, filter, reduce), object manipulation, destructuring, and the spread operator. These concepts are used constantly in React - for rendering lists, managing state, handling props, and more. Practice these operations until they become second nature. Next, you'll learn about asynchronous JavaScript, which is essential for fetching data in React applications."
+    }
+  },
+  {
+    id: "js-4",
+    title: "Asynchronous JavaScript: Promises and async/await",
+    description: "Master asynchronous JavaScript with Promises and async/await. Essential for API calls, data fetching, and React applications.",
+    level: "beginner",
+    estimatedTime: "60 min",
+    topics: ["Promises", "async/await", "Fetch API", "Error Handling", "Async Patterns"],
+    prerequisites: ["JavaScript Arrays and Objects"],
+    videoUrl: "https://www.youtube.com/watch?v=DHvZLI7Db8E", // JavaScript Promises and async/await Tutorial
+    content: {
+      overview: "Asynchronous JavaScript allows your code to run without blocking. This is essential for fetching data from APIs, which is a core part of React applications. This tutorial covers Promises, async/await, the Fetch API, error handling, and common async patterns. Understanding asynchronous JavaScript is crucial for building real-world React applications that interact with APIs and handle data loading.",
+      sections: [
+        {
+          title: "Understanding Asynchronous Code",
+          content: "JavaScript is single-threaded but can handle asynchronous operations. Understanding how this works is crucial.\n\nSynchronous vs Asynchronous:\n• Synchronous: Code runs in order, blocks execution\n• Asynchronous: Code runs later, doesn't block\n\nWhy Asynchronous:\n• Network requests take time\n• File operations take time\n• Don't want to freeze UI\n• Better user experience\n\nCommon Async Operations:\n• Fetching data from APIs\n• Reading files\n• Timers (setTimeout, setInterval)\n• Database operations",
+          videoUrl: "https://www.youtube.com/watch?v=DHvZLI7Db8E",
+          codeExample: {
+            code: `// Synchronous code (blocks)
+console.log("1");
+console.log("2");
+console.log("3");
+// Output: 1, 2, 3 (in order)
+
+// Asynchronous code (doesn't block)
+console.log("1");
+setTimeout(() => {
+  console.log("2");
+}, 1000);
+console.log("3");
+// Output: 1, 3, 2 (2 comes later)
+
+// Real-world example: Fetching data
+console.log("Loading...");
+fetch("/api/users")
+  .then(response => response.json())
+  .then(data => {
+    console.log("Data loaded:", data);
+  });
+console.log("This runs immediately, before data loads");`,
+            explanation: "Asynchronous code doesn't block execution. Operations like API calls happen in the background, allowing other code to run. This is essential for responsive applications."
+          }
+        },
+        {
+          title: "Promises",
+          content: "Promises represent the eventual completion (or failure) of an asynchronous operation.\n\nPromise States:\n• Pending - Initial state\n• Fulfilled - Operation succeeded\n• Rejected - Operation failed\n\nPromise Methods:\n• then() - Handle success\n• catch() - Handle errors\n• finally() - Run regardless of outcome\n\nCreating Promises:\n• new Promise() constructor\n• Resolve on success\n• Reject on failure",
+          videoUrl: "https://www.youtube.com/watch?v=DHvZLI7Db8E",
+          codeExample: {
+            code: `// Creating a Promise
+const myPromise = new Promise((resolve, reject) => {
+  const success = true;
+  
+  if (success) {
+    resolve("Operation succeeded!");
+  } else {
+    reject("Operation failed!");
+  }
+});
+
+// Using Promises
+myPromise
+  .then(result => {
+    console.log(result); // "Operation succeeded!"
+  })
+  .catch(error => {
+    console.error(error); // "Operation failed!"
+  })
+  .finally(() => {
+    console.log("Promise completed");
+  });
+
+// Chaining Promises
+fetch("/api/users")
+  .then(response => response.json())
+  .then(users => {
+    console.log(users);
+    return fetch(\`/api/users/\${users[0].id}\`);
+  })
+  .then(response => response.json())
+  .then(user => {
+    console.log(user);
+  })
+  .catch(error => {
+    console.error("Error:", error);
+  });
+
+// Promise.all - Wait for all promises
+const promise1 = fetch("/api/users");
+const promise2 = fetch("/api/posts");
+const promise3 = fetch("/api/comments");
+
+Promise.all([promise1, promise2, promise3])
+  .then(responses => {
+    // All promises resolved
+    return Promise.all(responses.map(r => r.json()));
+  })
+  .then(([users, posts, comments]) => {
+    console.log({ users, posts, comments });
+  });`,
+            explanation: "Promises handle asynchronous operations. Use then() for success, catch() for errors. Chain promises for sequential operations. Promise.all() waits for multiple promises."
+          }
+        },
+        {
+          title: "async/await",
+          content: "async/await provides a cleaner syntax for working with Promises. It makes asynchronous code look like synchronous code.\n\nasync Functions:\n• Function declared with async\n• Always returns a Promise\n• Can use await inside\n\nawait Keyword:\n• Waits for Promise to resolve\n• Can only be used in async functions\n• Makes code easier to read\n\nError Handling:\n• Use try/catch blocks\n• Catch handles rejected promises\n\nWhy Use async/await:\n• Cleaner syntax\n• Easier to read\n• Better error handling\n• Preferred in modern JavaScript",
+          videoUrl: "https://www.youtube.com/watch?v=V_Kr9OSfDeU", // async/await Tutorial
+          codeExample: {
+            code: `// async function
+async function fetchUser() {
+  try {
+    const response = await fetch("/api/user");
+    const user = await response.json();
+    return user;
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    throw error;
+  }
+}
+
+// Using async function
+fetchUser()
+  .then(user => console.log(user))
+  .catch(error => console.error(error));
+
+// Multiple await calls
+async function fetchUserData(userId) {
+  try {
+    const user = await fetch(\`/api/users/\${userId}\`).then(r => r.json());
+    const posts = await fetch(\`/api/users/\${userId}/posts\`).then(r => r.json());
+    const comments = await fetch(\`/api/users/\${userId}/comments\`).then(r => r.json());
+    
+    return { user, posts, comments };
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
+
+// Parallel async operations
+async function fetchAllData(userId) {
+  try {
+    const [user, posts, comments] = await Promise.all([
+      fetch(\`/api/users/\${userId}\`).then(r => r.json()),
+      fetch(\`/api/users/\${userId}/posts\`).then(r => r.json()),
+      fetch(\`/api/users/\${userId}/comments\`).then(r => r.json())
+    ]);
+    
+    return { user, posts, comments };
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
+
+// async/await in React (preview)
+async function UserProfile({ userId }) {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    async function loadUser() {
+      try {
+        const response = await fetch(\`/api/users/\${userId}\`);
+        const userData = await response.json();
+        setUser(userData);
+      } catch (error) {
+        console.error("Error:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    loadUser();
+  }, [userId]);
+  
+  if (loading) return <div>Loading...</div>;
+  return <div>{user.name}</div>;
+}`,
+            explanation: "async/await makes asynchronous code easier to read and write. Use try/catch for error handling. await waits for Promises to resolve. Essential for React data fetching."
+          }
+        },
+        {
+          title: "Fetch API",
+          content: "The Fetch API is the modern way to make HTTP requests in JavaScript. It's used extensively in React applications.\n\nFetch Basics:\n• fetch(url) returns a Promise\n• Response object contains data\n• Use .json() to parse JSON\n• Handle errors properly\n\nFetch Options:\n• method - HTTP method (GET, POST, etc.)\n• headers - Request headers\n• body - Request body\n• credentials - Include cookies\n\nError Handling:\n• fetch doesn't reject on HTTP errors\n• Check response.ok\n• Handle network errors",
+          videoUrl: "https://www.youtube.com/watch?v=cuEtnrL9-H0", // Fetch API Tutorial
+          codeExample: {
+            code: `// Basic GET request
+fetch("/api/users")
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error("Error:", error));
+
+// With async/await
+async function getUsers() {
+  try {
+    const response = await fetch("/api/users");
+    const users = await response.json();
+    return users;
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
+
+// POST request
+async function createUser(userData) {
+  try {
+    const response = await fetch("/api/users", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(userData)
+    });
+    
+    if (!response.ok) {
+      throw new Error("Failed to create user");
+    }
+    
+    const newUser = await response.json();
+    return newUser;
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
+
+// Error handling
+async function fetchData(url) {
+  try {
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      throw new Error(\`HTTP error! status: \${response.status}\`);
+    }
+    
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Fetch error:", error);
+    throw error;
+  }
+}
+
+// Fetch in React (preview)
+function UserList() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    async function loadUsers() {
+      try {
+        const response = await fetch("/api/users");
+        if (!response.ok) throw new Error("Failed to fetch");
+        const data = await response.json();
+        setUsers(data);
+      } catch (error) {
+        console.error("Error:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    loadUsers();
+  }, []);
+  
+  if (loading) return <div>Loading...</div>;
+  return (
+    <ul>
+      {users.map(user => (
+        <li key={user.id}>{user.name}</li>
+      ))}
+    </ul>
+  );
+}`,
+            explanation: "Fetch API makes HTTP requests. Returns a Promise. Use async/await for cleaner code. Always check response.ok and handle errors. Essential for React data fetching."
+          }
+        }
+      ],
+      conclusion: "Asynchronous JavaScript is essential for React applications. You've learned about Promises, async/await, and the Fetch API. These concepts are used constantly in React for fetching data, handling user interactions, and managing side effects. Practice making API calls and handling errors. Understanding async JavaScript is crucial before diving into React hooks like useEffect, which handle asynchronous operations. Next, you'll be ready to start learning React!"
+    }
+  },
+  {
+    id: "js-5",
+    title: "ES6+ JavaScript Features for React",
+    description: "Learn modern JavaScript features essential for React: arrow functions, template literals, modules, and more. These features are used throughout React code.",
+    level: "beginner",
+    estimatedTime: "50 min",
+    topics: ["ES6 Features", "Arrow Functions", "Template Literals", "Modules", "Classes", "Default Parameters"],
+    prerequisites: ["JavaScript Functions and Scope"],
+    videoUrl: "https://www.youtube.com/watch?v=NCwa_xi0Uuc", // ES6 JavaScript Tutorial
+    content: {
+      overview: "ES6 (ECMAScript 2015) and later versions introduced many features that are now standard in React development. Understanding these modern JavaScript features is essential for reading and writing React code. This tutorial covers arrow functions, template literals, modules, classes, default parameters, and other ES6+ features that you'll see constantly in React applications.",
+      sections: [
+        {
+          title: "Arrow Functions (ES6)",
+          content: "Arrow functions provide a concise syntax for writing functions. They're the standard in React code.\n\nArrow Function Syntax:\n• Shorter than regular functions\n• Implicit return for single expressions\n• Lexical this binding\n• No arguments object\n\nWhen to Use:\n• Event handlers in React\n• Array methods (map, filter)\n• Callback functions\n• React components\n\nDifferences from Regular Functions:\n• No own this binding\n• No arguments object\n• Cannot be used as constructors",
+          videoUrl: "https://www.youtube.com/watch?v=NCwa_xi0Uuc",
+          codeExample: {
+            code: `// Regular function
+function add(a, b) {
+  return a + b;
+}
+
+// Arrow function
+const add = (a, b) => a + b;
+
+// Arrow function with body
+const add = (a, b) => {
+  return a + b;
+};
+
+// Single parameter (no parentheses needed)
+const square = x => x * x;
+
+// No parameters
+const greet = () => console.log("Hello!");
+
+// Arrow functions in array methods
+const numbers = [1, 2, 3, 4, 5];
+const doubled = numbers.map(num => num * 2);
+const evens = numbers.filter(num => num % 2 === 0);
+const sum = numbers.reduce((total, num) => total + num, 0);
+
+// Arrow functions in React (preview)
+const Button = ({ label, onClick }) => (
+  <button onClick={onClick}>
+    {label}
+  </button>
+);
+
+// Event handlers
+const handleClick = () => {
+  console.log("Clicked!");
+};
+
+// In component
+<button onClick={() => handleClick()}>Click</button>`,
+            explanation: "Arrow functions are the standard in React. They provide concise syntax and lexical this binding. Used extensively for event handlers, array methods, and React components."
+          }
+        },
+        {
+          title: "Template Literals (ES6)",
+          content: "Template literals provide an easy way to create strings with embedded expressions.\n\nTemplate Literal Syntax:\n• Use backticks (`) instead of quotes\n• Embed expressions with ${}\n• Support multi-line strings\n• More readable than concatenation\n\nUse Cases:\n• String interpolation\n• Multi-line strings\n• Dynamic content\n• React JSX (similar concept)",
+          videoUrl: "https://www.youtube.com/watch?v=NCwa_xi0Uuc",
+          codeExample: {
+            code: `// Old way (string concatenation)
+const name = "Alice";
+const greeting = "Hello, " + name + "!";
+
+// Template literal (ES6)
+const greeting = \`Hello, \${name}!\`;
+
+// Multi-line strings
+const message = \`This is a
+multi-line
+string\`;
+
+// Expressions in template literals
+const a = 5;
+const b = 10;
+const result = \`\${a} + \${b} = \${a + b}\`;
+// "5 + 10 = 15"
+
+// Function calls
+const getName = () => "Alice";
+const greeting = \`Hello, \${getName()}!\`;
+
+// Template literals in React (preview)
+function Greeting({ name, age }) {
+  return (
+    <div>
+      <h1>Hello, {name}!</h1>
+      <p>You are {age} years old</p>
+    </div>
+  );
+}
+
+// Similar concept in JSX
+const className = \`btn btn-\${variant} btn-\${size}\`;`,
+            explanation: "Template literals make string creation easier and more readable. They support expressions and multi-line strings. Similar concept to JSX interpolation in React."
+          }
+        },
+        {
+          title: "Destructuring (ES6)",
+          content: "Destructuring allows you to extract values from arrays and objects. It's used extensively in React.\n\nArray Destructuring:\n• Extract by position\n• Skip values\n• Rest operator\n\nObject Destructuring:\n• Extract by property name\n• Rename variables\n• Default values\n• Nested destructuring\n\nIn React:\n• Destructure props\n• Destructure state\n• Function parameters",
+          videoUrl: "https://www.youtube.com/watch?v=NIq3qLaHCIs",
+          codeExample: {
+            code: `// Array destructuring
+const [first, second] = [1, 2];
+
+// Object destructuring
+const { name, age } = { name: "Alice", age: 30 };
+
+// Destructuring in React (preview)
+function UserCard({ name, age, email }) {
+  // Instead of props.name, props.age, etc.
+  return (
+    <div>
+      <h2>{name}</h2>
+      <p>{age} years old</p>
+    </div>
+  );
+}
+
+// Destructuring with defaults
+function Button({ label, onClick, variant = "primary" }) {
+  return <button className={\`btn-\${variant}\`} onClick={onClick}>{label}</button>;
+}
+
+// Destructuring state
+const [user, setUser] = useState({ name: "Alice", age: 30 });
+const { name, age } = user;`,
+            explanation: "Destructuring is used constantly in React for props, state, and function parameters. Makes code cleaner and more readable."
+          }
+        },
+        {
+          title: "Spread Operator (ES6)",
+          content: "The spread operator expands arrays and objects. Essential for React state management.\n\nSpread Uses:\n• Copy arrays/objects\n• Combine arrays/objects\n• Pass arguments\n• Update state immutably\n\nIn React:\n• State updates\n• Props spreading\n• Combining arrays",
+          videoUrl: "https://www.youtube.com/watch?v=NIq3qLaHCIs",
+          codeExample: {
+            code: `// Spread arrays
+const arr1 = [1, 2, 3];
+const arr2 = [...arr1, 4, 5];
+
+// Spread objects
+const user = { name: "Alice", age: 30 };
+const updated = { ...user, age: 31 };
+
+// Spread in React (preview)
+function Component() {
+  const [user, setUser] = useState({ name: "Alice", age: 30 });
+  
+  const updateAge = () => {
+    setUser({ ...user, age: user.age + 1 });
+  };
+  
+  return <button onClick={updateAge}>Age: {user.age}</button>;
+}
+
+// Adding to array
+const [todos, setTodos] = useState([]);
+const addTodo = (newTodo) => {
+  setTodos([...todos, newTodo]);
+};`,
+            explanation: "Spread operator is essential for React state updates. Always create new objects/arrays instead of mutating. Used for immutable state updates."
+          }
+        },
+        {
+          title: "Modules: import and export (ES6)",
+          content: "ES6 modules allow you to organize code into separate files. React uses this extensively.\n\nExport:\n• export - Named export\n• export default - Default export\n• Can export functions, objects, classes\n\nImport:\n• import { name } - Named import\n• import name from - Default import\n• import * as - Namespace import\n\nIn React:\n• Component files\n• Utility files\n• Hook files\n• Type files",
+          videoUrl: "https://www.youtube.com/watch?v=cRHQNNcYf6s", // JavaScript Modules Tutorial
+          codeExample: {
+            code: `// Exporting (utils.js)
+export function formatDate(date) {
+  return date.toLocaleDateString();
+}
+
+export const API_URL = "https://api.example.com";
+
+export default function helper() {
+  // Default export
+}
+
+// Importing
+import { formatDate, API_URL } from "./utils";
+import helper from "./utils"; // Default import
+import * as utils from "./utils"; // All exports
+
+// React example (preview)
+// Button.jsx
+export function Button({ label, onClick }) {
+  return <button onClick={onClick}>{label}</button>;
+}
+
+// App.jsx
+import { Button } from "./Button";
+
+function App() {
+  return <Button label="Click me" onClick={() => {}} />;
+}
+
+// Hooks
+// useCounter.js
+export function useCounter(initial = 0) {
+  const [count, setCount] = useState(initial);
+  return { count, setCount };
+}
+
+// Component.jsx
+import { useCounter } from "./hooks/useCounter";`,
+            explanation: "ES6 modules organize code into files. React uses this for components, hooks, and utilities. export and import are standard in React projects."
+          }
+        }
+      ],
+      conclusion: "ES6+ features are the foundation of modern React code. You've learned arrow functions, template literals, destructuring, spread operator, and modules. These features are used constantly in React - in components, hooks, event handlers, and state management. Practice these features until they become natural. With this JavaScript foundation, you're now ready to dive into React development!"
+    }
+  },
+
+  // INTERMEDIATE LEVEL - JavaScript
+  {
+    id: "js-intermediate-1",
+    title: "JavaScript Closures and Scope Deep Dive",
+    description: "Master JavaScript closures, lexical scope, and how they work. Essential for understanding React hooks and advanced JavaScript patterns.",
+    level: "intermediate",
+    estimatedTime: "60 min",
+    topics: ["Closures", "Lexical Scope", "Scope Chain", "IIFE", "Module Pattern"],
+    prerequisites: ["JavaScript Functions and Scope"],
+    videoUrl: "https://www.youtube.com/watch?v=3a0p8OqBv-Q", // JavaScript Closures Tutorial
+    content: {
+      overview: "Closures are one of JavaScript's most powerful features. A closure gives you access to an outer function's scope from an inner function. Understanding closures is essential for React hooks, event handlers, and advanced JavaScript patterns. This tutorial covers what closures are, how they work, lexical scope, the scope chain, and practical use cases including the module pattern and React hooks.",
+      sections: [
+        {
+          title: "What are Closures?",
+          content: "A closure is a function that has access to variables in its outer (enclosing) scope even after the outer function has returned.\n\nKey Concepts:\n• Inner function has access to outer function's variables\n• Variables persist even after outer function completes\n• Each closure has its own scope\n• Closures are created every time a function is created\n\nWhy Closures Matter:\n• Enable data privacy\n• Create function factories\n• Essential for React hooks\n• Enable module pattern",
+          videoUrl: "https://www.youtube.com/watch?v=3a0p8OqBv-Q",
+          codeExample: {
+            code: `// Simple closure example
+function outerFunction(x) {
+  // Outer function's variable
+  const outerVariable = x;
+  
+  // Inner function (closure)
+  function innerFunction(y) {
+    console.log(outerVariable + y); // Accesses outerVariable
+  }
+  
+  return innerFunction;
+}
+
+const closure = outerFunction(10);
+closure(5); // 15 - outerVariable is still accessible!
+
+// Closure with multiple variables
+function createCounter() {
+  let count = 0; // Private variable
+  
+  return {
+    increment: function() {
+      count++;
+      return count;
+    },
+    decrement: function() {
+      count--;
+      return count;
+    },
+    getCount: function() {
+      return count;
+    }
+  };
+}
+
+const counter = createCounter();
+console.log(counter.increment()); // 1
+console.log(counter.increment()); // 2
+console.log(counter.getCount()); // 2
+// count is not directly accessible - it's private!
+
+// Closures in loops (common gotcha)
+for (var i = 0; i < 3; i++) {
+  setTimeout(function() {
+    console.log(i); // Prints 3, 3, 3 (not 0, 1, 2)
+  }, 100);
+}
+
+// Solution: Use let or IIFE
+for (let i = 0; i < 3; i++) {
+  setTimeout(function() {
+    console.log(i); // Prints 0, 1, 2
+  }, 100);
+}`,
+            explanation: "Closures allow inner functions to access outer function variables even after the outer function returns. This enables data privacy and function factories. Be careful with closures in loops - use let instead of var."
+          }
+        },
+        {
+          title: "Lexical Scope and Scope Chain",
+          content: "JavaScript uses lexical (static) scoping, meaning scope is determined by where variables and functions are declared in the code.\n\nLexical Scope:\n• Scope determined at write time\n• Based on physical location in code\n• Inner scopes can access outer scopes\n• Outer scopes cannot access inner scopes\n\nScope Chain:\n• JavaScript looks up variables through scope chain\n• Starts at current scope\n• Moves up to outer scopes\n• Stops at global scope\n• Returns undefined if not found",
+          videoUrl: "https://www.youtube.com/watch?v=3a0p8OqBv-Q",
+          codeExample: {
+            code: `// Lexical scope example
+const globalVar = "global";
+
+function outer() {
+  const outerVar = "outer";
+  
+  function inner() {
+    const innerVar = "inner";
+    
+    // Can access all three variables
+    console.log(globalVar); // "global"
+    console.log(outerVar); // "outer"
+    console.log(innerVar); // "inner"
+  }
+  
+  inner();
+  // Can only access outer and global
+  // console.log(innerVar); // ❌ Error
+}
+
+outer();
+
+// Scope chain in action
+let a = 1;
+
+function first() {
+  let b = 2;
+  
+  function second() {
+    let c = 3;
+    
+    function third() {
+      let d = 4;
+      console.log(a, b, c, d); // 1, 2, 3, 4
+      // JavaScript looks up: third -> second -> first -> global
+    }
+    
+    third();
+  }
+  
+  second();
+}
+
+first();`,
+            explanation: "Lexical scope means scope is determined by code structure. JavaScript follows the scope chain to find variables, starting from the current scope and moving outward."
+          }
+        },
+        {
+          title: "IIFE (Immediately Invoked Function Expression)",
+          content: "IIFE is a function that runs as soon as it's defined. It's useful for creating private scopes and avoiding global namespace pollution.\n\nIIFE Syntax:\n• (function() { ... })()\n• (function() { ... }())\n• Creates new scope\n• Variables inside are private\n\nUse Cases:\n• Module pattern\n• Avoid global variables\n• Create private scope\n• Initialize code",
+          videoUrl: "https://www.youtube.com/watch?v=3a0p8OqBv-Q",
+          codeExample: {
+            code: `// Basic IIFE
+(function() {
+  const privateVar = "I'm private";
+  console.log(privateVar);
+})();
+// privateVar is not accessible outside
+
+// IIFE with parameters
+(function(name) {
+  console.log(\`Hello, \${name}!\`);
+})("Alice");
+
+// IIFE that returns a value
+const counter = (function() {
+  let count = 0;
+  
+  return {
+    increment: function() {
+      return ++count;
+    },
+    decrement: function() {
+      return --count;
+    },
+    getCount: function() {
+      return count;
+    }
+  };
+})();
+
+console.log(counter.increment()); // 1
+console.log(counter.increment()); // 2
+
+// Module pattern with IIFE
+const MyModule = (function() {
+  let privateVar = 0;
+  
+  function privateFunction() {
+    return privateVar;
+  }
+  
+  return {
+    publicMethod: function() {
+      return privateFunction();
+    },
+    setValue: function(val) {
+      privateVar = val;
+    }
+  };
+})();
+
+MyModule.setValue(10);
+console.log(MyModule.publicMethod()); // 10`,
+            explanation: "IIFE creates a private scope immediately. Useful for module patterns and avoiding global namespace pollution. Modern JavaScript uses ES6 modules instead, but IIFE is still useful."
+          }
+        },
+        {
+          title: "Closures in React (Hooks)",
+          content: "React hooks use closures extensively. Understanding closures helps you understand how hooks work.\n\nHow Hooks Use Closures:\n• useState stores values in closure\n• useEffect captures values in closure\n• Custom hooks rely on closures\n• Event handlers use closures\n\nCommon Patterns:\n• Stale closures in useEffect\n• Closures in event handlers\n• Custom hooks with closures",
+          videoUrl: "https://www.youtube.com/watch?v=3a0p8OqBv-Q",
+          codeExample: {
+            code: `// useState uses closures
+function useState(initialValue) {
+  let state = initialValue; // Stored in closure
+  
+  function setState(newValue) {
+    state = newValue;
+    // Re-render component
+  }
+  
+  return [state, setState];
+}
+
+// useEffect and closures
+function Component() {
+  const [count, setCount] = useState(0);
+  
+  useEffect(() => {
+    // This closure captures count
+    const timer = setInterval(() => {
+      console.log(count); // May be stale!
+      setCount(c => c + 1); // Use functional update
+    }, 1000);
+    
+    return () => clearInterval(timer);
+  }, []); // Empty deps - closure captures initial count
+  
+  // Better: include count in dependencies
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCount(count + 1); // Fresh count
+    }, 1000);
+    
+    return () => clearInterval(timer);
+  }, [count]); // Closure updates when count changes
+  
+  // Custom hook using closures
+  function useCounter(initial = 0) {
+    const [count, setCount] = useState(initial);
+    
+    const increment = useCallback(() => {
+      setCount(c => c + 1); // Closure over setCount
+    }, []);
+    
+    const decrement = useCallback(() => {
+      setCount(c => c - 1);
+    }, []);
+    
+    return { count, increment, decrement };
+  }`,
+            explanation: "React hooks rely heavily on closures. useState stores state in closures. Be aware of stale closures in useEffect - use dependency arrays or functional updates."
+          }
+        }
+      ],
+      conclusion: "Closures are fundamental to JavaScript and React. You've learned how closures work, lexical scope, scope chains, IIFE, and how React hooks use closures. Understanding closures helps you write better React code, debug issues, and create powerful abstractions. Practice creating closures and understanding scope chains. This knowledge is essential for advanced React development."
+    }
+  },
+  {
+    id: "js-intermediate-2",
+    title: "JavaScript Prototypes and Inheritance",
+    description: "Understand JavaScript's prototype-based inheritance system. Learn how objects inherit properties and methods, and how to work with prototypes.",
+    level: "intermediate",
+    estimatedTime: "70 min",
+    topics: ["Prototypes", "Prototype Chain", "Inheritance", "Object.create", "Classes"],
+    prerequisites: ["JavaScript Arrays and Objects"],
+    videoUrl: "https://www.youtube.com/watch?v=wstwjQ1yqWQ", // JavaScript Prototypes Tutorial
+    content: {
+      overview: "JavaScript uses prototype-based inheritance, not class-based inheritance like many other languages. Understanding prototypes is crucial for understanding how JavaScript objects work, how inheritance functions, and how ES6 classes work under the hood. This tutorial covers the prototype chain, how inheritance works, Object.create, constructor functions, and how ES6 classes relate to prototypes.",
+      sections: [
+        {
+          title: "Understanding Prototypes",
+          content: "Every JavaScript object has a prototype. The prototype is another object that the current object inherits properties and methods from.\n\nPrototype Basics:\n• Every object has __proto__ property\n• Points to prototype object\n• Prototype chain allows inheritance\n• Object.prototype is root of chain\n\nAccessing Prototypes:\n• obj.__proto__ (deprecated, but works)\n• Object.getPrototypeOf(obj) (preferred)\n• Object.setPrototypeOf(obj, proto) (set prototype)",
+          videoUrl: "https://www.youtube.com/watch?v=wstwjQ1yqWQ",
+          codeExample: {
+            code: `// Every object has a prototype
+const obj = {};
+console.log(obj.__proto__); // Points to Object.prototype
+console.log(Object.getPrototypeOf(obj)); // Same, preferred method
+
+// Prototype chain
+const arr = [1, 2, 3];
+console.log(arr.__proto__); // Array.prototype
+console.log(arr.__proto__.__proto__); // Object.prototype
+console.log(arr.__proto__.__proto__.__proto__); // null (end of chain)
+
+// Inheritance through prototype chain
+const person = {
+  name: "Alice",
+  greet: function() {
+    return \`Hello, I'm \${this.name}\`;
+  }
+};
+
+const student = Object.create(person);
+student.name = "Bob";
+student.study = function() {
+  return "Studying...";
+};
+
+console.log(student.greet()); // "Hello, I'm Bob" - inherited!
+console.log(student.study()); // "Studying..." - own method
+
+// How JavaScript finds properties
+// 1. Check object itself
+// 2. Check prototype
+// 3. Check prototype's prototype
+// 4. Continue up chain until null`,
+            explanation: "Prototypes enable inheritance in JavaScript. Objects inherit from their prototype through the prototype chain. JavaScript looks up properties through this chain."
+          }
+        },
+        {
+          title: "Constructor Functions",
+          content: "Constructor functions are used to create objects with shared properties and methods. They're the traditional way to implement inheritance.\n\nConstructor Functions:\n• Functions used with new keyword\n• Create objects with shared prototype\n• this refers to new object\n• Convention: Capitalize constructor name\n\nPrototype Property:\n• Constructor functions have .prototype property\n• Objects created inherit from this prototype\n• Add methods to prototype for efficiency",
+          videoUrl: "https://www.youtube.com/watch?v=wstwjQ1yqWQ",
+          codeExample: {
+            code: `// Constructor function
+function Person(name, age) {
+  this.name = name;
+  this.age = age;
+}
+
+// Add methods to prototype (shared by all instances)
+Person.prototype.greet = function() {
+  return \`Hello, I'm \${this.name}\`;
+};
+
+Person.prototype.getAge = function() {
+  return this.age;
+};
+
+// Create instances
+const person1 = new Person("Alice", 30);
+const person2 = new Person("Bob", 25);
+
+console.log(person1.greet()); // "Hello, I'm Alice"
+console.log(person2.greet()); // "Hello, I'm Bob"
+
+// Both share same prototype
+console.log(person1.__proto__ === Person.prototype); // true
+console.log(person2.__proto__ === Person.prototype); // true
+
+// Inheritance with constructor functions
+function Student(name, age, school) {
+  Person.call(this, name, age); // Call parent constructor
+  this.school = school;
+}
+
+// Set up prototype chain
+Student.prototype = Object.create(Person.prototype);
+Student.prototype.constructor = Student;
+
+Student.prototype.study = function() {
+  return "Studying...";
+};
+
+const student = new Student("Charlie", 20, "University");
+console.log(student.greet()); // Inherited from Person
+console.log(student.study()); // Own method`,
+            explanation: "Constructor functions create objects with shared prototypes. Add methods to prototype for efficiency. Use Object.create() for inheritance."
+          }
+        },
+        {
+          title: "ES6 Classes and Prototypes",
+          content: "ES6 classes are syntactic sugar over constructor functions and prototypes. They make inheritance easier but work the same way under the hood.\n\nES6 Classes:\n• class keyword\n• constructor method\n• Methods on prototype\n• extends for inheritance\n• super for parent access\n\nUnder the Hood:\n• Classes are constructor functions\n• Methods go on prototype\n• extends sets up prototype chain\n• Works exactly like constructor functions",
+          videoUrl: "https://www.youtube.com/watch?v=wstwjQ1yqWQ",
+          codeExample: {
+            code: `// ES6 Class (syntactic sugar)
+class Person {
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+  
+  greet() {
+    return \`Hello, I'm \${this.name}\`;
+  }
+  
+  getAge() {
+    return this.age;
+  }
+}
+
+// Under the hood, this is equivalent to:
+// function Person(name, age) {
+//   this.name = name;
+//   this.age = age;
+// }
+// Person.prototype.greet = function() { ... };
+
+const person = new Person("Alice", 30);
+console.log(person.greet()); // "Hello, I'm Alice"
+
+// Inheritance with classes
+class Student extends Person {
+  constructor(name, age, school) {
+    super(name, age); // Call parent constructor
+    this.school = school;
+  }
+  
+  study() {
+    return "Studying...";
+  }
+}
+
+const student = new Student("Bob", 20, "University");
+console.log(student.greet()); // Inherited
+console.log(student.study()); // Own method
+
+// Static methods
+class MathUtils {
+  static add(a, b) {
+    return a + b;
+  }
+}
+
+console.log(MathUtils.add(5, 3)); // 8
+// Called on class, not instance`,
+            explanation: "ES6 classes are syntactic sugar over prototypes. They make inheritance easier but work the same way. extends sets up the prototype chain automatically."
+          }
+        },
+        {
+          title: "Object.create() for Prototype Inheritance",
+          content: "Object.create() is a clean way to create objects with a specific prototype. It's useful for creating inheritance without constructor functions.\n\nObject.create():\n• Creates object with specified prototype\n• More explicit than constructor functions\n• Clean inheritance pattern\n• Used in modern JavaScript",
+          videoUrl: "https://www.youtube.com/watch?v=wstwjQ1yqWQ",
+          codeExample: {
+            code: `// Object.create() for inheritance
+const person = {
+  name: "Unknown",
+  greet() {
+    return \`Hello, I'm \${this.name}\`;
+  }
+};
+
+// Create object with person as prototype
+const alice = Object.create(person);
+alice.name = "Alice";
+console.log(alice.greet()); // "Hello, I'm Alice"
+
+// Factory function with Object.create
+function createPerson(name, age) {
+  const person = Object.create(personMethods);
+  person.name = name;
+  person.age = age;
+  return person;
+}
+
+const personMethods = {
+  greet() {
+    return \`Hello, I'm \${this.name}\`;
+  },
+  getAge() {
+    return this.age;
+  }
+};
+
+const bob = createPerson("Bob", 25);
+console.log(bob.greet()); // "Hello, I'm Bob"
+
+// Multiple levels of inheritance
+const animal = {
+  eat() {
+    return "Eating...";
+  }
+};
+
+const dog = Object.create(animal);
+dog.bark = function() {
+  return "Woof!";
+};
+
+const myDog = Object.create(dog);
+myDog.name = "Buddy";
+console.log(myDog.eat()); // Inherited from animal
+console.log(myDog.bark()); // Inherited from dog`,
+            explanation: "Object.create() creates objects with specific prototypes. It's a clean way to implement inheritance without constructor functions. Useful for modern JavaScript patterns."
+          }
+        }
+      ],
+      conclusion: "Prototypes are fundamental to JavaScript. You've learned how the prototype chain works, constructor functions, ES6 classes (which are syntactic sugar), and Object.create(). Understanding prototypes helps you understand how JavaScript inheritance works, how classes work under the hood, and how to create efficient object hierarchies. This knowledge is valuable even in React, as it helps you understand JavaScript's object model."
+    }
+  },
+  {
+    id: "js-intermediate-3",
+    title: "JavaScript Design Patterns",
+    description: "Learn common JavaScript design patterns: Module, Singleton, Factory, Observer, and more. Essential for writing maintainable, scalable code.",
+    level: "intermediate",
+    estimatedTime: "80 min",
+    topics: ["Module Pattern", "Singleton", "Factory", "Observer", "Strategy", "Decorator"],
+    prerequisites: ["JavaScript Closures and Scope Deep Dive"],
+    videoUrl: "https://www.youtube.com/watch?v=tv-_1er1mWI", // JavaScript Design Patterns Tutorial
+    content: {
+      overview: "Design patterns are reusable solutions to common programming problems. Understanding design patterns helps you write more maintainable, scalable, and testable code. This tutorial covers essential JavaScript design patterns including Module, Singleton, Factory, Observer, Strategy, and Decorator patterns. These patterns are used in React libraries and can help you structure your React applications better.",
+      sections: [
+        {
+          title: "Module Pattern",
+          content: "The Module pattern provides a way to create private and public members, encapsulating functionality.\n\nModule Pattern:\n• Encapsulates code\n• Private and public members\n• Avoids global namespace pollution\n• Can use IIFE or ES6 modules\n\nBenefits:\n• Code organization\n• Privacy\n• Reusability\n• Maintainability",
+          videoUrl: "https://www.youtube.com/watch?v=tv-_1er1mWI",
+          codeExample: {
+            code: `// Module pattern with IIFE
+const MyModule = (function() {
+  // Private variables
+  let privateVar = 0;
+  
+  // Private function
+  function privateFunction() {
+    return privateVar;
+  }
+  
+  // Public API
+  return {
+    // Public method
+    publicMethod: function() {
+      return privateFunction();
+    },
+    
+    // Public method that modifies private state
+    setValue: function(val) {
+      privateVar = val;
+    },
+    
+    // Public property
+    publicProperty: "I'm public"
+  };
+})();
+
+MyModule.setValue(10);
+console.log(MyModule.publicMethod()); // 10
+console.log(MyModule.publicProperty); // "I'm public"
+// console.log(MyModule.privateVar); // undefined (private)
+
+// Module pattern with ES6 modules
+// mathUtils.js
+let privateCounter = 0;
+
+export function increment() {
+  privateCounter++;
+  return privateCounter;
+}
+
+export function decrement() {
+  privateCounter--;
+  return privateCounter;
+}
+
+export function getCount() {
+  return privateCounter;
+}
+
+// main.js
+import { increment, decrement, getCount } from './mathUtils';
+
+increment();
+increment();
+console.log(getCount()); // 2`,
+            explanation: "Module pattern encapsulates code with private and public members. Use IIFE for traditional modules or ES6 modules for modern JavaScript. Keeps code organized and prevents global namespace pollution."
+          }
+        },
+        {
+          title: "Singleton Pattern",
+          content: "Singleton ensures a class has only one instance and provides global access to it.\n\nSingleton Pattern:\n• Only one instance exists\n• Global access point\n• Lazy initialization\n• Useful for shared resources\n\nUse Cases:\n• Configuration objects\n• Database connections\n• Logging services\n• Cache managers",
+          videoUrl: "https://www.youtube.com/watch?v=tv-_1er1mWI",
+          codeExample: {
+            code: `// Singleton with function
+const Singleton = (function() {
+  let instance;
+  
+  function createInstance() {
+    return {
+      name: "Singleton Instance",
+      getData: function() {
+        return "Some data";
+      }
+    };
+  }
+  
+  return {
+    getInstance: function() {
+      if (!instance) {
+        instance = createInstance();
+      }
+      return instance;
+    }
+  };
+})();
+
+const instance1 = Singleton.getInstance();
+const instance2 = Singleton.getInstance();
+console.log(instance1 === instance2); // true (same instance)
+
+// Singleton with class
+class Database {
+  constructor() {
+    if (Database.instance) {
+      return Database.instance;
+    }
+    
+    this.connection = "Connected";
+    Database.instance = this;
+    return this;
+  }
+  
+  query(sql) {
+    return \`Executing: \${sql}\`;
+  }
+}
+
+const db1 = new Database();
+const db2 = new Database();
+console.log(db1 === db2); // true
+
+// Modern ES6 singleton
+class Config {
+  static instance = null;
+  
+  constructor() {
+    if (Config.instance) {
+      return Config.instance;
+    }
+    
+    this.settings = {};
+    Config.instance = this;
+  }
+  
+  set(key, value) {
+    this.settings[key] = value;
+  }
+  
+  get(key) {
+    return this.settings[key];
+  }
+}
+
+const config1 = new Config();
+const config2 = new Config();
+config1.set("theme", "dark");
+console.log(config2.get("theme")); // "dark" (same instance)`,
+            explanation: "Singleton ensures only one instance exists. Useful for shared resources like configuration, database connections, or logging services. Be careful - can make testing harder."
+          }
+        },
+        {
+          title: "Factory Pattern",
+          content: "Factory pattern creates objects without specifying the exact class. It provides a way to create objects based on a condition or parameter.\n\nFactory Pattern:\n• Creates objects based on input\n• Hides object creation logic\n• Centralizes object creation\n• Flexible and extensible\n\nUse Cases:\n• Creating different object types\n• Complex object initialization\n• Dynamic object creation\n• Plugin systems",
+          videoUrl: "https://www.youtube.com/watch?v=tv-_1er1mWI",
+          codeExample: {
+            code: `// Simple factory function
+function createUser(type, name) {
+  switch(type) {
+    case "admin":
+      return {
+        name,
+        role: "admin",
+        permissions: ["read", "write", "delete"]
+      };
+    case "user":
+      return {
+        name,
+        role: "user",
+        permissions: ["read"]
+      };
+    default:
+      throw new Error("Unknown user type");
+  }
+}
+
+const admin = createUser("admin", "Alice");
+const user = createUser("user", "Bob");
+
+// Factory with classes
+class Car {
+  constructor(make, model) {
+    this.make = make;
+    this.model = model;
+  }
+}
+
+class Truck {
+  constructor(make, model) {
+    this.make = make;
+    this.model = model;
+  }
+}
+
+class VehicleFactory {
+  createVehicle(type, make, model) {
+    switch(type) {
+      case "car":
+        return new Car(make, model);
+      case "truck":
+        return new Truck(make, model);
+      default:
+        throw new Error("Unknown vehicle type");
+    }
+  }
+}
+
+const factory = new VehicleFactory();
+const car = factory.createVehicle("car", "Toyota", "Camry");
+const truck = factory.createVehicle("truck", "Ford", "F-150");
+
+// Factory in React (preview)
+function createComponent(type, props) {
+  const components = {
+    button: () => <button {...props} />,
+    input: () => <input {...props} />,
+    div: () => <div {...props} />
+  };
+  
+  return components[type]?.() || null;
+}`,
+            explanation: "Factory pattern centralizes object creation. Creates objects based on input without exposing creation logic. Useful for creating different types of objects dynamically."
+          }
+        },
+        {
+          title: "Observer Pattern",
+          content: "Observer pattern defines a one-to-many dependency between objects. When one object changes state, all dependents are notified.\n\nObserver Pattern:\n• Subject maintains list of observers\n• Observers subscribe/unsubscribe\n• Subject notifies observers of changes\n• Loose coupling between subject and observers\n\nUse Cases:\n• Event systems\n• Model-View updates\n• React state management\n• Pub/Sub systems",
+          videoUrl: "https://www.youtube.com/watch?v=tv-_1er1mWI",
+          codeExample: {
+            code: `// Observer pattern implementation
+class Subject {
+  constructor() {
+    this.observers = [];
+  }
+  
+  subscribe(observer) {
+    this.observers.push(observer);
+  }
+  
+  unsubscribe(observer) {
+    this.observers = this.observers.filter(obs => obs !== observer);
+  }
+  
+  notify(data) {
+    this.observers.forEach(observer => observer.update(data));
+  }
+}
+
+class Observer {
+  constructor(name) {
+    this.name = name;
+  }
+  
+  update(data) {
+    console.log(\`\${this.name} received: \${data}\`);
+  }
+}
+
+// Usage
+const subject = new Subject();
+const observer1 = new Observer("Observer 1");
+const observer2 = new Observer("Observer 2");
+
+subject.subscribe(observer1);
+subject.subscribe(observer2);
+
+subject.notify("Hello!"); 
+// Observer 1 received: Hello!
+// Observer 2 received: Hello!
+
+subject.unsubscribe(observer1);
+subject.notify("Goodbye!");
+// Observer 2 received: Goodbye!
+
+// Observer pattern in React (preview)
+// React's useState is similar to observer pattern
+function useObserver(initialValue) {
+  const [value, setValue] = useState(initialValue);
+  const observers = useRef([]);
+  
+  const subscribe = useCallback((callback) => {
+    observers.current.push(callback);
+    return () => {
+      observers.current = observers.current.filter(cb => cb !== callback);
+    };
+  }, []);
+  
+  const update = useCallback((newValue) => {
+    setValue(newValue);
+    observers.current.forEach(callback => callback(newValue));
+  }, []);
+  
+  return { value, update, subscribe };
+}`,
+            explanation: "Observer pattern enables one-to-many communication. Subject notifies observers of changes. Similar to React's state management and event systems. Enables loose coupling."
+          }
+        }
+      ],
+      conclusion: "Design patterns provide proven solutions to common problems. You've learned Module, Singleton, Factory, and Observer patterns. These patterns help you write more maintainable, scalable code. Understanding patterns helps you recognize them in libraries and frameworks, and apply them in your own code. Practice implementing these patterns and look for opportunities to use them in your React applications."
+    }
+  },
+  {
+    id: "js-intermediate-4",
+    title: "JavaScript Runtime Execution Order: Event Loop Deep Dive",
+    description: "Master JavaScript's execution order: understand how synchronous code, Promises, and setTimeout execute. Learn the event loop, call stack, microtask queue, and macrotask queue.",
+    level: "intermediate",
+    estimatedTime: "70 min",
+    topics: ["Event Loop", "Call Stack", "Microtask Queue", "Macrotask Queue", "Execution Order", "Promise Queue"],
+    prerequisites: ["Asynchronous JavaScript: Promises and async/await"],
+    videoUrl: "https://www.youtube.com/watch?v=8aGhZQoF2QU", // JavaScript Event Loop Explained
+    content: {
+      overview: "Understanding JavaScript's execution order is crucial for debugging async code and writing performant applications. JavaScript executes code in a specific order: synchronous code first, then microtasks (Promises), then macrotasks (setTimeout, setInterval). This tutorial covers the event loop, call stack, microtask queue, macrotask queue, and how to predict execution order. You'll learn to solve complex execution order problems and understand why certain code runs when it does.",
+      sections: [
+        {
+          title: "Understanding the Event Loop",
+          content: "The event loop is JavaScript's mechanism for handling asynchronous operations. It manages the execution of code, callbacks, and events.\n\nEvent Loop Components:\n• Call Stack - Where synchronous code executes\n• Web APIs - Browser APIs (setTimeout, fetch, DOM)\n• Callback Queue (Macrotask Queue) - For setTimeout, setInterval\n• Microtask Queue - For Promises, queueMicrotask\n• Event Loop - Coordinates everything\n\nExecution Flow:\n1. Execute all synchronous code from call stack\n2. Execute all microtasks (Promises)\n3. Execute one macrotask (setTimeout callback)\n4. Repeat from step 2\n\nKey Rule: Microtasks always run before macrotasks!",
+          videoUrl: "https://www.youtube.com/watch?v=8aGhZQoF2QU",
+          codeExample: {
+            code: `// Basic execution order
+console.log("1 - Synchronous");
+
+setTimeout(() => {
+  console.log("2 - setTimeout (Macrotask)");
+}, 0);
+
+Promise.resolve().then(() => {
+  console.log("3 - Promise (Microtask)");
+});
+
+console.log("4 - Synchronous");
+
+// Output: 1, 4, 3, 2
+// Explanation:
+// 1. "1" - Synchronous code runs first
+// 2. setTimeout - Moved to Web API, callback queued in Macrotask Queue
+// 3. Promise - Moved to Microtask Queue
+// 4. "4" - Synchronous code continues
+// 5. "3" - Microtasks run (Promises have higher priority)
+// 6. "2" - Macrotasks run after microtasks
+
+// Visual representation:
+// Call Stack: [main]
+// 1. console.log("1") executes → "1" printed
+// 2. setTimeout → Web API → Macrotask Queue
+// 3. Promise.resolve().then() → Microtask Queue
+// 4. console.log("4") executes → "4" printed
+// 5. Call stack empty → Process Microtask Queue → "3" printed
+// 6. Process Macrotask Queue → "2" printed`,
+            explanation: "The event loop coordinates execution. Synchronous code runs first, then all microtasks, then one macrotask. This is why Promises run before setTimeout callbacks."
+          }
+        },
+        {
+          title: "The Classic Interview Question",
+          content: "This is one of the most common JavaScript interview questions. Understanding it demonstrates deep knowledge of the event loop.\n\nQuestion: What is the execution order?\n\nCode:\n```javascript\nconsole.log(1)\nnew Promise(resolve => resolve()).then(() => console.log(2))\nsetTimeout(() => console.log(3), 0)\nconsole.log(4)\n```\n\nAnswer: 1, 4, 2, 3\n\nWhy?\n• console.log(1) - Synchronous, runs immediately\n• Promise - Added to Microtask Queue\n• setTimeout - Added to Macrotask Queue\n• console.log(4) - Synchronous, runs immediately\n• Microtask Queue processed - console.log(2) runs\n• Macrotask Queue processed - console.log(3) runs",
+          videoUrl: "https://www.youtube.com/watch?v=8aGhZQoF2QU",
+          codeExample: {
+            code: `// The classic question
+console.log(1);
+
+new Promise((resolve) => {
+  resolve();
+}).then(() => {
+  console.log(2);
+});
+
+setTimeout(() => {
+  console.log(3);
+}, 0);
+
+console.log(4);
+
+// Output: 1, 4, 2, 3
+
+// Step-by-step execution:
+// Step 1: console.log(1) → "1" printed (synchronous)
+// Step 2: Promise created, resolve() called immediately
+//         → .then() callback added to Microtask Queue
+// Step 3: setTimeout → Web API → callback added to Macrotask Queue
+// Step 4: console.log(4) → "4" printed (synchronous)
+// Step 5: Call stack empty, process Microtask Queue
+//         → console.log(2) → "2" printed
+// Step 6: Process Macrotask Queue
+//         → console.log(3) → "3" printed
+
+// More complex example
+console.log("Start");
+
+setTimeout(() => console.log("Timeout 1"), 0);
+
+Promise.resolve().then(() => {
+  console.log("Promise 1");
+  setTimeout(() => console.log("Timeout 2"), 0);
+});
+
+Promise.resolve().then(() => {
+  console.log("Promise 2");
+});
+
+setTimeout(() => console.log("Timeout 3"), 0);
+
+console.log("End");
+
+// Output: Start, End, Promise 1, Promise 2, Timeout 1, Timeout 3, Timeout 2
+// Explanation:
+// 1. "Start" - synchronous
+// 2. setTimeout 1 → Macrotask Queue
+// 3. Promise 1 → Microtask Queue
+// 4. Promise 2 → Microtask Queue
+// 5. setTimeout 3 → Macrotask Queue
+// 6. "End" - synchronous
+// 7. Process Microtasks: "Promise 1", "Promise 2"
+//    - Promise 1 adds setTimeout 2 to Macrotask Queue
+// 8. Process Macrotasks: "Timeout 1", "Timeout 3", "Timeout 2"`,
+            explanation: "This classic question tests understanding of execution order. Remember: synchronous → all microtasks → one macrotask → repeat. Promises (microtasks) always run before setTimeout (macrotasks)."
+          }
+        },
+        {
+          title: "Microtask Queue vs Macrotask Queue",
+          content: "Understanding the difference between microtasks and macrotasks is crucial for predicting execution order.\n\nMicrotask Queue (Higher Priority):\n• Promise.then() / Promise.catch() / Promise.finally()\n• queueMicrotask()\n• MutationObserver callbacks\n• Runs after current execution, before macrotasks\n• All microtasks run before next macrotask\n\nMacrotask Queue (Lower Priority):\n• setTimeout()\n• setInterval()\n• setImmediate() (Node.js)\n• I/O callbacks\n• UI rendering\n• Runs after all microtasks complete\n• One macrotask per event loop iteration",
+          videoUrl: "https://www.youtube.com/watch?v=8aGhZQoF2QU",
+          codeExample: {
+            code: `// Microtasks vs Macrotasks
+console.log("1");
+
+// Macrotask
+setTimeout(() => console.log("Macrotask 1"), 0);
+
+// Microtask
+Promise.resolve().then(() => console.log("Microtask 1"));
+
+// Macrotask
+setTimeout(() => console.log("Macrotask 2"), 0);
+
+// Microtask
+Promise.resolve().then(() => {
+  console.log("Microtask 2");
+  // This microtask adds another microtask
+  Promise.resolve().then(() => console.log("Microtask 3"));
+});
+
+console.log("2");
+
+// Output: 1, 2, Microtask 1, Microtask 2, Microtask 3, Macrotask 1, Macrotask 2
+
+// All microtasks run before any macrotask
+// Even if microtasks add more microtasks, they all run first
+
+// queueMicrotask() - explicit microtask
+console.log("Start");
+
+queueMicrotask(() => {
+  console.log("Microtask from queueMicrotask");
+});
+
+Promise.resolve().then(() => {
+  console.log("Microtask from Promise");
+});
+
+setTimeout(() => {
+  console.log("Macrotask from setTimeout");
+}, 0);
+
+console.log("End");
+
+// Output: Start, End, Microtask from queueMicrotask, Microtask from Promise, Macrotask from setTimeout
+// Note: queueMicrotask runs before Promise.then() in some engines, but both are microtasks
+
+// Nested microtasks
+Promise.resolve().then(() => {
+  console.log("1");
+  Promise.resolve().then(() => {
+    console.log("2");
+    Promise.resolve().then(() => {
+      console.log("3");
+    });
+  });
+});
+
+setTimeout(() => console.log("4"), 0);
+
+// Output: 1, 2, 3, 4
+// All nested microtasks run before macrotasks`,
+            explanation: "Microtasks (Promises, queueMicrotask) have higher priority than macrotasks (setTimeout). All microtasks run before any macrotask, even if microtasks create more microtasks."
+          }
+        },
+        {
+          title: "Async/Await and Execution Order",
+          content: "async/await is syntactic sugar over Promises, so it follows the same microtask rules.\n\nAsync Function Behavior:\n• async functions return Promises\n• await pauses execution, doesn't block\n• Code after await runs as microtask\n• Follows Promise execution order\n\nExecution Flow:\n• Synchronous code before await runs immediately\n• await pauses, returns control\n• Remaining code runs as microtask\n• Other microtasks can run during await",
+          videoUrl: "https://www.youtube.com/watch?v=8aGhZQoF2QU",
+          codeExample: {
+            code: `// async/await execution order
+console.log("1");
+
+async function asyncFunc() {
+  console.log("2");
+  await Promise.resolve();
+  console.log("3");
+}
+
+asyncFunc();
+
+console.log("4");
+
+// Output: 1, 2, 4, 3
+// Explanation:
+// 1. "1" - synchronous
+// 2. asyncFunc() called, "2" printed (synchronous part)
+// 3. await pauses, returns control
+// 4. "4" - synchronous code continues
+// 5. "3" - runs as microtask after await resolves
+
+// More complex async/await
+console.log("Start");
+
+async function func1() {
+  console.log("func1 start");
+  await Promise.resolve();
+  console.log("func1 end");
+}
+
+async function func2() {
+  console.log("func2 start");
+  await Promise.resolve();
+  console.log("func2 end");
+}
+
+func1();
+func2();
+
+setTimeout(() => console.log("setTimeout"), 0);
+
+console.log("End");
+
+// Output: Start, func1 start, func2 start, End, func1 end, func2 end, setTimeout
+// Explanation:
+// 1. "Start" - synchronous
+// 2. func1() called, "func1 start" printed
+// 3. func2() called, "func2 start" printed
+// 4. Both await, return control
+// 5. "End" - synchronous
+// 6. Microtasks: "func1 end", "func2 end"
+// 7. Macrotask: "setTimeout"
+
+// async/await with setTimeout
+async function test() {
+  console.log("1");
+  await new Promise(resolve => {
+    setTimeout(() => {
+      console.log("2");
+      resolve();
+    }, 0);
+  });
+  console.log("3");
+}
+
+test();
+console.log("4");
+
+// Output: 1, 4, 2, 3
+// Explanation:
+// 1. "1" - synchronous part of async function
+// 2. await with setTimeout → setTimeout is macrotask
+// 3. "4" - synchronous code continues
+// 4. setTimeout callback runs → "2" printed, Promise resolves
+// 5. Code after await runs → "3" printed`,
+            explanation: "async/await follows Promise execution order. Code before await runs synchronously, code after await runs as microtask. await doesn't block the event loop."
+          }
+        },
+        {
+          title: "Common Execution Order Patterns",
+          content: "Recognizing common patterns helps you predict execution order quickly.\n\nPattern 1: Promise Chain\n• Each .then() adds to microtask queue\n• All run before macrotasks\n\nPattern 2: setTimeout in Promise\n• setTimeout callback is macrotask\n• Runs after all microtasks\n\nPattern 3: Nested Async Operations\n• Inner operations queue before outer completes\n• Microtasks process in order\n\nPattern 4: Promise.all()\n• All Promises resolve, then .then() runs\n• Single microtask for all results",
+          videoUrl: "https://www.youtube.com/watch?v=8aGhZQoF2QU",
+          codeExample: {
+            code: `// Pattern 1: Promise chain
+Promise.resolve()
+  .then(() => console.log("1"))
+  .then(() => console.log("2"))
+  .then(() => console.log("3"));
+
+setTimeout(() => console.log("4"), 0);
+
+// Output: 1, 2, 3, 4
+// All .then() callbacks are microtasks
+
+// Pattern 2: setTimeout in Promise
+Promise.resolve().then(() => {
+  console.log("1");
+  setTimeout(() => console.log("2"), 0);
+});
+
+setTimeout(() => console.log("3"), 0);
+
+// Output: 1, 3, 2
+// Explanation:
+// 1. Promise resolves → "1" printed (microtask)
+// 2. setTimeout in Promise → added to Macrotask Queue
+// 3. setTimeout outside → added to Macrotask Queue
+// 4. Both macrotasks run: "3", "2" (order depends on queue)
+
+// Pattern 3: Nested Promises
+Promise.resolve().then(() => {
+  console.log("1");
+  Promise.resolve().then(() => {
+    console.log("2");
+    Promise.resolve().then(() => {
+      console.log("3");
+    });
+  });
+});
+
+setTimeout(() => console.log("4"), 0);
+
+// Output: 1, 2, 3, 4
+// All nested microtasks run before macrotasks
+
+// Pattern 4: Promise.all()
+Promise.all([
+  Promise.resolve().then(() => console.log("1")),
+  Promise.resolve().then(() => console.log("2"))
+]).then(() => console.log("3"));
+
+setTimeout(() => console.log("4"), 0);
+
+// Output: 1, 2, 3, 4
+// Individual Promises run first, then Promise.all .then()`,
+            explanation: "Recognize common patterns: Promise chains, setTimeout in Promises, nested async operations. Understanding these patterns helps predict execution order quickly."
+          }
+        },
+        {
+          title: "Debugging Execution Order Issues",
+          content: "Common issues and how to debug them.\n\nCommon Issues:\n• Code running in unexpected order\n• State updates not reflecting\n• Race conditions\n• Stale closures\n\nDebugging Techniques:\n• Add console.logs with labels\n• Use debugger statement\n• Check call stack in DevTools\n• Understand microtask vs macrotask\n• Use async/await for clearer flow",
+          videoUrl: "https://www.youtube.com/watch?v=8aGhZQoF2QU",
+          codeExample: {
+            code: `// Issue: State not updating as expected
+function Component() {
+  const [count, setCount] = useState(0);
+  
+  const handleClick = () => {
+    setCount(count + 1);
+    setCount(count + 1);
+    console.log(count); // Still 0! (stale closure)
+  };
+  
+  // Solution: Use functional updates
+  const handleClickFixed = () => {
+    setCount(c => c + 1);
+    setCount(c => c + 1);
+    // Both updates batched, count will be 2
+  };
+}
+
+// Issue: Execution order confusion
+console.log("1");
+setTimeout(() => console.log("2"), 0);
+Promise.resolve().then(() => console.log("3"));
+console.log("4");
+
+// Debug: Add labels
+console.log("[SYNC] 1");
+setTimeout(() => console.log("[MACRO] 2"), 0);
+Promise.resolve().then(() => console.log("[MICRO] 3"));
+console.log("[SYNC] 4");
+
+// Use DevTools
+// 1. Set breakpoints
+// 2. Check Call Stack
+// 3. Monitor Promise and setTimeout queues
+// 4. Use Performance tab to see execution timeline
+
+// Issue: Race condition
+let data = null;
+
+fetch("/api/data").then(res => {
+  data = res.json();
+});
+
+// data might be null here!
+console.log(data);
+
+// Solution: Use async/await
+async function loadData() {
+  const data = await fetch("/api/data").then(r => r.json());
+  console.log(data); // Guaranteed to have data
+  return data;
+}`,
+            explanation: "Debug execution order issues by understanding microtasks vs macrotasks, using functional updates in React, and leveraging DevTools. async/await makes execution flow clearer."
+          }
+        }
+      ],
+      conclusion: "Understanding JavaScript's execution order is essential for writing correct async code and debugging issues. You've learned about the event loop, microtask queue, macrotask queue, and how to predict execution order. Remember: synchronous code → all microtasks → one macrotask → repeat. This knowledge helps you write better React code, especially when working with useEffect, async operations, and state updates. Practice predicting execution order with different combinations of Promises, setTimeout, and async/await."
+    }
+  },
+
+  // ADVANCED LEVEL - JavaScript
+  {
+    id: "js-advanced-1",
+    title: "Advanced JavaScript: Memory Management and Performance",
+    description: "Deep dive into JavaScript memory management, garbage collection, memory leaks, and performance optimization techniques.",
+    level: "advanced",
+    estimatedTime: "90 min",
+    topics: ["Memory Management", "Garbage Collection", "Memory Leaks", "Performance", "Profiling"],
+    prerequisites: ["JavaScript Closures and Scope Deep Dive"],
+    videoUrl: "https://www.youtube.com/watch?v=AeUCN2lBq0s", // JavaScript Memory Management
+    content: {
+      overview: "Understanding JavaScript memory management is crucial for building performant applications. This tutorial covers how JavaScript manages memory, garbage collection, common memory leaks, performance optimization techniques, and profiling tools. This knowledge is essential for building large-scale React applications that perform well.",
+      sections: [
+        {
+          title: "JavaScript Memory Management",
+          content: "JavaScript automatically manages memory through garbage collection. Understanding how this works helps you write efficient code.\n\nMemory Lifecycle:\n• Allocation - Memory is allocated when needed\n• Use - Memory is used by your program\n• Release - Memory is freed when no longer needed\n\nGarbage Collection:\n• Automatic memory management\n• Marks and sweeps unreachable objects\n• Runs periodically\n• Can cause performance hiccups",
+          videoUrl: "https://www.youtube.com/watch?v=AeUCN2lBq0s",
+          codeExample: {
+            code: `// Memory allocation
+let obj = { name: "Alice" }; // Memory allocated
+obj = null; // Memory can be garbage collected
+
+// Memory leaks - global variables
+// ❌ BAD: Global variable never freed
+window.data = new Array(1000000).fill(0);
+
+// ✅ GOOD: Local variable
+function processData() {
+  const data = new Array(1000000).fill(0);
+  // data is garbage collected after function ends
+}
+
+// Memory leaks - closures
+// ❌ BAD: Closure holds reference
+function createLeak() {
+  const largeData = new Array(1000000).fill(0);
+  
+  return function() {
+    // Closure holds reference to largeData even if unused
+    console.log("Leak");
+  };
+}
+
+// ✅ GOOD: Only capture what you need
+function createNoLeak() {
+  return function() {
+    console.log("No leak");
+  };
+}
+
+// Memory leaks - event listeners
+// ❌ BAD: Event listeners not removed
+function addListener() {
+  const button = document.getElementById("btn");
+  button.addEventListener("click", handleClick);
+  // Listener never removed
+}
+
+// ✅ GOOD: Remove listeners
+function addListener() {
+  const button = document.getElementById("btn");
+  button.addEventListener("click", handleClick);
+  
+  return () => {
+    button.removeEventListener("click", handleClick);
+  };
+}
+
+// Memory leaks in React
+function Component() {
+  const [data, setData] = useState(null);
+  
+  useEffect(() => {
+    const controller = new AbortController();
+    
+    fetch("/api/data", { signal: controller.signal })
+      .then(res => res.json())
+      .then(setData);
+    
+    // ✅ Cleanup prevents memory leaks
+    return () => {
+      controller.abort();
+    };
+  }, []);
+}`,
+            explanation: "JavaScript automatically manages memory. Avoid memory leaks by: removing event listeners, cleaning up closures, avoiding global variables, and properly cleaning up in React useEffect."
+          }
+        },
+        {
+          title: "Performance Optimization Techniques",
+          content: "Optimize JavaScript performance through various techniques: debouncing, throttling, lazy loading, and code splitting.\n\nOptimization Strategies:\n• Debounce/throttle event handlers\n• Lazy load resources\n• Code splitting\n• Memoization\n• Virtual scrolling\n• Web Workers for heavy computation",
+          videoUrl: "https://www.youtube.com/watch?v=AeUCN2lBq0s",
+          codeExample: {
+            code: `// Debouncing (wait for pause)
+function debounce(func, delay) {
+  let timeoutId;
+  return function(...args) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => func.apply(this, args), delay);
+  };
+}
+
+const debouncedSearch = debounce((query) => {
+  console.log("Searching:", query);
+}, 300);
+
+// Throttling (limit execution frequency)
+function throttle(func, limit) {
+  let inThrottle;
+  return function(...args) {
+    if (!inThrottle) {
+      func.apply(this, args);
+      inThrottle = true;
+      setTimeout(() => inThrottle = false, limit);
+    }
+  };
+}
+
+const throttledScroll = throttle(() => {
+  console.log("Scrolled");
+}, 100);
+
+// Memoization
+function memoize(fn) {
+  const cache = {};
+  return function(...args) {
+    const key = JSON.stringify(args);
+    if (cache[key]) {
+      return cache[key];
+    }
+    const result = fn.apply(this, args);
+    cache[key] = result;
+    return result;
+  };
+}
+
+const expensiveFunction = memoize((n) => {
+  // Expensive calculation
+  return n * n;
+});
+
+// Lazy loading
+const LazyComponent = React.lazy(() => import('./HeavyComponent'));
+
+// Code splitting
+import('./module').then(module => {
+  module.doSomething();
+});`,
+            explanation: "Optimize performance with debouncing, throttling, memoization, lazy loading, and code splitting. These techniques reduce unnecessary work and improve user experience."
+          }
+        }
+      ],
+      conclusion: "Memory management and performance optimization are crucial for building scalable applications. You've learned about garbage collection, memory leaks, and optimization techniques. Apply these concepts in your React applications to ensure they perform well at scale."
+    }
+  },
+  {
+    id: "js-advanced-2",
+    title: "Functional Programming in JavaScript",
+    description: "Master functional programming concepts: pure functions, immutability, higher-order functions, and functional composition.",
+    level: "advanced",
+    estimatedTime: "90 min",
+    topics: ["Pure Functions", "Immutability", "Higher-Order Functions", "Composition", "Currying", "Recursion"],
+    prerequisites: ["JavaScript Functions and Scope"],
+    videoUrl: "https://www.youtube.com/watch?v=e-5obm1G_FY", // Functional Programming in JavaScript
+    content: {
+      overview: "Functional programming is a programming paradigm that treats computation as the evaluation of mathematical functions. Many React patterns are inspired by functional programming. This tutorial covers pure functions, immutability, higher-order functions, function composition, currying, and recursion. Understanding functional programming helps you write better React code.",
+      sections: [
+        {
+          title: "Pure Functions",
+          content: "Pure functions always return the same output for the same input and have no side effects.\n\nPure Function Characteristics:\n• Same input → same output\n• No side effects\n• Doesn't depend on external state\n• Predictable and testable\n\nBenefits:\n• Easier to test\n• Easier to reason about\n• Can be memoized\n• Parallelizable",
+          videoUrl: "https://www.youtube.com/watch?v=e-5obm1G_FY",
+          codeExample: {
+            code: `// ✅ Pure function
+function add(a, b) {
+  return a + b;
+}
+
+// Same input always gives same output
+console.log(add(2, 3)); // 5
+console.log(add(2, 3)); // 5
+
+// ❌ Impure function (depends on external state)
+let counter = 0;
+function increment() {
+  counter++;
+  return counter;
+}
+
+// ❌ Impure function (side effect)
+function logMessage(msg) {
+  console.log(msg); // Side effect: logging
+  return msg;
+}
+
+// ✅ Pure function (no side effects)
+function formatMessage(msg) {
+  return \`[LOG] \${msg}\`;
+}
+
+// Pure functions in React
+function Button({ label, onClick }) {
+  // Pure component - same props → same output
+  return <button onClick={onClick}>{label}</button>;
+}
+
+// Impure component (uses external state)
+function Clock() {
+  const [time, setTime] = useState(new Date());
+  // Uses state, but component itself is still "pure" in React's sense
+  return <div>{time.toString()}</div>;
+}`,
+            explanation: "Pure functions are predictable and testable. They always return the same output for the same input and have no side effects. React components should be pure when possible."
+          }
+        },
+        {
+          title: "Immutability",
+          content: "Immutability means data cannot be changed after creation. Instead, create new data structures.\n\nImmutability Benefits:\n• Prevents accidental mutations\n• Easier to track changes\n• Better for React (re-renders)\n• Enables time-travel debugging\n\nIn JavaScript:\n• Use const for variables\n• Create new objects/arrays\n• Use spread operator\n• Use immutable libraries",
+          videoUrl: "https://www.youtube.com/watch?v=e-5obm1G_FY",
+          codeExample: {
+            code: `// ❌ Mutation
+const user = { name: "Alice", age: 30 };
+user.age = 31; // Mutates original object
+
+// ✅ Immutability
+const user = { name: "Alice", age: 30 };
+const updatedUser = { ...user, age: 31 }; // New object
+
+// ❌ Array mutation
+const numbers = [1, 2, 3];
+numbers.push(4); // Mutates array
+
+// ✅ Immutable array operations
+const numbers = [1, 2, 3];
+const newNumbers = [...numbers, 4]; // New array
+
+// Immutability in React
+function Component() {
+  const [items, setItems] = useState([1, 2, 3]);
+  
+  const addItem = (item) => {
+    // ✅ Create new array
+    setItems([...items, item]);
+    
+    // ❌ Don't mutate
+    // items.push(item);
+    // setItems(items);
+  };
+  
+  const updateItem = (index, newValue) => {
+    // ✅ Create new array with updated item
+    setItems(items.map((item, i) => 
+      i === index ? newValue : item
+    ));
+  };
+}`,
+            explanation: "Immutability prevents bugs and makes code easier to reason about. Always create new objects/arrays in React instead of mutating existing ones. Essential for React's re-rendering."
+          }
+        },
+        {
+          title: "Function Composition",
+          content: "Function composition combines simple functions to build complex ones.\n\nComposition:\n• Combine functions\n• Output of one is input of next\n• Build complex behavior from simple parts\n• More readable than nested calls\n\nBenefits:\n• Reusable functions\n• Easier to test\n• More readable\n• Follows single responsibility",
+          videoUrl: "https://www.youtube.com/watch?v=e-5obm1G_FY",
+          codeExample: {
+            code: `// Simple functions
+const add = (a, b) => a + b;
+const multiply = (a, b) => a * b;
+const square = x => x * x;
+
+// Composition
+const addThenSquare = (a, b) => square(add(a, b));
+console.log(addThenSquare(2, 3)); // 25
+
+// Compose utility
+const compose = (...fns) => (value) => 
+  fns.reduceRight((acc, fn) => fn(acc), value);
+
+const pipe = (...fns) => (value) => 
+  fns.reduce((acc, fn) => fn(acc), value);
+
+// Usage
+const process = pipe(
+  (x) => x + 1,
+  (x) => x * 2,
+  (x) => x.toString()
+);
+
+console.log(process(5)); // "12"
+
+// Composition in React
+const withAuth = (Component) => (props) => {
+  if (!props.isAuthenticated) {
+    return <Login />;
+  }
+  return <Component {...props} />;
+};
+
+const withLogging = (Component) => (props) => {
+  console.log("Rendering:", Component.name);
+  return <Component {...props} />;
+};
+
+const EnhancedComponent = withLogging(withAuth(MyComponent));`,
+            explanation: "Function composition combines simple functions to build complex behavior. Makes code more reusable and readable. Used in React for higher-order components and hooks."
+          }
+        },
+        {
+          title: "Currying",
+          content: "Currying transforms a function with multiple arguments into a sequence of functions with single arguments.\n\nCurrying:\n• Function returns another function\n• Each function takes one argument\n• Partial application\n• More flexible function usage\n\nBenefits:\n• Partial application\n• Function reuse\n• More flexible APIs\n• Functional composition",
+          videoUrl: "https://www.youtube.com/watch?v=e-5obm1G_FY",
+          codeExample: {
+            code: `// Regular function
+function add(a, b, c) {
+  return a + b + c;
+}
+
+// Curried function
+function curriedAdd(a) {
+  return function(b) {
+    return function(c) {
+      return a + b + c;
+    };
+  };
+}
+
+// Arrow function currying
+const curriedAdd = a => b => c => a + b + c;
+
+console.log(curriedAdd(1)(2)(3)); // 6
+
+// Partial application
+const add5 = curriedAdd(5);
+const add5And10 = add5(10);
+console.log(add5And10(15)); // 30
+
+// Currying utility
+function curry(fn) {
+  return function curried(...args) {
+    if (args.length >= fn.length) {
+      return fn.apply(this, args);
+    }
+    return function(...nextArgs) {
+      return curried.apply(this, args.concat(nextArgs));
+    };
+  };
+}
+
+const curriedMultiply = curry((a, b, c) => a * b * c);
+console.log(curriedMultiply(2)(3)(4)); // 24
+console.log(curriedMultiply(2, 3)(4)); // 24
+console.log(curriedMultiply(2)(3, 4)); // 24
+
+// Currying in React
+const handleChange = (field) => (event) => {
+  setFormData({
+    ...formData,
+    [field]: event.target.value
+  });
+};
+
+<input onChange={handleChange("name")} />
+<input onChange={handleChange("email")} />`,
+            explanation: "Currying transforms multi-argument functions into sequences of single-argument functions. Enables partial application and more flexible function usage. Useful in React for event handlers."
+          }
+        }
+      ],
+      conclusion: "Functional programming provides powerful patterns for writing maintainable code. You've learned pure functions, immutability, composition, and currying. These concepts are fundamental to React development. Practice these patterns and apply them in your React applications for cleaner, more testable code."
+    }
+  },
+
+  // EXPERT LEVEL - JavaScript
+  {
+    id: "js-expert-1",
+    title: "JavaScript Engine Internals: V8 and Execution",
+    description: "Deep dive into JavaScript engine internals: how V8 works, execution context, call stack, event loop, and optimization techniques.",
+    level: "expert",
+    estimatedTime: "120 min",
+    topics: ["V8 Engine", "Execution Context", "Call Stack", "Event Loop", "JIT Compilation", "Optimization"],
+    prerequisites: ["Advanced JavaScript: Memory Management and Performance"],
+    videoUrl: "https://www.youtube.com/watch?v=8aGhZQoF2QU", // JavaScript Event Loop
+    content: {
+      overview: "Understanding JavaScript engine internals helps you write more performant code and debug complex issues. This expert-level tutorial covers how the V8 engine works, execution context, call stack, event loop, JIT compilation, and optimization techniques. This knowledge is essential for optimizing React applications and understanding performance bottlenecks.",
+      sections: [
+        {
+          title: "JavaScript Engine Overview",
+          content: "JavaScript engines parse, compile, and execute JavaScript code. Understanding how they work helps optimize your code.\n\nEngine Components:\n• Parser - Converts code to AST\n• Compiler - Converts AST to bytecode/machine code\n• Interpreter - Executes code\n• JIT Compiler - Optimizes hot code\n• Garbage Collector - Manages memory\n\nPopular Engines:\n• V8 (Chrome, Node.js)\n• SpiderMonkey (Firefox)\n• JavaScriptCore (Safari)\n• Chakra (Edge, deprecated)",
+          videoUrl: "https://www.youtube.com/watch?v=8aGhZQoF2QU",
+          codeExample: {
+            code: `// Understanding execution
+// 1. Code is parsed into AST
+function add(a, b) {
+  return a + b;
+}
+
+// 2. AST is compiled to bytecode
+// 3. Bytecode is executed by interpreter
+// 4. Hot code is optimized by JIT compiler
+
+// V8 optimization strategies
+// - Inline caching
+// - Hidden classes
+// - Type feedback
+
+// Optimize for V8
+// ✅ Use consistent object shapes
+function createUser(name, age) {
+  return { name, age }; // Consistent shape
+}
+
+// ❌ Avoid changing object shapes
+const obj = {};
+obj.name = "Alice"; // Shape 1
+obj.age = 30; // Shape 2 (different shape)
+
+// ✅ Prefer arrays for numeric indices
+const arr = [1, 2, 3]; // Optimized
+
+// ❌ Avoid sparse arrays
+const sparse = [];
+sparse[1000] = 1; // Not optimized`,
+            explanation: "JavaScript engines optimize code through parsing, compilation, and JIT optimization. Write code with consistent object shapes and avoid patterns that prevent optimization."
+          }
+        },
+        {
+          title: "Execution Context and Call Stack",
+          content: "Understanding execution context and call stack is crucial for debugging and understanding JavaScript behavior.\n\nExecution Context:\n• Global context\n• Function context\n• Eval context\n\nContext Contains:\n• Variable environment\n• Lexical environment\n• this binding\n• Outer environment reference\n\nCall Stack:\n• Tracks function calls\n• LIFO structure\n• Stack overflow possible",
+          videoUrl: "https://www.youtube.com/watch?v=8aGhZQoF2QU",
+          codeExample: {
+            code: `// Execution context creation
+function outer() {
+  const a = 1;
+  
+  function inner() {
+    const b = 2;
+    console.log(a, b);
+  }
+  
+  inner();
+}
+
+outer();
+
+// Call stack visualization:
+// 1. Global context pushed
+// 2. outer() context pushed
+// 3. inner() context pushed
+// 4. inner() context popped
+// 5. outer() context popped
+// 6. Global context remains
+
+// Stack overflow
+function recursive() {
+  recursive(); // Infinite recursion
+}
+
+// Maximum call stack size exceeded
+// recursive(); // ❌ Error
+
+// Tail call optimization (ES6)
+function factorial(n, acc = 1) {
+  if (n <= 1) return acc;
+  return factorial(n - 1, n * acc); // Tail call
+}
+
+// Proper tail calls allow infinite recursion (in strict mode)`,
+            explanation: "Execution context contains variable environment, lexical environment, and this binding. Call stack tracks function calls. Understanding this helps debug and optimize code."
+          }
+        },
+        {
+          title: "Event Loop and Asynchronous Execution",
+          content: "The event loop is JavaScript's mechanism for handling asynchronous operations. Understanding it is crucial for async code.\n\nEvent Loop Components:\n• Call stack\n• Web APIs (browser) / C++ APIs (Node.js)\n• Callback queue\n• Microtask queue\n\nExecution Order:\n• Synchronous code first\n• Microtasks (Promises) next\n• Macrotasks (setTimeout) last",
+          videoUrl: "https://www.youtube.com/watch?v=8aGhZQoF2QU",
+          codeExample: {
+            code: `// Event loop execution order
+console.log("1");
+
+setTimeout(() => console.log("2"), 0);
+
+Promise.resolve().then(() => console.log("3"));
+
+console.log("4");
+
+// Output: 1, 4, 3, 2
+// Explanation:
+// 1. "1" - synchronous
+// 2. setTimeout - moved to Web API, callback queued
+// 3. Promise - moved to microtask queue
+// 4. "4" - synchronous
+// 5. "3" - microtask (runs before macrotasks)
+// 6. "2" - macrotask (runs after microtasks)
+
+// Microtasks vs Macrotasks
+console.log("start");
+
+setTimeout(() => console.log("timeout"), 0);
+
+Promise.resolve().then(() => {
+  console.log("promise 1");
+  return Promise.resolve();
+}).then(() => {
+  console.log("promise 2");
+});
+
+console.log("end");
+
+// Output: start, end, promise 1, promise 2, timeout
+
+// Blocking the event loop
+function blocking() {
+  const start = Date.now();
+  while (Date.now() - start < 5000) {
+    // Block for 5 seconds
+  }
+}
+
+// This blocks all JavaScript execution
+// Use Web Workers for heavy computation`,
+            explanation: "Event loop handles asynchronous execution. Microtasks (Promises) run before macrotasks (setTimeout). Understanding execution order is crucial for async code. Avoid blocking the event loop."
+          }
+        }
+      ],
+      conclusion: "Understanding JavaScript engine internals helps you write more performant code and debug complex issues. You've learned about V8, execution context, call stack, and the event loop. Apply this knowledge to optimize your React applications and understand performance characteristics."
+    }
+  },
+
+  // STAFF LEVEL - JavaScript
+  {
+    id: "js-staff-1",
+    title: "JavaScript Architecture and System Design",
+    description: "Master-level JavaScript architecture: building scalable systems, microservices, design patterns at scale, and architectural decisions.",
+    level: "staff",
+    estimatedTime: "180 min",
+    topics: ["System Architecture", "Microservices", "Scalability", "Design Patterns", "Performance", "Security"],
+    prerequisites: ["JavaScript Engine Internals: V8 and Execution"],
+    videoUrl: "https://www.youtube.com/watch?v=x2RNw4M6cME", // JavaScript Architecture
+    content: {
+      overview: "Staff engineers need to make architectural decisions that affect entire systems. This tutorial covers JavaScript architecture at scale: system design, microservices, scalability patterns, security, and performance optimization. You'll learn how to design systems that scale, maintain code quality at scale, and make informed architectural decisions.",
+      sections: [
+        {
+          title: "System Architecture Patterns",
+          content: "Designing JavaScript applications at scale requires understanding architectural patterns.\n\nArchitecture Patterns:\n• Monolithic vs Microservices\n• Serverless architecture\n• Event-driven architecture\n• Layered architecture\n• Modular monolith\n\nConsiderations:\n• Scalability requirements\n• Team size and structure\n• Deployment complexity\n• Performance needs\n• Cost constraints",
+          videoUrl: "https://www.youtube.com/watch?v=x2RNw4M6cME",
+          codeExample: {
+            code: `// Modular architecture
+// services/userService.js
+export class UserService {
+  async getUser(id) {
+    // User logic
+  }
+}
+
+// services/orderService.js
+export class OrderService {
+  async createOrder(data) {
+    // Order logic
+  }
+}
+
+// Event-driven architecture
+class EventBus {
+  constructor() {
+    this.subscribers = {};
+  }
+  
+  subscribe(event, handler) {
+    if (!this.subscribers[event]) {
+      this.subscribers[event] = [];
+    }
+    this.subscribers[event].push(handler);
+  }
+  
+  publish(event, data) {
+    if (this.subscribers[event]) {
+      this.subscribers[event].forEach(handler => handler(data));
+    }
+  }
+}
+
+// Usage
+const eventBus = new EventBus();
+
+eventBus.subscribe('user.created', (user) => {
+  // Send welcome email
+});
+
+eventBus.subscribe('user.created', (user) => {
+  // Create user profile
+});
+
+// Publish event
+eventBus.publish('user.created', { id: 1, name: 'Alice' });`,
+            explanation: "Choose architecture patterns based on scale, team, and requirements. Modular architecture and event-driven patterns help build scalable systems. Consider trade-offs carefully."
+          }
+        },
+        {
+          title: "Scalability and Performance",
+          content: "Designing for scale requires understanding bottlenecks and optimization strategies.\n\nScalability Strategies:\n• Horizontal scaling\n• Caching strategies\n• Database optimization\n• CDN usage\n• Load balancing\n• Database sharding\n\nPerformance Optimization:\n• Code splitting\n• Lazy loading\n• Memoization\n• Virtual scrolling\n• Web Workers\n• Service Workers",
+          videoUrl: "https://www.youtube.com/watch?v=x2RNw4M6cME",
+          codeExample: {
+            code: `// Caching strategy
+class Cache {
+  constructor(ttl = 3600000) {
+    this.cache = new Map();
+    this.ttl = ttl;
+  }
+  
+  set(key, value) {
+    this.cache.set(key, {
+      value,
+      expires: Date.now() + this.ttl
+    });
+  }
+  
+  get(key) {
+    const item = this.cache.get(key);
+    if (!item) return null;
+    
+    if (Date.now() > item.expires) {
+      this.cache.delete(key);
+      return null;
+    }
+    
+    return item.value;
+  }
+}
+
+// Database connection pooling
+class ConnectionPool {
+  constructor(maxConnections = 10) {
+    this.pool = [];
+    this.maxConnections = maxConnections;
+  }
+  
+  async getConnection() {
+    if (this.pool.length < this.maxConnections) {
+      const connection = await createConnection();
+      this.pool.push(connection);
+      return connection;
+    }
+    // Wait for available connection
+    return this.waitForConnection();
+  }
+}
+
+// Load balancing strategy
+class LoadBalancer {
+  constructor(servers) {
+    this.servers = servers;
+    this.current = 0;
+  }
+  
+  getServer() {
+    const server = this.servers[this.current];
+    this.current = (this.current + 1) % this.servers.length;
+    return server;
+  }
+}`,
+            explanation: "Design for scale with caching, connection pooling, and load balancing. Consider horizontal scaling, database optimization, and performance patterns from the start."
+          }
+        }
+      ],
+      conclusion: "Staff-level JavaScript architecture requires understanding system design, scalability, and making informed architectural decisions. You've learned about architecture patterns, scalability strategies, and performance optimization. Apply these principles to design systems that scale and maintain code quality at scale."
+    }
+  },
+  // BEGINNER LEVEL - React Tutorials
   {
     id: "beginner-1",
     title: "Introduction to React: Your First Component",
@@ -10,12 +3138,14 @@ export const tutorials: Tutorial[] = [
     estimatedTime: "45 min",
     topics: ["What is React", "JSX Basics", "Components", "Rendering"],
     prerequisites: ["Basic JavaScript knowledge", "HTML & CSS basics"],
+    videoUrl: "https://www.youtube.com/watch?v=SqcY0GlETPk", // React Tutorial for Beginners
     content: {
       overview: "React is a JavaScript library for building user interfaces. It lets you create reusable UI components and efficiently update them when your data changes. Created by Facebook (now Meta), React has become one of the most popular frontend frameworks, powering applications like Facebook, Instagram, Netflix, and many others. React's core philosophy is based on declarative programming - you describe what the UI should look like for any given state, and React takes care of efficiently updating the DOM when that state changes.",
       sections: [
         {
           title: "What is React and Why Use It?",
-          content: "React is a declarative, efficient, and flexible JavaScript library for building user interfaces. Instead of manually manipulating the DOM (like with vanilla JavaScript or jQuery), you describe what the UI should look like, and React efficiently updates it when your data changes.\n\nKey Advantages:\n• Component-Based Architecture: Break your UI into reusable, independent pieces\n• Declarative Syntax: Write what you want, not how to do it\n• Virtual DOM: React creates a virtual representation of the DOM for efficient updates\n• One-Way Data Flow: Data flows down from parent to child, making debugging easier\n• Rich Ecosystem: Massive community and library ecosystem\n• Learn Once, Write Anywhere: Works on web, mobile (React Native), and desktop (Electron)"
+          content: "React is a declarative, efficient, and flexible JavaScript library for building user interfaces. Instead of manually manipulating the DOM (like with vanilla JavaScript or jQuery), you describe what the UI should look like, and React efficiently updates it when your data changes.\n\nKey Advantages:\n• Component-Based Architecture: Break your UI into reusable, independent pieces\n• Declarative Syntax: Write what you want, not how to do it\n• Virtual DOM: React creates a virtual representation of the DOM for efficient updates\n• One-Way Data Flow: Data flows down from parent to child, making debugging easier\n• Rich Ecosystem: Massive community and library ecosystem\n• Learn Once, Write Anywhere: Works on web, mobile (React Native), and desktop (Electron)",
+          videoUrl: "https://www.youtube.com/watch?v=SqcY0GlETPk"
         },
         {
           title: "Setting Up a React Project",
@@ -24,6 +3154,7 @@ export const tutorials: Tutorial[] = [
         {
           title: "Creating Your First Component",
           content: "Components are the building blocks of React applications. They let you split the UI into independent, reusable pieces. Think of components like JavaScript functions - they accept inputs (called props) and return React elements describing what should appear on screen.\n\nThere are two ways to write components:\n1. Function Components (modern, recommended)\n2. Class Components (older, still supported but rarely used)\n\nFunction components are simpler and more modern. They're just JavaScript functions that return JSX.",
+          videoUrl: "https://www.youtube.com/watch?v=OzqR10jG1pg", // React Components Tutorial
           codeExample: {
             code: `// Simple function component
 function Welcome() {
@@ -56,6 +3187,7 @@ export function Header() {
         {
           title: "Understanding JSX Syntax",
           content: "JSX is a syntax extension for JavaScript that looks similar to HTML. It allows you to write HTML-like code in your JavaScript files. JSX gets transformed into React.createElement() calls, which create React elements.\n\nKey JSX Rules:\n• Must return a single root element (or use React Fragments)\n• Use className instead of class\n• Use camelCase for attributes (onClick, not onclick)\n• Self-closing tags must have a closing slash\n• JavaScript expressions go inside curly braces {}",
+          videoUrl: "https://www.youtube.com/watch?v=7fPXI_MnBOY", // React JSX Tutorial
           codeExample: {
             code: `// Basic JSX with JavaScript expressions
 const name = "Alice";
@@ -211,6 +3343,7 @@ function Good({ name }) {
     estimatedTime: "20 min",
     topics: ["Props", "Component Communication", "Prop Types", "Default Props"],
     prerequisites: ["Introduction to React"],
+    videoUrl: "https://www.youtube.com/watch?v=7fPXI_MnBOY", // React Props Tutorial - The Net Ninja
     content: {
       overview: "Props (short for properties) are how you pass data from parent components to child components. They make components reusable and dynamic. Props are React's way of making components customizable - like function parameters, but for components. Understanding props is fundamental to building React applications, as they enable the one-way data flow that makes React applications predictable and easy to debug.",
       sections: [
@@ -446,6 +3579,7 @@ function GoodList({ items }) {
     estimatedTime: "25 min",
     topics: ["State", "useState Hook", "Event Handlers", "State Updates"],
     prerequisites: ["Understanding Props"],
+    videoUrl: "https://www.youtube.com/watch?v=O6P86uwfdR0", // React useState Hook Tutorial
     content: {
       overview: "State allows components to create and manage their own data. When state changes, React re-renders the component to reflect the new data. State is what makes React components interactive - it enables components to 'remember' information and react to user interactions, API responses, and other changes over time. Unlike props (which come from parent components), state is internal to the component and can be updated using setter functions.",
       sections: [
@@ -456,6 +3590,7 @@ function GoodList({ items }) {
         {
           title: "The useState Hook Basics",
           content: "The useState hook lets you add state to functional components. It returns an array with the current state value and a function to update it. useState is the most commonly used React hook and is essential for building interactive components.",
+          videoUrl: "https://www.youtube.com/watch?v=O6P86uwfdR0", // React useState Hook Tutorial
           codeExample: {
             code: `import { useState } from 'react';
 
@@ -845,12 +3980,14 @@ function GoodList() {
     estimatedTime: "30 min",
     topics: ["Side Effects", "useEffect", "Dependency Arrays", "Cleanup"],
     prerequisites: ["Managing State with useState"],
+    videoUrl: "https://www.youtube.com/watch?v=0ZJgIjI4Ywc", // React useEffect Hook - Web Dev Simplified
     content: {
       overview: "Side effects are operations that affect something outside the component's render, like API calls, setting up subscriptions, or manually changing the DOM. React components are 'pure functions' - given the same props and state, they should always return the same JSX. But applications need to do things like fetch data, set up subscriptions, or update the DOM - these are 'side effects'. The useEffect hook is React's way of handling side effects in function components. Understanding useEffect is crucial for building real-world applications that interact with APIs, manage subscriptions, and handle cleanup.",
       sections: [
         {
           title: "Understanding Side Effects in React",
-          content: "In React, side effects are operations that interact with the outside world - anything that doesn't directly relate to rendering JSX. React components should be 'pure functions' that return JSX based on props and state, but real applications need to do more.\n\nCommon Side Effects:\n• Fetching data from an API\n• Setting up subscriptions (websockets, event listeners)\n• Manually changing the DOM (updating document title, focusing inputs)\n• Starting/stopping timers\n• Logging analytics\n• Reading from/writing to localStorage\n\nWhy useEffect?\n• Separates side effects from rendering logic\n• Runs after render, not during (won't block rendering)\n• Provides cleanup mechanism\n• Can control when effects run using dependencies"
+          content: "In React, side effects are operations that interact with the outside world - anything that doesn't directly relate to rendering JSX. React components should be 'pure functions' that return JSX based on props and state, but real applications need to do more.\n\nCommon Side Effects:\n• Fetching data from an API\n• Setting up subscriptions (websockets, event listeners)\n• Manually changing the DOM (updating document title, focusing inputs)\n• Starting/stopping timers\n• Logging analytics\n• Reading from/writing to localStorage\n\nWhy useEffect?\n• Separates side effects from rendering logic\n• Runs after render, not during (won't block rendering)\n• Provides cleanup mechanism\n• Can control when effects run using dependencies",
+          videoUrl: "https://www.youtube.com/watch?v=0ZJgIjI4Ywc" // React useEffect Explained
         },
         {
           title: "useEffect Basic Syntax",
@@ -889,6 +4026,7 @@ function Counter() {
         {
           title: "The Three Types of useEffect",
           content: "There are three main patterns for useEffect, each serving different purposes:\n\n1. Effect with no dependencies - runs after every render\n2. Effect with empty dependencies - runs once after mount\n3. Effect with dependencies - runs when dependencies change",
+          videoUrl: "https://www.youtube.com/watch?v=0ZJgIjI4Ywc", // useEffect Dependency Array Explained
           codeExample: {
             code: `// Pattern 1: Run after every render (rarely needed)
 useEffect(() => {
@@ -1037,6 +4175,7 @@ useEffect(() => {
         {
           title: "Data Fetching with useEffect",
           content: "Fetching data is one of the most common use cases for useEffect. However, there are important patterns to follow to handle loading states, errors, and cleanup properly.",
+          videoUrl: "https://www.youtube.com/watch?v=qdCHEUaFhBk", // React Data Fetching Tutorial
           codeExample: {
             code: `function UserProfile({ userId }) {
   const [user, setUser] = useState(null);
@@ -1244,6 +4383,7 @@ function UserProfile({ userId }) {
     estimatedTime: "90 min",
     topics: ["Composition", "Context API", "Prop Drilling", "Provider Pattern", "Children Props", "Render Props"],
     prerequisites: ["Side Effects and useEffect Hook"],
+    videoUrl: "https://www.youtube.com/watch?v=35lXWvCuM8o", // React Context API Tutorial - The Net Ninja
     content: {
       overview: "As React applications grow, passing props through many component levels becomes tedious and hard to maintain. Component composition and the Context API provide elegant solutions to these problems. This tutorial covers composition patterns (children, render props, compound components), the Context API for sharing data across the component tree, when to use each pattern, and how to avoid common pitfalls. You'll learn to build flexible, maintainable component architectures.",
       sections: [
@@ -6944,6 +10084,7 @@ function PaginatedList({ items }) {
     estimatedTime: "90 min",
     topics: ["Controlled Components", "Form Handling", "Validation", "useActionState", "useFormStatus", "Server Actions"],
     prerequisites: ["Managing State with useState"],
+    videoUrl: "https://www.youtube.com/watch?v=IkMND33x0qQ", // React Forms Tutorial - The Net Ninja
     content: {
       overview: "Forms are central to most web applications. This tutorial covers both traditional form handling with controlled components and modern React 19 patterns using useActionState and useFormStatus. You'll learn how to create forms with validation, handle submissions, manage form state, and leverage React 19's powerful form features for better developer experience and user experience.",
       sections: [
@@ -8224,6 +11365,7 @@ function KeyboardAccessibleForm() {
     estimatedTime: "90 min",
     topics: ["Error Boundaries", "Error Handling", "Fallback UI", "Error Logging", "Async Errors", "Error Recovery"],
     prerequisites: ["Handling Forms and User Input"],
+    videoUrl: "https://www.youtube.com/watch?v=2U9jJ9Riykk", // React Error Boundaries - Web Dev Simplified
     content: {
       overview: "Errors are inevitable in production applications. React error boundaries provide a way to catch JavaScript errors anywhere in the component tree and display fallback UI instead of crashing the entire app. This tutorial covers error boundaries (both class components and modern alternatives), error logging, handling async errors, form validation errors, error recovery patterns, and best practices for building resilient React applications. You'll learn to create graceful error experiences that inform users while providing developers with actionable error information.",
       sections: [
@@ -11211,6 +14353,7 @@ export function trackComponentUsage(componentName: string) {
     estimatedTime: "60 min",
     topics: ["TypeScript Basics", "Type Annotations", "Interfaces", "React with TypeScript", "Props Typing"],
     prerequisites: ["Introduction to React: Your First Component", "Basic JavaScript knowledge"],
+    videoUrl: "https://www.youtube.com/watch?v=BwuLxPH8IDs", // TypeScript Tutorial for Beginners - Programming with Mosh
     content: {
       overview: "TypeScript is JavaScript with type safety. It adds static typing to help catch errors during development, provides better IDE support, and makes your code more maintainable. This tutorial covers TypeScript fundamentals specifically for React developers. You'll learn how to type React components, props, state, and events. TypeScript helps prevent bugs, improves developer experience with autocomplete, and makes refactoring safer and easier.",
       sections: [
@@ -11513,6 +14656,7 @@ function UserProfile({ userId }: { userId: number }) {
     estimatedTime: "90 min",
     topics: ["Generics", "Utility Types", "Type Guards", "Advanced Patterns", "Type Narrowing"],
     prerequisites: ["TypeScript Basics for React Developers", "Component Composition and Context"],
+    videoUrl: "https://www.youtube.com/watch?v=Z5iWr6Srsj8", // TypeScript for React - Programming with Mosh
     content: {
       overview: "As you build more complex React applications, you'll encounter situations that require advanced TypeScript patterns. This tutorial covers generics for reusable components, utility types for transforming types, type guards for runtime type checking, and advanced patterns for complex scenarios. You'll learn how to create flexible, type-safe components that work with different data types while maintaining full type safety.",
       sections: [
@@ -12856,12 +16000,14 @@ function callService<
     estimatedTime: "60 min",
     topics: ["Throttling", "Debouncing", "Performance Optimization", "Event Handlers", "Custom Hooks", "API Optimization"],
     prerequisites: ["Managing State with useState", "Understanding useEffect", "Event Handling in React"],
+    videoUrl: "https://www.youtube.com/watch?v=cjIswDCKgu0", // Debounce and Throttle in JavaScript
     content: {
       overview: "Throttling and debouncing are essential techniques for optimizing performance in React applications. They help control how often functions execute, which is crucial for handling frequent events like scrolling, resizing, typing, or API calls. This tutorial covers the differences between throttling and debouncing, when to use each, and how to implement them effectively in React components using custom hooks.",
       sections: [
         {
           title: "Understanding Throttling vs Debouncing",
           content: "Throttling and debouncing are often confused, but they serve different purposes.\n\nThrottling:\n• Limits function execution to at most once per time period\n• Executes the function at regular intervals\n• Useful for events that fire continuously (scroll, resize, mousemove)\n• Example: Update scroll position indicator every 100ms\n\nDebouncing:\n• Delays function execution until after a period of inactivity\n• Executes only after user stops the action\n• Useful for events that should trigger after completion (search input, form validation)\n• Example: Search API call only after user stops typing for 300ms\n\nKey Difference:\n• Throttling: \"Execute at most once per X milliseconds\"\n• Debouncing: \"Execute only if X milliseconds have passed since last call\"\n\nVisual Analogy:\n• Throttling: Like a metronome - regular beats\n• Debouncing: Like an elevator - waits for everyone to get on before moving",
+          videoUrl: "https://www.youtube.com/watch?v=cjIswDCKgu0", // Debounce vs Throttle Explained
           codeExample: {
             code: `// Throttling: Execute at most once per 100ms
 // If called 10 times in 50ms, executes 2 times (at 0ms and 100ms)
@@ -12878,6 +16024,7 @@ function callService<
         {
           title: "Implementing Debouncing",
           content: "Debouncing is perfect for search inputs, form validation, and API calls triggered by user input.\n\nWhen to Use Debouncing:\n• Search input fields\n• Form validation on typing\n• API calls triggered by input\n• Window resize handlers (sometimes)\n• Auto-save functionality\n\nBenefits:\n• Reduces unnecessary API calls\n• Improves performance\n• Better user experience (less flickering)\n• Saves server resources\n\nImplementation Steps:\n1. Create a debounce function\n2. Use useMemo or useCallback to create debounced version\n3. Clean up on unmount\n4. Handle edge cases (immediate execution, cancellation)",
+          videoUrl: "https://www.youtube.com/watch?v=cjIswDCKgu0", // JavaScript Debounce Explained
           codeExample: {
             code: `// Basic debounce implementation
 function debounce<T extends (...args: unknown[]) => unknown>(
@@ -12984,6 +16131,7 @@ function debounceImmediate<T extends (...args: unknown[]) => unknown>(
         {
           title: "Implementing Throttling",
           content: "Throttling ensures functions execute at most once per time period, perfect for continuous events.\n\nWhen to Use Throttling:\n• Scroll event handlers\n• Window resize handlers\n• Mouse move tracking\n• Touch move events\n• Infinite scroll loading\n• Analytics tracking\n\nBenefits:\n• Prevents excessive function calls\n• Maintains responsiveness\n• Reduces performance impact\n• Smooth user experience\n\nImplementation Approaches:\n1. Leading edge: Execute immediately, then throttle\n2. Trailing edge: Execute at end of time period\n3. Both: Execute immediately and at end",
+          videoUrl: "https://www.youtube.com/watch?v=cjIswDCKgu0", // JavaScript Throttle Explained
           codeExample: {
             code: `// Basic throttle implementation (leading edge)
 function throttle<T extends (...args: unknown[]) => unknown>(
@@ -13088,6 +16236,7 @@ function ResponsiveComponent() {
         {
           title: "Custom React Hooks for Throttling and Debouncing",
           content: "Creating custom hooks makes throttling and debouncing reusable across components.\n\nBenefits of Custom Hooks:\n• Reusable logic\n• Clean component code\n• Proper cleanup handling\n• Type safety\n• Easy testing\n\nHook Design Considerations:\n• Handle cleanup on unmount\n• Support dependency arrays\n• Allow configuration (delay, immediate)\n• Return cancel function\n• TypeScript support",
+          videoUrl: "https://www.youtube.com/watch?v=6ThXsUwLWvc", // React Custom Hooks for Debounce/Throttle
           codeExample: {
             code: `// Custom useDebounce hook
 function useDebounce<T>(value: T, delay: number): T {
@@ -13525,12 +16674,14 @@ const DELAY_GUIDE = {
     estimatedTime: "50 min",
     topics: ["Conditional Rendering", "Lists", "Keys", "Array Methods", "Filtering", "Mapping"],
     prerequisites: ["Understanding Props", "Managing State with useState"],
+    videoUrl: "https://www.youtube.com/watch?v=7VO1LOzlgTE", // React Lists and Keys - The Net Ninja
     content: {
       overview: "Conditional rendering and lists are fundamental patterns in React. You'll frequently need to show or hide components based on conditions, and display collections of data. This tutorial covers all the ways to conditionally render content and how to properly render lists with keys for optimal performance.",
       sections: [
         {
           title: "Understanding Conditional Rendering",
           content: "Conditional rendering allows you to show or hide components based on conditions. React supports several patterns for conditional rendering.\n\nCommon Use Cases:\n• Show/hide components based on state\n• Display different content for logged in/out users\n• Show loading states\n• Display error messages conditionally\n• Render different components based on props\n\nWhy It's Important:\n• Creates dynamic, interactive UIs\n• Improves user experience\n• Reduces unnecessary DOM elements\n• Makes components more flexible",
+          videoUrl: "https://www.youtube.com/watch?v=7VO1LOzlgTE", // React Conditional Rendering
           codeExample: {
             code: `// Basic conditional rendering with if/else
 function Greeting({ isLoggedIn }) {
@@ -13640,6 +16791,7 @@ function TodoItem({ todo }) {
         {
           title: "Understanding Keys in Lists",
           content: "Keys are special string attributes you need to include when creating lists of elements. They help React identify which items have changed, been added, or removed.\n\nWhy Keys Matter:\n• Help React efficiently update the DOM\n• Preserve component state across re-renders\n• Prevent bugs when list order changes\n• Improve performance\n\nKey Rules:\n• Keys must be unique among siblings\n• Keys should be stable (don't use index if items can reorder)\n• Keys should be predictable (not random)\n• Keys only need to be unique within the same list\n\nWhat NOT to Use:\n• Don't use array index if items can be reordered\n• Don't use random values\n• Don't use keys that change on every render",
+          videoUrl: "https://www.youtube.com/watch?v=7VO1LOzlgTE", // React Lists and Keys Explained
           codeExample: {
             code: `// ✅ GOOD: Using unique IDs
 function UserList({ users }) {
@@ -13982,12 +17134,14 @@ function PaginatedList({ items, pageSize = 10 }) {
     estimatedTime: "45 min",
     topics: ["Event Handlers", "Synthetic Events", "Form Events", "Keyboard Events", "Event Binding", "Preventing Default"],
     prerequisites: ["Understanding Props", "Managing State with useState"],
+    videoUrl: "https://www.youtube.com/watch?v=4oV5GVEEow8", // React Events Tutorial - The Net Ninja
     content: {
       overview: "Event handling is how you make React components interactive. React uses SyntheticEvents - a wrapper around native browser events that provides consistent behavior across browsers. This tutorial covers all aspects of handling events in React, from simple clicks to complex form interactions.",
       sections: [
         {
           title: "Understanding React Events",
           content: "React events are similar to native DOM events, but with some important differences.\n\nKey Concepts:\n• React uses SyntheticEvents (cross-browser compatible)\n• Event handlers are passed as props (onClick, onChange, etc.)\n• Events are camelCase (onClick, not onclick)\n• Event handlers receive a SyntheticEvent object\n• React pools events for performance\n\nDifferences from Native Events:\n• Consistent across browsers\n• Events are pooled (for performance)\n• Can't access event asynchronously without special handling\n• Some events work differently (e.g., onChange fires on every keystroke)",
+          videoUrl: "https://www.youtube.com/watch?v=4oV5GVEEow8", // React Events Explained
           codeExample: {
             code: `// Basic event handler
 function Button() {
@@ -14434,12 +17588,14 @@ function Dropdown({ isOpen, onClose, children }) {
     estimatedTime: "75 min",
     topics: ["Component Composition", "Children Prop", "Render Props", "Compound Components", "Higher-Order Components", "Composition Patterns"],
     prerequisites: ["Understanding Props", "Managing State with useState", "Conditional Rendering and Lists"],
+    videoUrl: "https://www.youtube.com/watch?v=3aGSqasVPsI", // React Component Composition - Web Dev Simplified
     content: {
       overview: "Component composition is one of React's most powerful features. Instead of building monolithic components, you compose smaller, focused components together. This tutorial covers various composition patterns including children, render props, compound components, and higher-order components to create flexible, reusable component APIs.",
       sections: [
         {
           title: "Understanding Component Composition",
           content: "Component composition means building complex UIs by combining simpler components. It's the foundation of React's component model.\n\nBenefits:\n• Reusability - Use components in different contexts\n• Flexibility - Combine components in various ways\n• Maintainability - Smaller, focused components\n• Testability - Test components in isolation\n• Readability - Clear component structure\n\nComposition vs Inheritance:\n• React favors composition over inheritance\n• Use composition to share behavior\n• Components can contain other components\n• Props allow flexible composition",
+          videoUrl: "https://www.youtube.com/watch?v=3aGSqasVPsI", // React Component Composition
           codeExample: {
             code: `// Simple composition
 function Button({ children, onClick }) {
@@ -14508,6 +17664,7 @@ function App() {
         {
           title: "Using the Children Prop",
           content: "The children prop is a special prop that allows you to pass components as data to other components. It's one of the most powerful composition patterns.\n\nWhat is Children:\n• Special prop that contains content between component tags\n• Can be any valid React node\n• Can be a single element, array, or even a function\n• Makes components more flexible and reusable\n\nUse Cases:\n• Wrapper components (Card, Modal, Layout)\n• Container components\n• Higher-order components\n• Flexible component APIs",
+          videoUrl: "https://www.youtube.com/watch?v=3aGSqasVPsI", // React Children Prop Tutorial
           codeExample: {
             code: `// Basic children usage
 function Container({ children }) {
@@ -14601,6 +17758,7 @@ function ButtonList({ children }) {
         {
           title: "Render Props Pattern",
           content: "Render props is a pattern where a component receives a function as a prop that returns React elements. The component calls this function instead of implementing its own render logic.\n\nWhat are Render Props:\n• Component receives function as prop\n• Function receives data/state as arguments\n• Component calls function to render\n• Allows sharing logic between components\n\nBenefits:\n• Share stateful logic\n• Flexible rendering\n• Separation of concerns\n• Reusable logic\n\nCommon Use Cases:\n• Data fetching\n• Mouse tracking\n• Form state management\n• Theme providers",
+          videoUrl: "https://www.youtube.com/watch?v=BcVAq3YFiuc", // React Render Props Pattern
           codeExample: {
             code: `// Basic render prop
 function MouseTracker({ render }) {
@@ -14999,12 +18157,14 @@ function FormField({ label, error, children, config }) {
     estimatedTime: "60 min",
     topics: ["Custom Hooks", "Hook Rules", "Reusable Logic", "Hook Composition", "Testing Hooks", "Hook Patterns"],
     prerequisites: ["Managing State with useState", "Understanding useEffect", "Event Handling in React"],
+    videoUrl: "https://www.youtube.com/watch?v=6ThXsUwLWvc", // React Custom Hooks - Web Dev Simplified
     content: {
       overview: "Custom hooks are JavaScript functions that start with 'use' and can call other hooks. They allow you to extract component logic into reusable functions. Custom hooks are one of React's most powerful features for code reuse and organization. This tutorial covers how to create custom hooks, follow the rules of hooks, and build reusable logic that can be shared across components.",
       sections: [
         {
           title: "What are Custom Hooks",
           content: "Custom hooks are functions that encapsulate reusable logic using React hooks. They follow a simple naming convention and can use any React hooks inside them.\n\nKey Characteristics:\n• Functions that start with 'use'\n• Can call other hooks\n• Share stateful logic between components\n• Don't render anything themselves\n• Follow the same rules as regular hooks\n\nWhy Use Custom Hooks:\n• Reuse logic across components\n• Separate concerns\n• Make components cleaner\n• Test logic independently\n• Share logic with the community\n\nBenefits:\n• DRY (Don't Repeat Yourself)\n• Better organization\n• Easier testing\n• Reusable across projects",
+          videoUrl: "https://www.youtube.com/watch?v=6ThXsUwLWvc", // React Custom Hooks Tutorial
           codeExample: {
             code: `// Simple custom hook
 function useCounter(initialValue = 0) {
@@ -15064,6 +18224,7 @@ function ToggleButton() {
         {
           title: "Rules of Hooks",
           content: "Custom hooks must follow the same rules as regular hooks. Understanding these rules is crucial for writing correct custom hooks.\n\nRules of Hooks:\n1. Only call hooks at the top level\n   • Don't call inside loops, conditions, or nested functions\n   • Always call in the same order\n\n2. Only call hooks from React functions\n   • React function components\n   • Custom hooks (functions starting with 'use')\n   • Not from regular JavaScript functions\n\nWhy These Rules Exist:\n• React relies on call order to track hooks\n• Violating rules causes bugs\n• ESLint plugin helps catch violations\n\nCommon Mistakes:\n• Calling hooks conditionally\n• Calling hooks in loops\n• Calling hooks in regular functions\n• Calling hooks in event handlers",
+          videoUrl: "https://www.youtube.com/watch?v=TNhaISOUy6Q", // React Hooks Rules Explained
           codeExample: {
             code: `// ❌ BAD: Conditional hook call
 function BadComponent({ condition }) {
@@ -15134,6 +18295,7 @@ function useConditional(condition) {
         {
           title: "Common Custom Hook Patterns",
           content: "There are many common patterns for custom hooks. Learning these patterns helps you build reusable hooks effectively.\n\nCommon Patterns:\n• State management hooks (useToggle, useCounter)\n• Data fetching hooks (useFetch, useAPI)\n• DOM hooks (useWindowSize, useScrollPosition)\n• Form hooks (useForm, useInput)\n• Timer hooks (useInterval, useTimeout)\n• Storage hooks (useLocalStorage, useSessionStorage)\n• Media hooks (useMediaQuery, useAudio)\n\nPattern Structure:\n• Encapsulate related logic\n• Return values and functions\n• Handle cleanup\n• Provide sensible defaults",
+          videoUrl: "https://www.youtube.com/watch?v=6ThXsUwLWvc", // React Custom Hook Patterns
           codeExample: {
             code: `// Data fetching hook
 function useFetch(url) {
@@ -15564,12 +18726,14 @@ function useApiCall(url) {
     estimatedTime: "50 min",
     topics: ["Error Boundaries", "Error Handling", "Component Lifecycle", "Error Recovery", "Error Logging", "Fallback UI"],
     prerequisites: ["Understanding Props", "Managing State with useState", "Understanding useEffect"],
+    videoUrl: "https://www.youtube.com/watch?v=2U9jJ9Riykk", // React Error Boundaries - Web Dev Simplified
     content: {
       overview: "Error Boundaries are React components that catch JavaScript errors anywhere in their child component tree, log those errors, and display a fallback UI instead of crashing the entire application. They're essential for building robust production applications. This tutorial covers how to create Error Boundaries, handle different types of errors, and implement error recovery strategies.",
       sections: [
         {
           title: "Understanding Error Boundaries",
           content: "Error Boundaries are React components that catch errors in their child component tree. They're like try-catch blocks, but for React components.\n\nWhat Error Boundaries Do:\n• Catch errors during rendering\n• Catch errors in lifecycle methods\n• Catch errors in constructors\n• Display fallback UI\n• Log errors for debugging\n\nWhat They DON'T Catch:\n• Errors in event handlers\n• Errors in async code (setTimeout, promises)\n• Errors during server-side rendering\n• Errors in the Error Boundary itself\n\nWhy We Need Them:\n• Prevent entire app from crashing\n• Provide better user experience\n• Isolate errors to specific parts\n• Enable error recovery",
+          videoUrl: "https://www.youtube.com/watch?v=2U9jJ9Riykk", // React Error Boundaries Explained
           codeExample: {
             code: `// Basic Error Boundary (class component)
 class ErrorBoundary extends React.Component {
@@ -15657,6 +18821,7 @@ class ErrorBoundaryWithRecovery extends React.Component {
         {
           title: "Creating Error Boundaries",
           content: "Error Boundaries must be class components (as of React 16+). However, you can create reusable Error Boundary components and use them throughout your app.\n\nError Boundary Requirements:\n• Must be a class component\n• Must implement getDerivedStateFromError\n• Should implement componentDidCatch\n• Can have custom fallback UI\n• Can support error recovery\n\nBest Practices:\n• Create reusable Error Boundary components\n• Place them strategically in component tree\n• Provide helpful error messages\n• Log errors to monitoring service\n• Allow error recovery when possible",
+          videoUrl: "https://www.youtube.com/watch?v=2U9jJ9Riykk", // Creating React Error Boundaries
           codeExample: {
             code: `// Reusable Error Boundary component
 class ErrorBoundary extends React.Component {
@@ -16183,6 +19348,7 @@ function App() {
     estimatedTime: "70 min",
     topics: ["React.memo", "useMemo", "useCallback", "Performance Optimization", "Re-render Prevention", "Profiling"],
     prerequisites: ["Managing State with useState", "Understanding useEffect", "Understanding Props"],
+    videoUrl: "https://www.youtube.com/watch?v=0lJZg3g-ydE", // React Performance Optimization - Dev Ed
     content: {
       overview: "Performance optimization is crucial for building fast React applications. React.memo, useMemo, and useCallback are powerful tools for preventing unnecessary re-renders and expensive recalculations. This tutorial covers when and how to use these optimization techniques, how to measure performance, and best practices for optimizing React applications.",
       sections: [
@@ -16249,6 +19415,7 @@ function Parent() {
         {
           title: "Using React.memo",
           content: "React.memo is a higher-order component that memoizes the result of a component. It only re-renders if props have changed.\n\nWhat React.memo Does:\n• Memoizes component render result\n• Compares props (shallow comparison by default)\n• Skips re-render if props unchanged\n• Only works for functional components\n\nWhen to Use:\n• Component receives same props frequently\n• Component is expensive to render\n• Parent re-renders often\n• Props are primitive or stable references\n\nWhen NOT to Use:\n• Component always receives new props\n• Props change frequently\n• Optimization overhead > benefit\n• Premature optimization",
+          videoUrl: "https://www.youtube.com/watch?v=0lJZg3g-ydE", // React.memo Explained
           codeExample: {
             code: `// Component without memo (re-renders on every parent render)
 function ExpensiveChild({ name, age }) {
@@ -16322,6 +19489,7 @@ function Parent() {
         {
           title: "Using useMemo for Expensive Calculations",
           content: "useMemo memoizes the result of expensive calculations, only recalculating when dependencies change.\n\nWhat useMemo Does:\n• Memoizes calculation result\n• Only recalculates when dependencies change\n• Returns cached value otherwise\n• Helps prevent expensive recalculations\n\nWhen to Use:\n• Expensive calculations\n• Derived state from props/state\n• Creating objects/arrays for props\n• Filtering/sorting large arrays\n\nWhen NOT to Use:\n• Simple calculations\n• Values that change frequently\n• Premature optimization\n• When overhead > benefit",
+          videoUrl: "https://www.youtube.com/watch?v=THL1OPn72vo", // React useMemo Hook Tutorial
           codeExample: {
             code: `// Expensive calculation without memo
 function ProductList({ products, filter }) {
@@ -16402,6 +19570,7 @@ function ExpensiveCalculation({ n }) {
         {
           title: "Using useCallback for Stable Function References",
           content: "useCallback memoizes functions, returning the same function reference when dependencies haven't changed. This is crucial when passing functions as props to memoized components.\n\nWhat useCallback Does:\n• Memoizes function\n• Returns same reference if dependencies unchanged\n• Prevents unnecessary re-renders of child components\n• Works with React.memo\n\nWhen to Use:\n• Function passed to memoized component\n• Function in dependency array\n• Function passed to child via props\n• Expensive function creation\n\nWhen NOT to Use:\n• Function not passed as prop\n• Dependencies change frequently\n• Simple function creation\n• Premature optimization",
+          videoUrl: "https://www.youtube.com/watch?v=3Y3Y9v4f3VM", // React useCallback Hook Tutorial
           codeExample: {
             code: `// Function without useCallback
 function Parent() {
@@ -16492,6 +19661,7 @@ function Form() {
         {
           title: "Combining Optimization Techniques",
           content: "Often you need to combine React.memo, useMemo, and useCallback for optimal performance. Understanding how they work together is crucial.\n\nCombination Patterns:\n• React.memo + useCallback for props\n• React.memo + useMemo for object props\n• useMemo + useCallback together\n• Multiple optimizations in one component\n\nBest Practices:\n• Optimize only when needed\n• Measure performance first\n• Don't over-optimize\n• Use React DevTools Profiler\n• Test with realistic data",
+          videoUrl: "https://www.youtube.com/watch?v=0lJZg3g-ydE", // React Performance Optimization Complete Guide
           codeExample: {
             code: `// Optimized component with all techniques
 const OptimizedChild = React.memo(function Child({ 
@@ -16695,12 +19865,14 @@ const OPTIMIZATION_CHECKLIST = {
     estimatedTime: "75 min",
     topics: ["Interfaces", "Interface Declaration", "Extending Interfaces", "Optional Properties", "Readonly Properties", "Index Signatures", "Interface Merging"],
     prerequisites: ["TypeScript Basics for React Developers", "Understanding Props"],
+    videoUrl: "https://www.youtube.com/watch?v=0fUyMo5H2GE", // TypeScript Interfaces Tutorial
     content: {
       overview: "Interfaces are one of TypeScript's most powerful features for defining object shapes and contracts. They provide a way to describe the structure of objects, function parameters, and return types. This comprehensive tutorial covers everything you need to know about interfaces: declaring them, extending them, using optional and readonly properties, index signatures, and best practices for using interfaces in React applications.",
       sections: [
         {
           title: "Understanding Interfaces",
           content: "Interfaces define the shape of objects in TypeScript. They describe what properties an object should have and their types.\n\nWhat are Interfaces:\n• Contracts that objects must follow\n• Define object structure\n• Provide type checking\n• Enable autocomplete in IDEs\n• Serve as documentation\n\nWhy Use Interfaces:\n• Type safety at compile time\n• Better IDE support\n• Self-documenting code\n• Catch errors early\n• Refactoring safety\n\nInterface vs Type:\n• Interfaces: Can be extended and merged\n• Types: More flexible, can represent unions, intersections, etc.\n• Both can describe object shapes\n• Choose based on use case",
+          videoUrl: "https://www.youtube.com/watch?v=0fUyMo5H2GE", // TypeScript Interfaces Tutorial
           codeExample: {
             code: `// Basic interface declaration
 interface User {
@@ -16839,6 +20011,7 @@ function Card({ title, description, id, onClick }: CardProps) {
         {
           title: "Extending and Implementing Interfaces",
           content: "Interfaces can extend other interfaces, allowing you to build complex type hierarchies and reuse interface definitions.\n\nExtending Interfaces:\n• Use extends keyword\n• Inherit all properties from parent\n• Can add new properties\n• Can override property types (with constraints)\n• Supports multiple inheritance\n\nInterface Inheritance:\n• Child interface includes all parent properties\n• Can add additional properties\n• Type-safe and checked at compile time\n• Useful for component prop hierarchies\n\nMultiple Inheritance:\n• Interfaces can extend multiple interfaces\n• Combine properties from multiple sources\n• Order matters for property conflicts\n\nBest Practices:\n• Keep interfaces focused\n• Use composition over deep inheritance\n• Name interfaces clearly\n• Document complex interfaces",
+          videoUrl: "https://www.youtube.com/watch?v=0fUyMo5H2GE", // TypeScript Interface Extension
           codeExample: {
             code: `// Basic interface extension
 interface Animal {
@@ -17326,6 +20499,7 @@ interface User {
     estimatedTime: "80 min",
     topics: ["Type Aliases", "Union Types", "Intersection Types", "Literal Types", "Template Literal Types", "Mapped Types", "Conditional Types"],
     prerequisites: ["TypeScript Basics for React Developers", "TypeScript Interfaces: Comprehensive Guide"],
+    videoUrl: "https://www.youtube.com/watch?v=30LWjhZzg50", // Learn TypeScript Full Tutorial - freeCodeCamp
     content: {
       overview: "Type aliases provide a way to create new names for types, making complex types reusable and readable. Combined with union types, intersection types, and advanced TypeScript features, type aliases enable powerful type declarations. This tutorial covers everything from basic type aliases to advanced patterns like conditional types and template literal types, giving you the tools to create flexible and expressive type systems.",
       sections: [
@@ -17403,6 +20577,7 @@ type TUser = {
         {
           title: "Union Types",
           content: "Union types allow a value to be one of several types. They're created using the | operator and are one of TypeScript's most powerful features.\n\nWhat are Union Types:\n• Value can be one of multiple types\n• Created with | operator\n• TypeScript narrows type based on usage\n• Essential for flexible APIs\n• Enable type-safe alternatives\n\nUse Cases:\n• Function parameters that accept multiple types\n• API responses with different shapes\n• Component props with variants\n• State that can be different types\n• Error handling\n\nType Narrowing:\n• TypeScript narrows union types\n• Use typeof, instanceof, or type guards\n• Enables type-safe code\n• Prevents runtime errors",
+          videoUrl: "https://www.youtube.com/watch?v=30LWjhZzg50", // TypeScript Union Types
           codeExample: {
             code: `// Basic union type
 type StringOrNumber = string | number;
@@ -17487,6 +20662,7 @@ const arr: MixedArray = ["hello", 42, "world", 100];`,
         {
           title: "Intersection Types",
           content: "Intersection types combine multiple types into one. A value must satisfy all types in the intersection. Created using the & operator.\n\nWhat are Intersection Types:\n• Combines multiple types\n• Value must satisfy ALL types\n• Created with & operator\n• Useful for mixing types\n• Similar to extending interfaces\n\nUse Cases:\n• Combining object types\n• Mixing interfaces\n• Adding properties to existing types\n• Creating complex types from simple ones\n• Extending types without modification\n\nIntersection vs Union:\n• Intersection (&): Must satisfy ALL types\n• Union (|): Must satisfy ONE type\n• Use intersection to combine\n• Use union for alternatives",
+          videoUrl: "https://www.youtube.com/watch?v=30LWjhZzg50", // TypeScript Intersection Types
           codeExample: {
             code: `// Basic intersection type
 type Person = {
@@ -17989,12 +21165,14 @@ function FlexibleComponent(props: ComponentProps) {
     estimatedTime: "70 min",
     topics: ["Generics", "Generic Functions", "Type Inference", "Generic Constraints", "createContext Pattern", "Type Parameters"],
     prerequisites: ["TypeScript Basics for React Developers", "TypeScript Interfaces: Comprehensive Guide"],
+    videoUrl: "https://www.youtube.com/watch?v=nViEqpgwxHE", // TypeScript Generics Tutorial - Programming with Mosh
     content: {
       overview: "Generics allow you to create functions, components, and types that work with multiple types while maintaining type safety. They enable dynamic typing where the type is determined by how the function is called. This tutorial covers how to create generic functions like React's createContext, understand type inference, use generic constraints, and build flexible, reusable functions that adapt to different types.",
       sections: [
         {
           title: "Understanding Generics",
           content: "Generics are TypeScript's way of creating reusable code that works with multiple types. They allow you to write functions and types that are flexible yet type-safe.\n\nWhat are Generics:\n• Type parameters that make code flexible\n• Written with angle brackets: <T>\n• Type is determined when function is called\n• Maintains type safety\n• Enables code reuse\n\nWhy Use Generics:\n• Write code once, use with many types\n• Maintain type safety\n• Better than using 'any'\n• Enables type inference\n• Common in libraries and frameworks\n\nBasic Syntax:\n• function name<T>(param: T): T\n• T is a type variable\n• Can use any name (T, U, V, Item, Value, etc.)\n• Type is inferred from usage",
+          videoUrl: "https://www.youtube.com/watch?v=nViEqpgwxHE", // TypeScript Generics Explained
           codeExample: {
             code: `// Function without generics (not flexible)
 function getFirst(arr: number[]): number {
@@ -18040,6 +21218,7 @@ const [user, setUser] = useState<User | null>(null); // T is User | null`,
         {
           title: "How createContext Works with Generics",
           content: "React's createContext is a perfect example of a generic function. It creates a context that can hold any type, and TypeScript infers the type from the initial value you provide.\n\ncreateContext Pattern:\n• Generic function: createContext<T>\n• Takes initial value of type T\n• Returns Context with type T\n• Type is inferred from initial value\n• Can be explicitly typed\n\nUnderstanding the Pattern:\n• Function accepts type parameter\n• Type can be inferred or explicit\n• Return type uses the type parameter\n• Maintains type safety throughout\n\nWhy This Pattern is Powerful:\n• One function works with any type\n• Type safety is maintained\n• TypeScript knows the exact type\n• Autocomplete works perfectly",
+          videoUrl: "https://www.youtube.com/watch?v=nViEqpgwxHE", // TypeScript Generics with React Context
           codeExample: {
             code: `// How createContext is defined (simplified)
 function createContext<T>(defaultValue: T): Context<T> {

@@ -22,6 +22,7 @@ export interface Tutorial {
     code: string;
     explanation: string;
   }[];
+  videoUrl?: string; // Main tutorial video URL (YouTube)
 }
 
 export interface TutorialSection {
@@ -32,5 +33,6 @@ export interface TutorialSection {
     explanation: string;
   };
   interactive?: boolean;
+  videoUrl?: string; // YouTube video URL or ID
 }
 
